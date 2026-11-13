@@ -1,6 +1,6 @@
 /* 自動更新が止まっていたら、画面の上で知らせる（古い情報を新しいと思わせないため）。外部への通信はしない。 */
 (function () {
-  var b = document.body;
+  var b = document.querySelector("[data-generated]") || document.body;
   var gen = Date.parse(b.getAttribute("data-generated"));
   var hours = parseFloat(b.getAttribute("data-stale-hours") || "72");
   if (!gen || isNaN(gen)) return;
