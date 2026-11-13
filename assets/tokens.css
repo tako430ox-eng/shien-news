@@ -1,7 +1,7 @@
 /* ==========================================================================
-   ひだまり デザイントークン v1.0（2026-11-13）
+   ひだまり デザイントークン v1.2（2026-11-13。v1.2 は「道しるべ（大胆）」：緑の看板・強い枠の緊急タイル。v1.1 の付箋・蛍光ペン・方眼・手書き風は不採用で削除）
    プロジェクト「社会的弱者の救済」の共通デザインの決まり。
-   行動支援の試作（家賃の次の一歩）と、支援情報の自動更新サイトで共有する。
+   行動支援の試作（くらしの非常口）と、支援情報の自動更新サイトで共有する。
    値を直接書かず、必ずこの変数を使うこと。説明は README.md。
    ========================================================================== */
 :root {
@@ -26,6 +26,10 @@
   --c-ok: #1d6b3a;            /* 完了・成功 */
   --c-ok-bg: #e6f3ea;
   --c-info-bg: #eaf2f8;       /* 中立のお知らせ（更新情報など） */
+  --c-sign: #0e6655;          /* 看板（ページ上部の緑の面） v1.2 */
+  --c-sign-ink: #ffffff;      /* 看板の上の文字 v1.2 */
+  --c-sign-accent: #ffd54a;   /* 看板の上で強調する文字（黄色） v1.2 */
+  --c-tile-edge: #1e2433;     /* 緊急タイルの太い枠と影 v1.2 */
 
   /* ---- 文字 ---- */
   --f-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
@@ -59,7 +63,7 @@
     --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
     --c-line: #303644; --c-line-strong: #7f8798;
     --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
-    --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36;
+    --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36; --c-sign: #123f36; --c-sign-ink: #ffffff; --c-sign-accent: #ffd54a; --c-tile-edge: #b0b6c3;
     --shadow-1: none; color-scheme: dark;
   }
 }
@@ -67,6 +71,6 @@
   --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
   --c-line: #303644; --c-line-strong: #7f8798;
   --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
-  --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36;
+  --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36; --c-sign: #123f36; --c-sign-ink: #ffffff; --c-sign-accent: #ffd54a; --c-tile-edge: #b0b6c3;
   --shadow-1: none; color-scheme: dark;
 }

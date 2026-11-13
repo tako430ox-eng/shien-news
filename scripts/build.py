@@ -91,20 +91,24 @@ class Site:
         sample = ""
         if self.sample:
             sample = '<div class="sample">画面の確認用の見本です。並んでいる項目は2026年11月12〜13日に各機関の新着一覧に実際に出ていた見出しの一部で、公開後は毎日の自動取得の結果に置き換わります。</div>'
+        brand = e(self.cfg.get("brand", self.cfg["name"]))
+        logo = '<svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>'
+        path = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>'
         if hero:
             top = f"""<header class="hero">
- <span class="strip lines" aria-hidden="true"></span>
- <h1>{e(self.cfg['name'])}</h1>
- <p class="lead">{e(self.cfg['tagline'])}</p>
+ <div class="brandrow">{logo}<span class="brand">{brand}</span><span class="tag">新着まとめ</span></div>
+ <h1>国の支援の<em>新着</em>を、<br>毎日まとめて。</h1>
+ <p class="lead">暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選んでいます。</p>
  <ul class="promise" aria-label="このページの約束">
-  <li>国の公式ページから自動で集めています</li><li>見出しは公式のまま</li><li>無料・登録なし</li><li>あなたの情報は集めません</li>
+  <li>国の公式から</li><li>見出しはそのまま</li><li>無料・登録なし</li><li>情報は集めません</li>
  </ul>
- <a class="jump" href="#help">いま困っていることがある人は、相談先へ（このページの下）</a>
+ <a class="jump" href="#help">いま困っていることがある人は、相談先へ ↓</a>
+ {path}
 </header>"""
         else:
-            top = f"""<header class="hero">
- <span class="strip lines" aria-hidden="true"></span>
- <a class="brand" href="{up}index.html">← {e(self.cfg['name'])}（トップへ）</a>
+            top = f"""<header class="hero hero-sub">
+ <div class="brandrow">{logo}<a class="brand" href="{up}index.html">{brand} 新着</a></div>
+ {path}
 </header>"""
         return f"""{sample}<div class="page">
 {top}
@@ -232,7 +236,6 @@ class Site:
         body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, hero=True)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
-        body.append(f'<p class="small">{e(desc)} 見出しは公式のまま、リンク先は公式ページです。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
         body.append('<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。</p>')

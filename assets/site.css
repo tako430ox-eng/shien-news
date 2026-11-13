@@ -19,7 +19,6 @@ a { color: var(--c-link); text-underline-offset: 3px; }
 
 /* ---- 最初の画面 ---- */
 .hero { display: grid; gap: var(--s-3); }
-.brand { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--c-ink-soft); font-weight: 700; text-decoration: none; font-size: var(--fs-small); }
 .strip { display: block; height: 10px; border-radius: 3px; }
 .hero h1 { font-size: var(--fs-h1); letter-spacing: 0.02em; }
 .hero .lead { font-size: var(--fs-lead); line-height: 1.65; font-weight: 700; }
@@ -92,3 +91,22 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .talk .n { font-family: var(--f-num); font-size: var(--fs-small); color: var(--c-ink-soft); font-weight: 400; }
 .talk-list { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); }
 .more-link { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
+
+/* ---- v1.2 道しるべ：緑の看板と黄色い道（design-system/components.css の v1.2 と同じ） ---- */
+.hero { background: var(--c-sign); color: var(--c-sign-ink); gap: var(--s-3);
+  margin: calc(-1 * var(--s-5)) calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0;
+  padding: var(--s-4) max(16px, env(safe-area-inset-left, 0px)) 0; overflow: hidden; }
+@media (min-width: 44rem) { .hero { border-radius: 0 0 var(--r-md) var(--r-md); } }
+.brandrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.brandrow .logo { width: 30px; height: 30px; flex: none; }
+.brandrow .brand { font-family: var(--f-display); font-weight: 900; font-size: 1.0625rem; letter-spacing: 0.06em; color: var(--c-sign-ink); text-decoration: none; display: inline-flex; align-items: center; min-height: var(--tap); }
+.brandrow .tag { margin-left: auto; font-size: 0.8125rem; font-weight: 700; color: var(--c-sign-ink); border: 1px solid rgba(255,255,255,0.6); padding: 0 10px; border-radius: var(--r-pill); }
+.hero h1 { font-weight: 900; line-height: 1.3; letter-spacing: 0; font-size: clamp(1.75rem, 7.2vw, 2.5rem); }
+.hero h1 em { font-style: normal; color: var(--c-sign-accent); }
+.hero .lead { color: var(--c-sign-ink); }
+.promise li { padding: 4px 12px 4px 10px; background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); color: var(--c-sign-ink); }
+.promise li::before { background: var(--c-sign-accent); }
+.hero .jump { color: var(--c-sign-ink); }
+.sign-path { display: block; width: calc(100% + 32px); height: 26px; margin: -4px -16px 0; }
+h2 { font-weight: 900; }
+@media print { .hero { background: none; color: var(--c-ink); margin: 0; padding: 0; } .hero h1 em, .hero .lead, .hero .jump, .brandrow .brand { color: var(--c-ink); } .sign-path, .brandrow .logo { display: none; } .brandrow .tag { color: var(--c-ink); border-color: var(--c-line-strong); } .promise li { color: var(--c-ink); background: none; } }
