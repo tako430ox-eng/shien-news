@@ -229,7 +229,7 @@ class Site:
     # ------------------------------------------------------------ ページ
     def page_index(self) -> str:
         desc = "生活・住まい・仕事・障害・子ども・高齢・外国籍の人に関わる国のお知らせの新着を、公式ページから毎日自動で集めて分野ごとに並べています。"
-        body = [self.head(self.cfg["name"] + "｜国の支援やお知らせの新着", desc, "index.html", 0), self.header(0, hero=True)]
+        body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, hero=True)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<p class="small">{e(desc)} 見出しは公式のまま、リンク先は公式ページです。</p>')
@@ -250,7 +250,7 @@ class Site:
         items = [it for it in self.useful if slug in it["topics"]]
         talk = [it for it in self.talk if slug in it["topics"]]
         desc = f"「{t['label']}」に関わる国の支援やお知らせの新着です。公式ページから毎日自動で集めています。"
-        body = [self.head(f"{t['label']}の新着｜{self.cfg['name']}", desc, f"t/{slug}.html", 1), self.header(1)]
+        body = [self.head(f"{t['label']}の支援制度・お知らせ 新着｜{self.cfg.get('brand', self.cfg['name'])}", desc, f"t/{slug}.html", 1), self.header(1)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">{e(t["label"])}の新着</h1><p class="lead">{e(desc)}</p>')
@@ -265,7 +265,7 @@ class Site:
 
     def page_talk(self) -> str:
         desc = "審議会・検討会の開催、意見募集、調査の結果など、国で話し合っていることの一覧です。まだ決まっていないことで、いま使える支援ではありません。"
-        body = [self.head(f"国で話し合っていること｜{self.cfg['name']}", desc, "talk.html", 0), self.header(0)]
+        body = [self.head(f"国で話し合っていること（審議会・意見募集）｜{self.cfg.get('brand', self.cfg['name'])}", desc, "talk.html", 0), self.header(0)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">国で話し合っていること</h1><p class="lead">{e(desc)}</p>')
@@ -291,7 +291,7 @@ class Site:
                         f'<td><a href="{e(s["license_url"])}" rel="noopener">{e(s["license"])}</a></td></tr>')
         kinds = "".join(f'<li><b>{e(k["label"])}</b>：{e(k["hint"])}</li>' for k in list(self.kinds.values()))
         desc = "このページのしくみ、出典、情報源の状態、利用条件について。"
-        body = [self.head(f"このページについて｜{self.cfg['name']}", desc, "about.html", 0), self.header(0)]
+        body = [self.head(f"このページについて｜{self.cfg.get('brand', self.cfg['name'])}", desc, "about.html", 0), self.header(0)]
         body.append(f"""<main id="main" class="prose">
 <h1 class="h1">このページについて</h1>
 <h2>何をしているページか</h2>

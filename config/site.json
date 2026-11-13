@@ -1,6 +1,6 @@
 {
  "_説明": "サイトの名前や公開先。名前と見た目はデザイン・届け方の担当と相談して変えてよい。base_url は公開先が決まったら書き換える。",
- "name": "くらしの支援 新着",
+ "name": "くらしの非常口 新着",
  "tagline": "国の支援やお知らせの新着を、毎日自動で集めています",
  "base_url": "https://tako430ox-eng.github.io/shien-news/",
  "repo_url": "https://github.com/tako430ox-eng/shien-news",
@@ -29,12 +29,13 @@
  ],
  "tools": [
   {
-   "label": "家賃が払えない・払えなくなりそうなとき：次の一歩を一緒に決める",
+   "label": "家賃が払えないとき、電話で何て言う？（くらしの非常口）",
    "url": "https://claude.ai/artifact/8kG4acRDsv8anrWNJLF5bX",
    "topics": [
     "housing",
     "money"
    ]
   }
- ]
+ ],
+ "brand": "くらしの非常口"
 }
