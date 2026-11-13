@@ -1,0 +1,39 @@
+# 週1回（月曜 日本時間 8:23）、行動支援の試作が出典にしている公式ページの変化を調べる。
+name: 出典ページの変化の見張り
+on:
+  schedule:
+    - cron: "23 23 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 見張る
+        run: python scripts/watch.py --report watch_report.md
+      - name: 状態を保存
+        run: |
+          git config user.name "shien-news-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/watch_state.json
+          if ! git diff --cached --quiet; then
+            git commit -m "出典ページの確認 $(TZ=Asia/Tokyo date '+%Y-%m-%d')"
+            git pull --rebase && git push
+          fi
+      - name: 変化があれば Issue で知らせる
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f watch_report.md ]; then
+            gh label create "出典の変化" --color 0E6655 --force >/dev/null 2>&1 || true
+            gh issue create --title "出典ページに変化がありました（$(TZ=Asia/Tokyo date '+%Y-%m-%d')）" --label "出典の変化" --body-file watch_report.md
+          fi

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel rdf:about="x"><title>t</title><link>x</link><dc:date>2024-09-30T00:00:00+09:00</dc:date></channel>
+<item rdf:about="https://example.go.jp/a"><title><![CDATA[テストの見出し]]></title><link>https://example.go.jp/a</link><dc:date>2026-11-12T17:24:00+09:00</dc:date></item>
+</rdf:RDF>

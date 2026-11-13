@@ -1,0 +1,78 @@
+{
+ "_説明": "情報源の一覧。publish が auto のものは自動で公開、review のものは候補として記録するだけで公開しない。license はその情報源の利用条件。確認日は checked。",
+ "sources": [
+  {
+   "id": "mhlw",
+   "name": "厚生労働省",
+   "type": "html_list",
+   "url": "https://www.mhlw.go.jp/stf/new-info/index.html",
+   "item_href": "^https://www\\.mhlw\\.go\\.jp/(stf|topics|toukei|content)/",
+   "strip_prefixes": [
+    "報道発表",
+    "審議会等",
+    "採用情報",
+    "その他",
+    "政策について",
+    "お知らせ",
+    "統計情報",
+    "NEW"
+   ],
+   "publish": "auto",
+   "license": "公共データ利用規約（第1.0版）",
+   "license_url": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "credit": "出典：厚生労働省ホームページ",
+   "note": "厚生労働省のRSS（news.rdf）は「その情報に基づいたホームページの作成、情報の再配布」を断っているため使わない。サイト本体のコンテンツ（この新着一覧ページを含む）は公共データ利用規約（第1.0版）で出典の記載を条件に利用できる。解釈に疑問が残るため、厚生労働省への確認を推奨（報告書を参照）。",
+   "checked": "2026-11-13"
+  },
+  {
+   "id": "cfa",
+   "name": "こども家庭庁",
+   "type": "html_list",
+   "url": "https://www.cfa.go.jp/news",
+   "item_href": "^https://www\\.cfa\\.go\\.jp/(press|councils|policies|speech|notice)/",
+   "strip_prefixes": [
+    "報道発表",
+    "会議等",
+    "会見",
+    "政策",
+    "お知らせ"
+   ],
+   "publish": "auto",
+   "license": "公共データ利用規約（第1.0版）",
+   "license_url": "https://www.cfa.go.jp/copyright-policy",
+   "credit": "出典：こども家庭庁ホームページ",
+   "checked": "2026-11-13",
+   "default_topics": [
+    "children"
+   ]
+  },
+  {
+   "id": "isa",
+   "name": "出入国在留管理庁",
+   "type": "html_list",
+   "url": "https://www.moj.go.jp/isa/publications/newslist/index.html",
+   "item_href": "^https://www\\.moj\\.go\\.jp/isa/",
+   "exclude_href": "/isa/publications/newslist/",
+   "strip_prefixes": [],
+   "publish": "auto",
+   "license": "公共データ利用規約（第1.0版）",
+   "license_url": "https://www.moj.go.jp/isa/copyright/index2.html",
+   "credit": "出典：出入国在留管理庁ホームページ",
+   "checked": "2026-11-13",
+   "default_topics": [
+    "foreign"
+   ]
+  },
+  {
+   "id": "digital",
+   "name": "デジタル庁",
+   "type": "rss",
+   "url": "https://www.digital.go.jp/rss/news.xml",
+   "publish": "auto",
+   "license": "公共データ利用規約（第1.0版）",
+   "license_url": "https://www.digital.go.jp/copyright-policy",
+   "credit": "出典：デジタル庁ホームページ",
+   "checked": "2026-11-13"
+  }
+ ]
+}

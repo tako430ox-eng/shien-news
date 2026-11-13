@@ -1,0 +1,30 @@
+{
+ "_説明": "行動支援の試作（家賃の次の一歩）が出典にしている公式ページ。内容が変わったら、人が試作の文面を見直すために知らせる。公開はしない（変化の検知だけ）。ignore は毎回変わってしまう部分（アクセス数など）を無視する正規表現。",
+ "used_by": "/mnt/project-files/action-support/app/index.html",
+ "pages": [
+  {"url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html", "what": "生活困窮者自立支援制度（厚生労働省）"},
+  {"url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html", "what": "生活保護制度（厚生労働省）"},
+  {"url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html", "what": "ハローワーク（厚生労働省）"},
+  {"url": "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel", "what": "電話相談の窓口（まもろうよ こころ）"},
+  {"url": "https://www.mhlw.go.jp/content/000697946.pdf", "what": "厚生労働省の資料（PDF）"},
+  {"url": "https://www.mhlw.go.jp/content/000626250.pdf", "what": "厚生労働省の資料（PDF）"},
+  {"url": "https://sumakoma.mhlw.go.jp/wiki/", "what": "すまこま。"},
+  {"url": "https://www.notalone-cao.go.jp/", "what": "あなたはひとりじゃない（内閣府）"},
+  {"url": "https://www.gender.go.jp/policy/no_violence/e-vaw/index.html", "what": "DV相談（内閣府男女共同参画局）"},
+  {"url": "https://www.houterasu.or.jp/", "what": "法テラス"},
+  {"url": "https://top.com-pass.site/", "what": "COMPASS（もやい）"},
+  {"url": "https://minna-tunagaru.jp/ichiran/", "what": "自立相談支援機関の一覧（みんなつながるネットワーク）"},
+  {"url": "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi", "what": "生活福祉資金（東京都）"},
+  {"url": "https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf", "what": "緊急小口資金のパンフレット（愛知県社協、PDF）"},
+  {"url": "https://www.pref.chiba.lg.jp/kenshidou/seikatsuhogo/seikatsuhogoseido.html", "what": "生活保護（千葉県）"},
+  {"url": "https://www.pref.fukuoka.lg.jp/contents/jyukyokakuho.html", "what": "住居確保給付金（福岡県）"},
+  {"url": "https://www.pref.tottori.lg.jp/secure/1073822/konkyo_1_1.pdf", "what": "鳥取県の資料（PDF）"},
+  {"url": "https://www.city.hamamatsu.shizuoka.jp/fukushisomu/jyuukyokakuho.html", "what": "住居確保給付金（浜松市）"},
+  {"url": "https://www.city.ota.tokyo.jp/seikatsu/fukushi/jyuutaku-kakuho-kyuufu-kin.html", "what": "住居確保給付金（大田区）"},
+  {"url": "https://www.city.setagaya.lg.jp/02409/1025.html", "what": "世田谷区のページ"},
+  {"url": "https://www.city.nagoya.jp/kenkofukushi/fukushi/1016735/1016740.html", "what": "名古屋市のページ"},
+  {"url": "https://www.city.funabashi.lg.jp/kenkou/korena/001/p087737.html", "what": "船橋市のページ"},
+  {"url": "https://www.city.bunkyo.lg.jp/b019/p003121.html", "what": "文京区のページ"}
+ ],
+ "ignore": ["閲覧数", "アクセス数", "ページ番号", "^\\d+$"]
+}

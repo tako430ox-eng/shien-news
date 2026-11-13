@@ -1,0 +1,63 @@
+# 1日2回（日本時間 7:17 と 18:17）、情報源を読みに行き、サイトを作り直して公開する。
+name: 新着の取得と公開
+on:
+  schedule:
+    - cron: "17 22 * * *"
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["config/**", "assets/**", "scripts/**", "data/notes.json", "data/deadlines.json"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  issues: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: テスト
+        run: python -m unittest discover -s tests
+      - name: 新着を取得
+        run: python scripts/update.py
+      - name: サイトを作る
+        run: python scripts/build.py --out site
+      - name: 取得結果を保存（変化があるときだけ）
+        run: |
+          git config user.name "shien-news-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/items.json data/health.json
+          if ! git diff --cached --quiet; then
+            git commit -m "新着の取得 $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
+            git pull --rebase && git push
+          fi
+      - name: 取れない情報源があれば Issue で知らせる（3回続けて失敗したとき）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/health_report.py > health_report.md || true
+          if [ -s health_report.md ]; then
+            n=$(gh issue list --state open --label "情報源の不調" --json number --jq '.[0].number')
+            if [ -z "$n" ]; then
+              gh label create "情報源の不調" --color B42318 --force >/dev/null 2>&1 || true
+              gh issue create --title "情報源から新着が取れていません" --label "情報源の不調" --body-file health_report.md
+            fi
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: 公開
+        uses: actions/deploy-pages@v4

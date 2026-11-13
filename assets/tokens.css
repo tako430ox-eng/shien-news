@@ -1,0 +1,72 @@
+/* ==========================================================================
+   ひだまり デザイントークン v1.0（2026-11-13）
+   プロジェクト「社会的弱者の救済」の共通デザインの決まり。
+   行動支援の試作（家賃の次の一歩）と、支援情報の自動更新サイトで共有する。
+   値を直接書かず、必ずこの変数を使うこと。説明は README.md。
+   ========================================================================== */
+:root {
+  /* ---- 色：基本 ---- */
+  --c-bg: #faf6ef;          /* 紙のような温かい白（ページの背景） */
+  --c-surface: #ffffff;     /* カード・入力欄 */
+  --c-sunken: #f1ebe0;      /* 一段沈んだ面（補足・ヒント） */
+  --c-ink: #1e2433;         /* 本文の文字 */
+  --c-ink-soft: #545b6b;    /* 補足の文字（背景どれでも 4.5:1 以上） */
+  --c-line: #e4dccd;        /* 区切り線（飾り。部品の境界には使わない） */
+  --c-line-strong: #857c6c; /* 入力欄・選択肢の枠（3:1 以上） */
+
+  /* ---- 色：意味 ---- */
+  --c-primary: #0e6655;       /* 行動（押す・電話する）。深い緑 */
+  --c-primary-ink: #ffffff;   /* primary の上の文字 */
+  --c-primary-soft: #e3f1ec;  /* 選んだもの・やさしい強調の面 */
+  --c-link: #0b5f73;          /* 文中のリンク（下線つき） */
+  --c-path: #f2b705;          /* 道しるべの黄色（点字ブロックの色。飾り専用、文字に使わない） */
+  --c-path-groove: rgba(0, 0, 0, 0.18);
+  --c-warn: #b42318;          /* 緊急・注意の文字と線 */
+  --c-warn-bg: #fdecea;
+  --c-ok: #1d6b3a;            /* 完了・成功 */
+  --c-ok-bg: #e6f3ea;
+  --c-info-bg: #eaf2f8;       /* 中立のお知らせ（更新情報など） */
+
+  /* ---- 文字 ---- */
+  --f-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic", "Meiryo", sans-serif;
+  --f-num: "BIZ UDGothic", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  --fs-small: 0.9375rem;   /* 15px 補足（これより小さくしない） */
+  --fs-body: 1.0625rem;    /* 17px 本文 */
+  --fs-lead: 1.1875rem;    /* 19px 導入・大事な一文 */
+  --fs-h3: 1.25rem;        /* 20px */
+  --fs-h2: 1.5rem;         /* 24px */
+  --fs-h1: clamp(1.875rem, 7vw, 2.5rem); /* 30〜40px */
+  --lh-body: 1.8;
+  --lh-tight: 1.45;
+  --measure: 40rem;        /* 1行の長さの上限（約35〜40字） */
+
+  /* ---- 余白（4の倍数） ---- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px;
+
+  /* ---- 形 ---- */
+  --r-sm: 10px;   /* 入力欄・小さなボタン */
+  --r-md: 16px;   /* カード */
+  --r-pill: 999px;/* 選択肢・電話ボタン */
+  --shadow-1: 0 1px 2px rgba(30, 36, 51, 0.06), 0 6px 20px rgba(30, 36, 51, 0.06);
+  --tap: 44px;    /* 押せる部品の最小の高さ */
+  --focus: 0 0 0 3px var(--c-bg), 0 0 0 6px var(--c-link);
+}
+
+/* ---- 暗い画面設定のとき ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
+    --c-line: #303644; --c-line-strong: #7f8798;
+    --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
+    --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36;
+    --shadow-1: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
+  --c-line: #303644; --c-line-strong: #7f8798;
+  --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
+  --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36;
+  --shadow-1: none; color-scheme: dark;
+}
