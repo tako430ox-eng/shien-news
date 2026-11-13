@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 正本: /mnt/project-files/action-support/app/index.html（sha256 先頭 5a116d05c6d7）。scripts/publish_app.py で作った。直接は編集しない。 -->
+<!-- 正本: /mnt/project-files/action-support/app/index.html（sha256 先頭 b5b9209e4150）。scripts/publish_app.py で作った。直接は編集しない。 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -267,11 +267,11 @@ h2 { font-weight: 900; }
       <span class="brand">くらしの非常口</span><span class="tag">試作版</span>
     </div>
     <h1>家賃が払えない。<br><em>今日やること</em>は、ひとつ。</h1>
-    <p class="lead">電話で読める文と、行く先を出します。</p>
+    <p class="lead">電話で言うことと、相談先を出します。</p>
     <ul class="promise" aria-label="このページの約束">
       <li>お金は求めません</li>
       <li>入力は送りません</li>
-      <li>決めるのは窓口</li>
+      <li>使えるかは窓口で</li>
       <li>家族と使えます</li>
     </ul>
     <svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>
@@ -280,12 +280,12 @@ h2 { font-weight: 900; }
   <section id="safety" class="stack-lg" aria-labelledby="safety-h">
     <div class="section-head">
       <h2 id="safety-h">いま、こんなことはありますか</h2>
-      <p>当てはまれば押してください。すぐ下に行く先を出します。なければ、そのまま下へ。</p>
+      <p>当てはまるものを押してください。すぐ下に相談先が出ます。なければ、そのまま下へ進んでください。</p>
     </div>
     <div class="opts tiles" role="group" aria-label="今すぐの危険">
       <label class="opt"><input type="checkbox" id="s_night" data-safety="night"><span>今夜、寝る場所がない</span></label>
       <label class="opt"><input type="checkbox" id="s_food" data-safety="food"><span>今日・明日の食べ物やお金がない</span></label>
-      <label class="opt"><input type="checkbox" id="s_life" data-safety="life"><span>体や心が危ない・死にたいほどつらい</span></label>
+      <label class="opt"><input type="checkbox" id="s_life" data-safety="life"><span>命の危険がある・死にたいほどつらい</span></label>
       <label class="opt"><input type="checkbox" id="s_dv" data-safety="dv"><span>暴力から逃げている・逃げたい</span></label>
     </div>
     <div id="urgentOut" aria-live="polite"></div>
@@ -300,7 +300,7 @@ h2 { font-weight: 900; }
       <span class="small muted">検索ボタンを押したときだけ、検索する言葉が Google に送られます。</span>
     </div>
     <div id="findOut"></div>
-    <p><a class="more" href="#situation">もっとくわしく：状況に合わせた手順・持ち物・聞くことを作る ↓</a></p>
+    <p><a class="more" href="#situation">もっとくわしく：状況に合わせて、手順・持ち物・窓口で聞くことを出す ↓</a></p>
   </section>
 
   <section id="situation" class="stack-lg" aria-labelledby="situation-h">
@@ -319,7 +319,7 @@ h2 { font-weight: 900; }
       <input type="date" id="payday">
     </div>
     <details>
-      <summary>電話で言う文に、名前や部屋番号を入れる（入れなくても使えます）</summary>
+      <summary>電話で言うことに、名前や部屋番号を入れる（入れなくても使えます）</summary>
       <div class="two" style="margin-top:10px">
         <div class="field"><label for="pname">名前</label><input type="text" id="pname" autocomplete="off" placeholder="例：山田"></div>
         <div class="field"><label for="room">部屋番号</label><input type="text" id="room" autocomplete="off" placeholder="例：203"></div>
@@ -332,7 +332,7 @@ h2 { font-weight: 900; }
   <section id="plan" class="stack-lg" aria-labelledby="plan-h">
     <div class="section-head">
       <h2 id="plan-h"><span class="stepno">2</span>やること（順番どおり）</h2>
-      <p>上から順に。終わったら「終わった」に印をつけます。言う文は、そのまま読み上げてかまいません。</p>
+      <p>上から順に進めてください。終わったら「終わった」に印をつけてください。電話で言うことは、そのまま読み上げてかまいません。</p>
       <p id="daysOut"></p>
     </div>
     <ol class="plan" id="planOut"></ol>
@@ -341,7 +341,7 @@ h2 { font-weight: 900; }
   <section id="candidates" class="stack-lg" aria-labelledby="cand-h">
     <div class="section-head">
       <h2 id="cand-h"><span class="stepno">3</span>窓口で聞いてみる制度</h2>
-      <p>窓口で名前を出して聞いてみる価値がありそうな制度です。押すと、理由と聞くことが開きます。<strong>受けられるかどうかは、窓口で決まります。</strong>金額や上限は地域で違うため、出していません。</p>
+      <p>窓口で制度の名前を出して、聞いてみるとよいものです。押すと、ここに出した理由と、窓口で聞くことが開きます。<strong>受けられるかどうかは、窓口で決まります。</strong>金額や上限は地域で違うため、出していません。</p>
       <p class="small">もっと広く探すとき：<a href="https://sumakoma.mhlw.go.jp/wiki/" target="_blank" rel="noopener">すまこま。（厚生労働省）</a>、<a href="https://top.com-pass.site/" target="_blank" rel="noopener">COMPASS 支援検索ナビ（もやい）</a>、<a href="https://www.notalone-cao.go.jp/" target="_blank" rel="noopener">あなたはひとりじゃない（内閣府）</a></p>
     </div>
     <div class="cands" id="candOut" aria-live="polite"></div>
@@ -351,7 +351,7 @@ h2 { font-weight: 900; }
   <section id="after" class="stack-lg" aria-labelledby="after-h">
     <div class="section-head">
       <h2 id="after-h"><span class="stepno">4</span>相談のあとで、どうなりましたか</h2>
-      <p>うまくいかなくても大丈夫です。結果を選ぶと、次の一歩を出します。</p>
+      <p>うまくいかなくても大丈夫です。結果を選ぶと、次にやることが出ます。</p>
     </div>
     <div class="opts" role="radiogroup" aria-label="相談の結果" id="afterOpts"></div>
     <div id="afterOut" aria-live="polite"></div>
@@ -389,12 +389,12 @@ h2 { font-weight: 900; }
 
   <section class="tip stack small" aria-label="支える人へ">
     <strong>隣で支える人へ</strong>
-    <p>研究では、制度の情報を見せるだけより、手続きを一緒にする方が利用につながりやすいことが示されています。電話をかけるときに隣にいる、持ち物を一緒にそろえる、窓口に付き添う、が役に立ちます。お金を個人的に貸すことは避け、専門の窓口につなぐ役に徹してください。</p>
+    <p>研究では、制度の情報を見せるだけより、手続きを一緒にする方が利用につながりやすいことが示されています。電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことが役に立ちます。お金を個人的に貸すのは避けてください。支える人の役目は、専門の窓口につなぐことです。</p>
   </section>
 
   <footer>
-    <p>このページは、プロジェクト「生活再建・機会接続プラットフォーム」の試作版です（第5版、2026年11月13日更新）。制度の内容は、下の出典で確認したものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
-    <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。書類はご本人が作るための手伝いです。</p>
+    <p>このページは「くらしの非常口」の試作版です（第5.1版、2026年11月13日更新）。制度の内容は、下の出典で確認したものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
+    <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。ご本人が自分で書類をそろえ、窓口で話すための手伝いです。</p>
     <p>このページは、入力された内容をどこにも送りません。外のサイトへのリンク、検索ボタン、電話のボタンは、押したときだけ動きます。</p>
     <p><strong>お金を求める人に注意してください。</strong>窓口への相談や申請は無料です。手数料や成功報酬を求める業者、決まった住まいや病院を使うことを条件にする人には注意してください。困ったときは、消費者ホットライン <a href="tel:188">188</a> に相談できます。</p>
     <p><a href="../unei.html">運営者と連絡先</a> ・ <a href="../">支援の新着（くらしの非常口 新着）</a></p>
@@ -414,45 +414,45 @@ h2 { font-weight: 900; }
 
   // ---- data: questions ----
   var QUESTIONS = [
-    { id: "rent", q: "家賃の状況は", opts: [
+    { id: "rent", q: "家賃はどんな状況ですか", opts: [
       ["soon", "今月は払えるが、来月以降が不安"],
       ["now", "次の家賃が払えない"],
       ["late1", "すでに1か月分たまっている"],
       ["late2", "2か月分以上たまっている"],
       ["evict", "出ていくよう言われた・鍵を替えられた"]
     ]},
-    { id: "reason", q: "収入が減ったきっかけは", opts: [
-      ["jobloss", "仕事を辞めた・失った・店をやめた"],
+    { id: "reason", q: "収入が減ったきっかけは何ですか", opts: [
+      ["jobloss", "仕事を辞めた・失った・店を閉めた"],
       ["cut", "仕事やシフトが減った・休業になった"],
       ["sick", "病気やけがで働けなくなった"],
-      ["pension", "年金だけでは足りない（仕事は失っていない）"],
+      ["pension", "年金だけでは足りない（仕事を失ったわけではない）"],
       ["other", "そのほか・わからない"]
     ]},
-    { id: "when", q: "それはいつごろ", opts: [
+    { id: "when", q: "それはいつごろですか", opts: [
       ["within2", "2年以内"],
       ["over2", "2年より前"],
       ["unknown", "わからない"]
     ]},
-    { id: "money", q: "手持ちのお金（貯金をふくむ）で、あとどのくらい暮らせそう", opts: [
-      ["none", "1週間くらいまで"],
+    { id: "money", q: "手持ちのお金（貯金をふくむ）で、あとどのくらい暮らせそうですか", opts: [
+      ["none", "長くて1週間くらい"],
       ["little", "1か月くらい"],
       ["some", "数か月はもつ"]
     ]},
-    { id: "outlook", q: "これから収入が戻る見込みは", opts: [
+    { id: "outlook", q: "これから収入が戻る見込みはありますか", opts: [
       ["back", "近いうちに戻りそう（就職が決まった、など）"],
       ["no", "見込みがない・わからない"]
     ]},
-    { id: "work", q: "仕事について", opts: [
+    { id: "work", q: "仕事について、近いものを選んでください", opts: [
       ["yes", "仕事を探したい・探している"],
       ["hard", "体調などで、今は探すのが難しい"],
       ["retired", "年齢などで、仕事は考えていない"]
     ]},
-    { id: "move", q: "今の家について", opts: [
+    { id: "move", q: "今の家について、近いものを選んでください", opts: [
       ["no", "今の家に住み続けたい"],
-      ["ok", "家賃の安いところへの引っ越しも考えてもいい"],
+      ["ok", "家賃の安いところへ引っ越してもいい"],
       ["flee", "暴力などの事情で、今の家を出たい"]
     ]},
-    { id: "debt", q: "家賃のほかに、借金や返せていない支払いは", opts: [
+    { id: "debt", q: "家賃のほかに、借金や返せていない支払いはありますか", opts: [
       ["yes", "ある"],
       ["no", "ない"]
     ]},
@@ -460,7 +460,7 @@ h2 { font-weight: 900; }
       ["no", "受けていない"],
       ["yes", "受けている"]
     ]},
-    { id: "nat", q: "国籍（答えなくてもかまいません。使える制度の説明が変わります）", opts: [
+    { id: "nat", q: "国籍はどちらですか（答えなくてもかまいません。答えると、制度の説明が国籍に合ったものになります）", opts: [
       ["jp", "日本国籍"],
       ["foreign", "日本以外の国籍"]
     ]}
@@ -518,7 +518,7 @@ h2 { font-weight: 900; }
     jukyo: {
       name: "住居確保給付金（家賃の補助）", where: "総合窓口",
       plain: "仕事を失ったり収入が大きく減ったりした人に、家賃にあたる額（上限あり）を原則3か月、条件によって最長9か月まで、自治体が大家さんや不動産会社に直接払う制度です。",
-      ask: ["住居確保給付金の対象になるか、収入と貯金で確認してください", "この地域の家賃の上限と、求職活動として必要なこと（回数）を教えてください", "決まるまで、どのくらいかかりますか。その間の家賃はどうすればいいですか"],
+      ask: ["私の収入と貯金で、住居確保給付金の対象になるか確かめてください", "この地域の家賃の上限と、求職活動として必要なこと（回数）を教えてください", "決まるまで、どのくらいかかりますか。その間の家賃はどうすればいいですか"],
       bring: ["jobloss", "bank", "contract"],
       caution: "収入と貯金の上限、家賃の上限は自治体ごとに違います。受けている間は、窓口との面談やハローワークでの相談、求人への応募など、決められた求職活動が必要です。国籍の条件はありません（厚生労働省のQ&A）。",
       local: true, src: ["hamamatsu", "ota", "fukuoka", "jukyoQA"]
@@ -534,7 +534,7 @@ h2 { font-weight: 900; }
     koguchi: {
       name: "緊急小口資金（社会福祉協議会の無利子の貸付）", where: "社会福祉協議会（総合窓口でも聞けます）",
       plain: "一時的に生活費が足りないときに、少額を無利子で借りられる制度です。申込みは住んでいる市区町村の社会福祉協議会です。",
-      ask: ["緊急小口資金を借りられますか。受け取るまで何日かかり、いつから返しますか"],
+      ask: ["緊急小口資金を借りられますか。受け取るまで何日かかり、いつから返すことになりますか"],
       bring: ["id", "income", "seal", "bank"],
       caution: "借りたお金は返す必要があります。借金の返済には使えません。原則として、総合窓口（自立相談支援機関）の支援を受けることが条件になっています（愛知県の案内による）。受け取るまで最短でも5営業日ほどかかるとされているため、今日・明日のお金がないときは、福祉事務所にも相談してください。",
       local: true, src: ["aichiShakyo", "tokyoShakyo"]
@@ -546,7 +546,7 @@ h2 { font-weight: 900; }
       bring: ["id", "bank", "contract"],
       caution: "「生活保護の申請は、国民の権利です」（千葉県）。家族が援助してくれないことを理由に受けられない、ということはありません（文京区）。申請書を出すのが原則ですが、出せない特別な事情があれば、申請書がなくても申請できます（厚生労働省）。家や車を持っていても認められる場合があります（千葉県）。",
       local: false, src: ["mhlwHogo", "chibaHogo", "bunkyoHogo"],
-      extra: { label: "申請書を前もって作るなら", html: '<a href="https://top.com-pass.site/" target="_blank" rel="noopener">COMPASS の PASS（もやいの生活保護申請書作成）</a>で作った申請書を持っていく方法があります。このページでは申請書は作りません。<br>申請したい気持ちを窓口ではっきり伝えるためのメモは、「相談のあと」で「使えないと言われた」を選ぶと出ます。' }
+      extra: { label: "申請書を前もって作るなら", html: '<a href="https://top.com-pass.site/" target="_blank" rel="noopener">COMPASS の PASS（もやいの生活保護申請書作成）</a>で作った申請書を持っていく方法があります。このページでは申請書は作りません。<br>申請したい気持ちを窓口ではっきり伝えるためのメモは、「4 相談のあとで、どうなりましたか」で「使えないと言われた」を選ぶと出ます。' }
     },
     houterasu: {
       name: "法テラス（無料の法律相談の案内）", where: "法テラス（電話）",
@@ -559,7 +559,7 @@ h2 { font-weight: 900; }
     },
     hellowork: {
       name: "ハローワーク（仕事さがし・職業訓練）", where: "ハローワーク",
-      plain: "仕事の紹介と、無料の職業訓練の案内を受けられます。住居確保給付金を受けるときの求職活動も、ここでの相談がふくまれます。",
+      plain: "仕事の紹介と、無料の職業訓練の案内を受けられます。住居確保給付金を受けている間に必要な求職活動には、ハローワークでの相談もふくまれます。",
       ask: ["すぐに働ける仕事を探しています。住居確保給付金の求職活動としての相談もしたいです"],
       bring: ["id", "resume"],
       caution: "", local: true, src: ["hellowork"]
@@ -640,19 +640,19 @@ h2 { font-weight: 900; }
   }
   function callerIsSupporter() { return state.supporter; }
   function supIntro() {
-    var who = state.name.trim() ? state.name.trim() + "さん" : "相談したい本人";
-    return who + "の" + (state.rel.trim() || "家族") + "です。本人がとなりにいて、本人の了解を得てお電話しています。";
+    var who = state.name.trim() ? state.name.trim() + "さん" : "相談したい人";
+    return who + "の" + (state.rel.trim() || "家族") + "です。本人の了解を得て、隣にいる本人に代わってお電話しています。";
   }
   function callScript() {
-    var foreign = has("nat", "foreign") ? "日本以外の国籍です。" : "";
+    var foreign = has("nat", "foreign") ? "国籍は日本ではありません。" : "";
     if (callerIsSupporter()) {
       return supIntro() + "本人の状況をお伝えします。" + situationSentence() + foreign + "住居確保給付金など、使える制度について相談したいです。相談の予約はできますか。持っていくものも教えてください。当日は私も一緒に行ってもかまいませんか。";
     }
     var me = state.name.trim() ? state.name.trim() + "と申します。" : "";
     return me + "家賃のことで相談したくて電話しました。" + situationSentence() + foreign + "住居確保給付金など、使える制度について相談したいです。相談の予約はできますか。持っていくものも教えてください。";
   }
-  var EVICT_SCRIPT = "家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少なく、無料で相談できる方法を教えてください。";
-  var DAIHYO = "生活のことで困っています。家賃が払えず、相談できる窓口につないでください。（自立相談支援機関、または生活困窮の相談窓口、と言われる窓口です）";
+  var EVICT_SCRIPT = "家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少ないので、無料で相談できる方法を教えてください。";
+  var DAIHYO = "生活のことで困っています。家賃が払えないので、相談できる窓口につないでいただけますか。（「自立相談支援機関」や「生活困窮者の相談窓口」と呼ばれる窓口です）";
   function isLate() {
     var dl = daysLeft();
     return any("rent", ["late1", "late2", "evict"]) || (dl !== null && dl < 0);
@@ -660,10 +660,10 @@ h2 { font-weight: 900; }
   function landlordScript() {
     var who = (state.room.trim() ? state.room.trim() + "号室の" : "") + (state.name.trim() || "");
     var intro = who ? who + "です。" : "";
-    if (has("rent", "evict")) return intro + "家賃が遅れていることは承知しています。収入が減ったためです。いま役所の窓口と、法律の相談窓口に相談しています。結果が出るまで、少しお待ちいただけないでしょうか。結果がわかり次第ご連絡します。";
-    if (isLate()) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いの方法について、ご相談させてください。";
-    if (has("rent", "soon")) return intro + "収入が減り、来月以降の家賃のお支払いが難しくなりそうです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
-    return intro + "収入が減り、次の家賃を期日までにお支払いできない見込みです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+    if (has("rent", "evict")) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。いま役所の窓口と、法律の相談窓口に相談しています。結果が出るまで、少しお待ちいただけないでしょうか。結果がわかり次第ご連絡します。";
+    if (isLate()) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。いま役所の窓口で、家賃を補助する制度について相談しています。結果がわかり次第ご連絡します。お支払いの方法について、ご相談させてください。";
+    if (has("rent", "soon")) return intro + "収入が減り、来月以降の家賃のお支払いが難しくなりそうです。いま役所の窓口で、家賃を補助する制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+    return intro + "収入が減り、次の家賃を期日までにお支払いできない見込みです。いま役所の窓口で、家賃を補助する制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
   }
   function sayBox(id, text, label) {
     return '<div class="say"><span class="small muted">' + esc(label || "言うこと（そのまま読んでかまいません）") + '</span><p class="text" id="say_' + id + '">' + esc(text) + '</p><div class="row"><button class="copy" type="button" data-copy-from="say_' + id + '">この文をコピー</button></div></div>';
@@ -675,7 +675,7 @@ h2 { font-weight: 900; }
     return '<div class="notice"><strong>いまは役所が閉まっている時間かもしれません</strong>' +
       '<span>多くの役所は平日の昼間だけ開いています（祝日は休み）。今夜できることは次のとおりです。</span>' +
       '<ol style="margin:0;padding-left:1.2em;display:grid;gap:6px">' +
-      '<li>住んでいる（いる場所の）<strong>市区町村の代表番号</strong>に電話して「今夜寝る場所がありません。緊急の生活の相談をしたいです」と伝える。国は、役所が閉まる年末年始などに、当番の職員が連絡を受けられる体制をつくるよう自治体に依頼しています（厚生労働省）。夜間・土曜の専用の電話窓口がある自治体もあります（例：名古屋市）。<strong>すべての自治体・時間で対応しているわけではありません。</strong></li>' +
+      '<li>住んでいる市区町村（または今いる場所の市区町村）の<strong>代表番号</strong>に電話して「今夜寝る場所がありません。緊急の生活の相談をしたいです」と伝える。国は、役所が閉まる年末年始などに、当番の職員が連絡を受けられる体制をつくるよう自治体に依頼しています（厚生労働省）。夜間・土曜の専用の電話窓口がある自治体もあります（例：名古屋市）。<strong>すべての自治体・時間で対応しているわけではありません。</strong></li>' +
       '<li>つながらないとき、一人でいるのがつらいときは、24時間の電話相談で話を聞いてもらう。' + contact("", YORISOI[0], YORISOI[1]) + '</li>' +
       '<li>危険が迫っているときは 110。体の具合が悪いときは 119。</li>' +
       '<li>' + esc(nextWeekdayLabel()) + 'いちばんに、福祉事務所へ行く（上の文を言う）。</li>' +
@@ -684,7 +684,7 @@ h2 { font-weight: 900; }
   function renderUrgent() {
     var s = state.safety, parts = [], yShown = false;
     if (s.night || s.food) {
-      parts.push('<div class="contact"><span class="who">住んでいる（いる場所の）市区町村の福祉事務所（役所の生活保護の担当）へ</span><span>住まいのない人に、一時的な宿泊場所と食事を用意する事業がある地域もあります。福祉事務所のない町村は、町村役場でも申請できます。</span></div>');
+      parts.push('<div class="contact"><span class="who">住んでいる市区町村（または今いる場所の市区町村）の福祉事務所（役所の生活保護の担当）へ</span><span>住まいのない人に、一時的な宿泊場所と食事を用意する事業がある地域もあります。福祉事務所がない町村に住んでいる人は、町村役場でも申請できます。</span></div>');
       parts.push(sayBox("urgent", urgentScript(), "福祉事務所で言うこと"));
       if (!officeOpen()) { parts.push(nightBlock()); yShown = true; }
       else if (!s.life) { parts.push(contact("つらいとき・話を聞いてほしいとき", YORISOI[0], YORISOI[1])); yShown = true; }
@@ -699,11 +699,11 @@ h2 { font-weight: 900; }
       parts.push(contact("暴力から逃げたいとき（危険が迫っているときは 110）", "#8008", "DV相談ナビ。近くの相談窓口につながります（内閣府）。受付時間は窓口ごとに違います"));
       parts.push(contact("", "0120-279-889", "DV相談＋（プラス）。24時間。チャットやメールの相談もあります"));
       parts.push('<span class="small">相手にこのページを見られそうなときは、画面の下の「すぐ閉じる」を押してください。画面と選んだ内容を消して、別のページに切り替えます。ブラウザの閲覧履歴には残るので、必要なら履歴も消してください。「この端末に保存」は押さないでください。</span>');
-      parts.push('<span class="small">逃げた先でも、生活保護や住まいの相談はできます。家族に居場所を知られたくない事情は、窓口で伝えてください（親族への連絡を見合わせられる場合があります）。下の「窓口に見せるメモ」に、その一文を入れることもできます。</span>');
+      parts.push('<span class="small">逃げた先でも、生活保護や住まいの相談はできます。家族に居場所を知られたくない事情は、窓口で伝えてください（親族への連絡を控えてもらえる場合があります）。下の「窓口や支援者に見せるメモ」に、その一文を入れることもできます。</span>');
     }
     if (!parts.length) { $("urgentOut").innerHTML = ""; return; }
     var html = parts.join("");
-    $("urgentOut").innerHTML = '<div class="urgent"><span class="dots" aria-hidden="true"></span><div class="inner"><h3>今すぐ行く先</h3>' + html + '<span class="small">この下の質問は、落ち着いてからで大丈夫です。</span></div></div>';
+    $("urgentOut").innerHTML = '<div class="urgent"><span class="dots" aria-hidden="true"></span><div class="inner"><h3>今すぐの相談先</h3>' + html + '<span class="small">この下の質問は、落ち着いてからで大丈夫です。</span></div></div>';
   }
 
   // ---- candidate logic ----
@@ -714,42 +714,43 @@ h2 { font-weight: 900; }
     var foreign = has("nat", "foreign");
     var pensionOnly = has("reason", "pension");
     var retired = has("work", "retired");
-    c.push({ id: "jiritsu", why: "家賃や生活の困りごとは、まずここが入口です。どの答えでも出しています。" });
+    c.push({ id: "jiritsu", why: "家賃や生活の困りごとは、まずここが入口です。どの答えを選んでも出しています。" });
 
     if (onHogo) {
       ex.push("生活保護を受けている場合、住居確保給付金は対象外とする自治体があります（大田区は明記）。家賃のことは、担当のケースワーカーに相談してください。");
     } else if (pensionOnly) {
       ex.push("住居確保給付金は、仕事を失った人や、仕事が減って収入が大きく減った人のための制度です。年金だけでは足りない場合は、総合窓口や福祉事務所（生活保護）で相談してください。");
     } else if (has("when", "over2")) {
-      ex.push("住居確保給付金は、原則として仕事を失った（収入が減った）日から2年以内が対象です。ただし病気などで求職活動ができなかった期間は加えられる場合があるので、総合窓口で事情を話してください。");
+      ex.push("住居確保給付金は、原則として仕事を失った（収入が減った）日から2年以内が対象です。ただし、病気などで求職活動ができなかった期間があれば、その分だけ2年より長く認められる場合があります。総合窓口で事情を話してください。");
     } else {
       var why = "収入が減って家賃が払えない人のための制度です。";
       if (has("reason", "sick")) why += "病気で仕事を辞めた場合も対象になることがありますが、受けている間は求職活動が必要です。";
       if (retired) why += "受けている間は求職活動が必要なため、仕事を考えていない場合は、窓口でほかの制度も聞いてください。";
       if (unset("reason") || unset("when")) why += "（まだ選んでいない質問があるため、広めに出しています）";
       c.push({ id: "jukyo", why: why });
-      if (has("move", "ok")) c.push({ id: "tenkyo", why: "引っ越しも考えられると選んだためです。家賃が下がって家計が良くなる場合の補助です。" });
+      if (has("move", "ok")) c.push({ id: "tenkyo", why: "「家賃の安いところへ引っ越してもいい」を選んだためです。家賃が下がって家計が良くなる場合の補助です。" });
     }
 
     if (!onHogo && !pensionOnly && !retired && (has("money", "little") || has("outlook", "back"))) {
-      c.push({ id: "koguchi", why: has("outlook", "back") ? "収入が戻る見込みがあり、それまでの一時的な不足を補う使い方に合います。" : "手持ちが1か月ほどのため、一時的な不足を補う選択肢として出しています。返す必要があります。" });
+      c.push({ id: "koguchi", why: has("outlook", "back") ? "収入が戻る見込みがあり、それまでの一時的な不足を補う使い方に合います。" : "手持ちのお金が1か月分ほどのため、一時的な不足を補う方法として出しています。返す必要があります。" });
     }
     if (!onHogo && (has("money", "none") || has("work", "hard") || urgent || pensionOnly || (retired && !has("money", "some")))) {
       var w = [];
-      if (has("money", "none")) w.push("手持ちのお金が1週間ほどまで");
-      if (has("work", "hard")) w.push("今は仕事を探すのが難しい");
+      if (has("money", "none")) w.push("手持ちのお金で暮らせるのは長くて1週間くらい");
+      if (has("work", "hard")) w.push("体調などで、今は仕事を探すのが難しい");
       if (pensionOnly) w.push("年金だけでは足りない");
-      else if (retired) w.push("年齢などで仕事は考えていない");
-      if (urgent) w.push("今日・明日の寝る場所やお金がない");
-      var hw = w.join("、") + "と選んだためです。収入や貯金が国の基準より少なければ、受けられる可能性があります。";
+      else if (retired) w.push("年齢などで、仕事は考えていない");
+      if (state.safety.night) w.push("今夜、寝る場所がない");
+      if (state.safety.food) w.push("今日・明日の食べ物やお金がない");
+      var hw = "「" + w.join("」「") + "」を選んだためです。収入や貯金が国の基準より少なければ、受けられる可能性があります。";
       if (foreign) hw += "外国籍の人は、在留資格などによって対象にならない場合があります（下の「知っておくこと」）。まず総合窓口か福祉事務所で確かめてください。";
       c.push({ id: "hogo", why: hw });
     }
     if (has("debt", "yes") || has("rent", "evict")) {
-      c.push({ id: "houterasu", why: has("rent", "evict") ? "出ていくよう言われた・鍵を替えられたと選んだためです。法律の相談先です。" : "借金や返せていない支払いがあると選んだためです。" });
+      c.push({ id: "houterasu", why: has("rent", "evict") ? "「出ていくよう言われた・鍵を替えられた」を選んだためです。法律の相談先です。" : "借金や返せていない支払いが「ある」を選んだためです。" });
     }
     if (has("work", "yes")) {
-      c.push({ id: "hellowork", why: "仕事を探したいと選んだためです。住居確保給付金の求職活動にも関わります。" });
+      c.push({ id: "hellowork", why: "「仕事を探したい・探している」を選んだためです。住居確保給付金の求職活動にも関わります。" });
     }
     return { c: c, ex: ex };
   }
@@ -757,14 +758,14 @@ h2 { font-weight: 900; }
   function srcLinks(ids) {
     return ids.map(function (k) { var s = SRC[k]; return '<a href="' + s.u + '" target="_blank" rel="noopener">' + esc(s.t) + '</a>'; }).join("、");
   }
-  var FOREIGN_HOGO = "外国籍の人について：生活保護法の対象は日本国民です。外国籍の人には、昭和29年の国の通知により、法律ではなく「行政措置」として保護が行われています（法律上の権利ではないため、不服申立てはできないとされています）。対象は、報道によれば永住者・定住者など一定の在留資格の人や、難民と認定された人です。在留資格ごとの範囲は、このページでは国の資料で確かめられていません。2026年1月には、政府が対象となる在留資格の見直しを検討すると報じられています。";
+  var FOREIGN_HOGO = "外国籍の人について：生活保護法の対象は日本国民です。外国籍の人には、昭和29年の国の通知により、法律ではなく「行政措置」として保護が行われています（法律上の権利ではないため、不服申立てはできないとされています）。対象は、報道によれば永住者・定住者など一定の在留資格の人や、難民と認定された人です。在留資格ごとの範囲は、このページの作成者がまだ国の資料で確かめきれていません。2026年1月には、政府が対象となる在留資格の見直しを検討すると報じられています。";
 
   function renderCandidates(d) {
     var html = "";
     d.c.forEach(function (x) {
       var p = PROGRAMS[x.id];
       var caution = p.caution, src = p.src;
-      if (x.id === "hogo") { caution = (has("nat", "foreign") ? FOREIGN_HOGO + " " : "") + caution + (has("nat", "foreign") ? "" : " 外国籍の人は条件が違います（国籍の質問で「日本以外」を選ぶと説明が出ます）。"); src = src.concat(["gaikoku", "gaikokuNews"]); }
+      if (x.id === "hogo") { caution = (has("nat", "foreign") ? FOREIGN_HOGO + " " : "") + caution + (has("nat", "foreign") ? "" : " 外国籍の人は条件が違います（国籍の質問で「日本以外の国籍」を選ぶと説明が出ます）。"); src = src.concat(["gaikoku", "gaikokuNews"]); }
       html += '<details class="cand"><summary><span class="cand-name">' + esc(p.name) + '</span><span class="cand-plain">' + esc(p.plain) + '</span>' + (p.local ? '<span class="badge local">地域で中身が違う</span>' : '<span class="badge">全国共通の制度</span>') + '</summary><div class="cand-body"><dl>';
       html += '<dt>候補に出した理由</dt><dd>' + esc(x.why) + '</dd>';
       if (x.id === "hogo" && has("nat", "foreign")) html += '<dt>外国籍の人へ</dt><dd>' + esc(FOREIGN_HOGO) + '</dd>';
@@ -802,22 +803,22 @@ h2 { font-weight: 900; }
     var dvFirst = !urgent && (state.safety.dv || has("move", "flee"));
     var html = "";
     if (urgent) {
-      html += '<p class="lead2">' + (open ? "福祉事務所（役所の生活保護の担当）に行く" : "今夜できることをする。役所が開いたら福祉事務所に行く") + '</p><p>言う文と行く先は、<a href="#safety">上の「今すぐ行く先」</a>にあります。</p>';
+      html += '<p class="lead2">' + (open ? "福祉事務所（役所の生活保護の担当）に行く" : "今夜できることをする。役所が開いたら福祉事務所に行く") + '</p><p>言うことと相談先は、<a href="#safety">上の「今すぐの相談先」</a>にあります。</p>';
     } else if (dvFirst) {
       html += '<p class="lead2">DVの相談窓口に電話して、家を出ることと、住まい・お金のことを相談する</p>' +
         contact("DV相談ナビ（近くの相談窓口につながります）", "#8008", "受付時間は窓口ごとに違います（内閣府）") + contact("DV相談＋（プラス）", "0120-279-889", "24時間。チャットやメールの相談もあります") +
         '<p class="small">家賃や生活費のことは、そのあと総合窓口でも相談できます（下の手順）。相手に見られそうなときは「すぐ閉じる」を押してください。</p>';
     } else if (has("rent", "evict")) {
       html += '<p class="lead2">法テラスに電話して、出ていくよう言われていることを相談する</p>' +
-        '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '</p><p class="small muted">平日9時〜21時、土曜9時〜17時（2026年10月確認）。その場で書類にサインしないでください。</p>' +
+        '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '</p><p class="small muted">平日9時〜21時、土曜9時〜17時（2026年10月確認）。大家さんなどから書類を出されても、その場ではサインしないでください。</p>' +
         sayBox("first_law", EVICT_SCRIPT) + '<p class="small">鍵を替えられた・荷物を出されたときは、そのことも伝えてください。</p>' +
-        '<p>同じ日に、総合窓口にも電話します（下の手順2）。</p>';
+        '<p>同じ日に、総合窓口にも電話してください（下の手順）。</p>';
     } else {
       html += '<p class="lead2">' + (callerIsSupporter() ? "支える人が" : "") + '市区町村の総合窓口（自立相談支援機関）に電話して、相談の予約をする</p>' +
         sayBox("first_call", callScript());
     }
     if (!open && !urgent) {
-      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスは平日9時〜21時と土曜9時〜17時、役所の窓口は平日の昼間だけです。開いている時間に電話してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文をスクリーンショットするか、紙に書き写しておくと安心です。</p>') +
+      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスは平日9時〜21時と土曜9時〜17時、役所の窓口は平日の昼間だけです。開いている時間に電話してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。</p>') +
         '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI[0], "よりそいホットライン（24時間）") + '</p>';
     }
     $("firstOut").innerHTML = html;
@@ -843,6 +844,7 @@ h2 { font-weight: 900; }
     var steps = [];
     var urgent = state.safety.night || state.safety.food;
     var evict = has("rent", "evict");
+    var firstIsCall = !urgent && !(state.safety.dv || has("move", "flee")) && !evict;
     var rentTrouble = any("rent", ["now", "late1", "late2", "evict"]) || isLate();
     var lawScript = evict ? EVICT_SCRIPT : "借金があって返せなくなっています。収入が少なく、無料で相談できる方法を教えてください。";
     var lawBody = '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '<button class="copy" type="button" data-copy="0570-078374">番号をコピー</button></p><p class="small muted">平日9時〜21時、土曜9時〜17時（2026年10月確認）</p>' + sayBox("law", lawScript) +
@@ -850,13 +852,13 @@ h2 { font-weight: 900; }
 
     if (state.supporter) {
       steps.push({ id: "sup", when: "はじめに（支える人）", title: "支える人の役割を、本人と決める", body:
-        '<p>決めるのは本人です。支える人は、手間を減らし、一人にしない役です。電話は、本人の了解を得て支える人がかけてもかまいません。そのときの文は、いちばん上の「今日やること」に出しています（支える人用の文になっています）。</p>' +
+        '<p>決めるのは本人です。支える人の役目は、本人の手間を減らし、本人を一人にしないことです。電話は、本人の了解を得て支える人がかけてもかまいません。' + (firstIsCall ? 'そのときに言うことは、いちばん上の「今日やること」に、支える人用の文で出ています。' : 'そのときに言うことは、下の「総合窓口（自立相談支援機関）に電話して、相談の予約をする」の手順に、支える人用の文で出ています。') + '</p>' +
         checkList("sup", ["本人に、どこまで手伝ってほしいかを聞いた", "電話のときに隣にいる（または本人の了解を得て代わりにかける）", "相談の日に付き添えるか決めた", "書類を一緒にそろえる日を決めた", "お金を個人的に貸さないことを決めた", "自分が無理なく関われる範囲を決めた"]) });
     }
 
     if (urgent) {
       steps.push({ id: "fukushi", when: officeOpen() ? "今日" : nextWeekdayLabel(), title: "福祉事務所に行く", body:
-        '<p>今日・明日の寝る場所やお金がないときは、まず役所の福祉事務所（生活保護の担当）へ。言う文は、いちばん上の「今日やること」にあります。</p>' + searchLinks(["福祉事務所 生活保護"]) });
+        '<p>今日・明日の寝る場所やお金がないときは、まず役所の福祉事務所（生活保護の担当）へ行ってください。言うことは、上の「今すぐの相談先」にあります。</p>' + searchLinks(["福祉事務所 生活保護"]) });
     }
     if (!urgent && (state.safety.dv || has("move", "flee"))) {
       steps.push({ id: "dv", when: "まず", title: "DVの相談窓口に電話する", body: '<p>家を出ること、逃げた先の住まいやお金のことを相談できます。番号は<a href="#first">いちばん上の「今日やること」</a>にあります。家賃の給付金や生活保護は、逃げた先の市区町村でも相談できます。</p>' });
@@ -864,7 +866,7 @@ h2 { font-weight: 900; }
     if (evict) steps.push({ id: "law", when: "すぐに（今日か明日）", title: "法テラスに電話する", body: lawBody });
 
     steps.push({ id: "call", when: urgent ? "福祉事務所のあと" : (evict ? "法テラスと同じ日に" : "今日か明日（平日の昼間）"), title: "総合窓口（自立相談支援機関）に電話して、相談の予約をする", body:
-      '<p>家賃の給付金も、生活保護以外の多くの制度も、ここが入口です。言う文と、番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。電話がこわいときは、支える人に隣にいてもらうか、直接窓口に行ってもかまいません。</p>' +
+      '<p>家賃の給付金も、生活保護以外の多くの制度も、ここが入口です。' + (firstIsCall ? '言うことと、番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。' : '番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。') + '電話がこわいときは、支える人に隣にいてもらうか、直接窓口に行ってもかまいません。</p>' + (firstIsCall ? '' : sayBox("call", callScript())) +
       checkList("call", ["相談の日時をメモした", "担当の人の名前をメモした", "持っていくものを聞いた"]) });
 
     if (ids.indexOf("hogo") >= 0 && !urgent) {
@@ -875,9 +877,9 @@ h2 { font-weight: 900; }
 
     if (rentTrouble) {
       var lateNow = isLate();
-      steps.push({ id: "landlord", when: evict ? "法律相談のあと" : (lateNow ? "早めに（今週中）" : "支払日の前に"), title: evict ? "大家さん・管理会社・保証会社とのやりとり" : "大家さん・管理会社に連絡する", body:
+      steps.push({ id: "landlord", when: evict ? "法律相談のあと" : (lateNow ? "早めに（今週中）" : "支払日の前に"), title: evict ? "大家さん・管理会社・保証会社と話す" : "大家さん・管理会社に連絡する", body:
         (evict ? '<p>まず法テラスなどで相談してから連絡すると安心です。書類にはその場でサインしないでください。</p>' : lateNow ? '<p>遅れていても、黙っているより連絡した方が話し合いの余地が残りやすくなります。払えない金額の約束は、無理にしないでください。</p>' : '<p>払えないとわかった時点で、支払日より前に伝える方が、話し合いの余地が残りやすくなります。払えない金額の約束は、無理にしないでください。</p>') +
-        ((state.room.trim() || state.name.trim()) ? "" : '<p class="small muted">はじめに、自分の名前と部屋番号を言ってください（「状況を選ぶ」の欄に入れると、文に入ります）。</p>') +
+        ((state.room.trim() || state.name.trim()) ? "" : '<p class="small muted">はじめに、自分の名前と部屋番号を言ってください（「1 今の状況を選ぶ」の中の欄に入れると、下の文に入ります）。</p>') +
         sayBox("landlord", landlordScript()) });
     }
 
@@ -887,7 +889,7 @@ h2 { font-weight: 900; }
     var keys = [];
     ids.forEach(function (k) { PROGRAMS[k].bring.forEach(function (b) { if (keys.indexOf(b) < 0) keys.push(b); }); });
     if (has("nat", "foreign")) keys.push("residence");
-    var bringItems = keys.map(function (k) { return BRING[k]; }).concat(["このページの「窓口で見せるメモ」（画面かスクリーンショットか書き写し）"]);
+    var bringItems = keys.map(function (k) { return BRING[k]; }).concat(["このページの「窓口や支援者に見せるメモ」（画面、スクリーンショット、書き写したもののどれでも）"]);
     steps.push({ id: "bring", when: "相談の前", title: "持ち物をそろえる", body:
       '<p>そろわなくても相談には行けます。足りないものは窓口で教えてもらえます。</p>' + checkList("bring", bringItems) });
 
@@ -898,9 +900,9 @@ h2 { font-weight: 900; }
       if (!gmap[w]) { gmap[w] = []; groups.push(w); }
       PROGRAMS[k].ask.forEach(function (a) { gmap[w].push(a); });
     });
-    var askHtml = groups.map(function (w, gi) { return '<p class="grp">' + esc(w) + 'で</p>' + checkList("visit" + gi, gmap[w]); }).join("");
-    steps.push({ id: "visit", when: "相談の日", title: "相談に行き、聞くことを聞く", body:
-      '<p>窓口ごとに聞くことを分けています。聞いたら印をつけると、聞き忘れが減ります。言われたことは、下の「相談のあと」のメモ欄に書いておきます。</p>' + askHtml });
+    var askHtml = groups.map(function (w, gi) { var wp = w.split("（"); return '<p class="grp">' + esc(wp[0] + "で" + (wp[1] ? "（" + wp.slice(1).join("（") : "")) + '</p>' + checkList("visit" + gi, gmap[w]); }).join("");
+    steps.push({ id: "visit", when: "相談の日", title: "相談に行って、聞きたいことを確かめる", body:
+      '<p>窓口ごとに聞くことを分けています。聞いたら印をつけると、聞き忘れが減ります。言われたことは、下の「相談のあとで、どうなりましたか」のメモ欄に書いておいてください。</p>' + askHtml });
 
     steps.push({ id: "keep", when: "このページを閉じる前に", title: "手順を手元に残す", body:
       '<p>このページは、保存しないと閉じたときに消えます。<a href="#memo">「この端末に保存」</a>を押すか、スクリーンショットを撮るか、紙に書き写してください。暴力をふるう相手などに端末を見られるおそれがあるときは、保存しないでください。</p>' });
@@ -919,7 +921,7 @@ h2 { font-weight: 900; }
     var dl = daysLeft();
     if (dl === null) $("daysOut").innerHTML = "";
     else if (dl >= 0) $("daysOut").innerHTML = '<span class="daysleft num">支払日（' + esc(jpDate(state.payday)) + '）まで あと ' + dl + ' 日</span> <span class="small muted">住居確保給付金は、申請から決まるまでに時間がかかることがあります。早めに相談してください。</span><br>' + calLink(state.payday, "家賃の支払日（その前に大家さんへ連絡）");
-    else $("daysOut").innerHTML = '<span class="daysleft num">支払日（' + esc(jpDate(state.payday)) + '）を ' + (-dl) + ' 日すぎています</span> <span class="small muted">すぎていても相談できます。総合窓口への相談と、大家さん・管理会社への連絡を急いでください。</span>';
+    else $("daysOut").innerHTML = '<span class="daysleft num">支払日（' + esc(jpDate(state.payday)) + '）を ' + (-dl) + ' 日過ぎています</span> <span class="small muted">過ぎていても相談できます。総合窓口への相談と、大家さん・管理会社への連絡を急いでください。</span>';
   }
 
   // ---- after ----
@@ -935,7 +937,7 @@ h2 { font-weight: 900; }
     next: ["次の日時と持ち物を、メモ欄に書いておきます。", "そろえにくい書類（離職票など）は、どこで手に入るかを窓口で聞いておきます。", "支払日が近いときは、大家さん・管理会社に「相談中」であることを伝えます。"],
     other: ["案内された窓口の名前と電話番号をメモします。", "電話では「〇〇（最初の窓口）の〇〇さんから案内されて電話しました」と伝えると話が早くなります。", "たらい回しのように感じたら、最初の窓口に「どこに、何を頼めばいいか」をもう一度確認してかまいません。"],
     refused: ["「どの条件に当てはまらなかったのか」を聞いて、メモしておきます。条件が変わったら、もう一度相談できます。", "ほかの制度がないか、同じ窓口で聞きます（緊急小口資金、生活保護、家計の相談など）。", "生活保護は、申請したいとはっきり伝えれば申請できます。申請書を出すのが原則ですが、出せない特別な事情があれば申請書がなくても申請できると、厚生労働省は説明しています。", "一人で行くのがつらいときは、家族や友人、支援団体の人に付き添ってもらってかまいません。"],
-    notyet: ["電話だけでも一歩です。いちばん上の「今日やること」にある、総合窓口に電話する文を、そのまま読み上げてください。", "番号が見つからないときは、役所の代表番号に電話して、つないでもらう方法もあります（「今日やること」の「番号が見つからないとき」）。", "電話がこわいときは、支える人に隣にいてもらうか、代わりにかけてもらう方法もあります。", "気持ちがつらいときは、よりそいホットライン（0120-279-338、24時間・無料）でも話を聞いてもらえます。", "支払日が近いときは、大家さん・管理会社への連絡だけでも先にしておきます。"]
+    notyet: ["電話だけでも一歩です。総合窓口に電話するときの文（「今日やること」か、手順の中にあります）を、そのまま読み上げてください。", "番号が見つからないときは、役所の代表番号に電話して、つないでもらう方法もあります（「今日やること」の「番号が見つからないとき」）。", "電話がこわいときは、支える人に隣にいてもらうか、代わりにかけてもらう方法もあります。", "気持ちがつらいときは、よりそいホットライン（0120-279-338、24時間・無料）でも話を聞いてもらえます。", "支払日が近いときは、大家さん・管理会社への連絡だけでも先にしておきます。"]
   };
   function renderAfterOpts() {
     $("afterOpts").innerHTML = AFTER.map(function (o) {
@@ -997,7 +999,7 @@ h2 { font-weight: 900; }
       if (dl !== null && dl < 0) lines.push("家賃の支払日（" + jpDate(state.payday) + "）を過ぎていて、まだ払えていません。");
       else lines.push("次の家賃の支払日：" + jpDate(state.payday) + (dl !== null ? "（あと" + dl + "日）" : ""));
     }
-    if (state.dvNote) { lines.push(""); lines.push("【大切なお願い】事情（暴力）があり、家族や相手に、ここに相談していることや居場所を知られたくありません。連絡しないでください。"); }
+    if (state.dvNote) { lines.push(""); lines.push("【大切なお願い】事情（暴力）があり、家族や相手に、ここに相談していることや居場所を知られたくありません。家族や相手には連絡しないでください。"); }
     lines.push("");
     lines.push("【聞きたい制度】");
     d.c.forEach(function (x) { lines.push("・" + PROGRAMS[x.id].name); });
