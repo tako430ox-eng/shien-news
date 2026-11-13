@@ -194,12 +194,10 @@ class TestEndToEnd(unittest.TestCase):
         # 関係のあるものは出す。公式へのリンクと出典つき
         self.assertIn("住居確保給付金の支給要件の見直し", index)
         self.assertIn("出典：厚生労働省ホームページ", index)
-        # 役立つ欄は「制度の変更・募集/申請・相談窓口・注意」の4種類だけ。行事や広報は「そのほかのお知らせ」へ
-        self.assertNotIn("生活オリエンテーション動画", index.split("そのほかのお知らせ")[0])
-        self.assertIn("生活オリエンテーション動画", (out / "other.html").read_text(encoding="utf-8"))
-        self.assertNotIn("生活オリエンテーション動画", (out / "feed.xml").read_text(encoding="utf-8"))
-        self.assertIn("other.html", (out / "sitemap.xml").read_text(encoding="utf-8"))
-        self.assertTrue(all(it["kind"] in {"change", "apply", "consult", "warning"} for it in site.useful))
+        # useful_kinds を書かない今の設定では、話し合い以外はすべて役立つ欄に出し、「そのほか」は作らない
+        self.assertIn("生活オリエンテーション動画", index.split("class=\"box talk\"")[0])
+        self.assertFalse((out / "other.html").exists())
+        self.assertNotIn("other.html", (out / "sitemap.xml").read_text(encoding="utf-8"))
         # 会議は「暮らしに役立つお知らせ」に混ぜず、「国で話し合っていること」に分ける
         useful_part = index.split("国で話し合っていること")[0]
         self.assertNotIn("ひとり親家庭支援ワーキンググループ", useful_part)

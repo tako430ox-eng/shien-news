@@ -386,11 +386,5 @@
   "薬局"
  ],
  "max_age_days": 120,
- "_区分": "kinds の group が talk のもの（検討中・意見募集・調査）は『国で話し合っていること』（talk.html）に出す。『暮らしに役立つお知らせ』には useful_kinds の種類（制度の変更・募集/申請・相談窓口・注意）だけを出し、それ以外（行事・広報・更新のお知らせなど）は『そのほかのお知らせ』（other.html）に出す。",
- "useful_kinds": [
-  "change",
-  "apply",
-  "consult",
-  "warning"
- ]
+ "_区分": "kinds の group が talk のもの（検討中・意見募集・調査）は『国で話し合っていること』（talk.html）に出す。それ以外は『暮らしに役立つお知らせ』に出す。useful_kinds（例：[\"change\",\"apply\",\"consult\",\"warning\"]）を書くと、役立つ欄をその種類だけに絞り、残りを『そのほかのお知らせ』（other.html）に出す（2026-11-14 に試して、利用者の判断でいったん外した）。"
 }
