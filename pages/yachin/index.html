@@ -1,0 +1,1160 @@
+<!doctype html>
+<!-- 正本: /mnt/project-files/action-support/app/index.html（sha256 先頭 5a116d05c6d7）。scripts/publish_app.py で作った。直接は編集しない。 -->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>家賃が払えない・滞納したとき、電話で何て言う？｜くらしの非常口</title>
+<meta name="description" content="家賃が払えない、滞納した、出ていくよう言われた。今日やることを1つだけ出し、電話でそのまま読める文、持ち物、相談先まで示します。無料・登録なし・入力はどこにも送りません。">
+<meta name="theme-color" content="#faf6ef">
+<link rel="canonical" href="https://tako430ox-eng.github.io/shien-news/yachin/">
+<meta property="og:title" content="家賃が払えない・滞納したとき、電話で何て言う？｜くらしの非常口">
+<meta property="og:description" content="家賃が払えない、滞納した、出ていくよう言われた。今日やることを1つだけ出し、電話でそのまま読める文、持ち物、相談先まで示します。無料・登録なし・入力はどこにも送りません。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tako430ox-eng.github.io/shien-news/yachin/">
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+/* ひだまり デザイン v1.0 ── 共通の決まりは /design-system/tokens.css。ここにはその写しと、このページの部品だけを書く。
+   方向性：温かい紙の白 × 深い緑の「行動」 × 点字ブロックの黄色の「道しるべ」。飾りは道しるべの黄色だけ。 */
+:root {
+  --c-bg: #faf6ef; --c-surface: #ffffff; --c-sunken: #f1ebe0; --c-ink: #1e2433; --c-ink-soft: #545b6b;
+  --c-line: #e4dccd; --c-line-strong: #857c6c; --c-primary: #0e6655; --c-primary-ink: #ffffff; --c-primary-soft: #e3f1ec;
+  --c-link: #0b5f73; --c-path: #f2b705; --c-path-groove: rgba(0,0,0,0.18); --c-warn: #b42318; --c-warn-bg: #fdecea;
+  --c-ok: #1d6b3a; --c-ok-bg: #e6f3ea; --c-info-bg: #eaf2f8;
+  --c-sign: #0e6655; --c-sign-ink: #ffffff; --c-sign-accent: #ffd54a; --c-tile-edge: #1e2433;
+  --f-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic", "Meiryo", sans-serif;
+  --f-num: "BIZ UDGothic", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  --fs-small: 0.9375rem; --fs-body: 1.0625rem; --fs-lead: 1.1875rem; --fs-h3: 1.25rem; --fs-h2: 1.5rem; --fs-h1: clamp(1.875rem, 7vw, 2.5rem);
+  --lh-body: 1.8; --lh-tight: 1.45;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px;
+  --r-sm: 10px; --r-md: 16px; --r-pill: 999px; --tap: 44px;
+  --shadow-1: 0 1px 2px rgba(30,36,51,0.06), 0 6px 20px rgba(30,36,51,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
+    --c-line: #303644; --c-line-strong: #7f8798; --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
+    --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36; --c-sign: #123f36; --c-sign-ink: #ffffff; --c-sign-accent: #ffd54a; --c-tile-edge: #b0b6c3; --shadow-1: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --c-bg: #14171d; --c-surface: #1c2029; --c-sunken: #232834; --c-ink: #eceef2; --c-ink-soft: #b0b6c3;
+  --c-line: #303644; --c-line-strong: #7f8798; --c-primary: #5cc6a8; --c-primary-ink: #0b1a16; --c-primary-soft: #19352d; --c-link: #79c9dc;
+  --c-path: #f5c518; --c-warn: #ff8f84; --c-warn-bg: #3a1f1f; --c-ok: #84d5a0; --c-ok-bg: #18301f; --c-info-bg: #1a2a36; --c-sign: #123f36; --c-sign-ink: #ffffff; --c-sign-accent: #ffd54a; --c-tile-edge: #b0b6c3; --shadow-1: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 88px; } /* 下の帯にフォーカスが隠れないように（WCAG 2.4.11） */
+body { margin: 0; background: var(--c-bg); color: var(--c-ink); font-family: var(--f-body); font-size: var(--fs-body); line-height: var(--lh-body); }
+.page {
+  max-width: 44rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: var(--s-5) 112px; display: grid; gap: var(--s-6);
+}
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: var(--lh-tight); text-wrap: balance; margin: 0; }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+p { margin: 0; }
+a { color: var(--c-link); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--c-link); outline-offset: 2px; border-radius: 6px; }
+.muted { color: var(--c-ink-soft); }
+.small { font-size: var(--fs-small); line-height: 1.7; }
+.stack { display: grid; gap: var(--s-3); }
+.stack-lg { display: grid; gap: var(--s-4); }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.lines { background-color: var(--c-path); background-image: repeating-linear-gradient(90deg, transparent 0 4px, var(--c-path-groove) 4px 6px); }
+.dots { background-color: var(--c-path); background-image: radial-gradient(circle, var(--c-path-groove) 1.7px, transparent 2.2px); background-size: 9px 9px; }
+
+/* ---- 見出しの帯（最初の画面） ---- */
+.hero { display: grid; gap: var(--s-3); }
+.hero-top { display: grid; grid-template-columns: 1fr auto; gap: var(--s-3); align-items: end; }
+.eyebrow { font-size: var(--fs-small); color: var(--c-ink-soft); font-weight: 700; line-height: 1.5; }
+.eyebrow .tag { display: inline-block; font-size: 0.8125rem; padding: 0 8px; border-radius: var(--r-pill); background: var(--c-sunken); margin-right: 6px; }
+.hero h1 { font-size: var(--fs-h1); letter-spacing: 0.02em; }
+.hero-art { width: 84px; height: 84px; flex: none; }
+.hero .lead { font-size: var(--fs-lead); line-height: 1.65; font-weight: 700; }
+.strip { display: block; height: 10px; border-radius: 3px; }
+.promise { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.promise li { font-size: var(--fs-small); line-height: 1.4; padding: 6px 12px 6px 10px; border-radius: var(--r-pill); background: var(--c-surface); border: 1px solid var(--c-line); display: inline-flex; gap: 6px; align-items: center; }
+.promise li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-primary); flex: none; }
+
+/* ---- 節の見出し ---- */
+.section-head { display: grid; gap: var(--s-2); }
+.section-head > p { color: var(--c-ink-soft); }
+.stepno { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--c-primary); color: var(--c-primary-ink); font-family: var(--f-num); font-weight: 700; margin-right: 10px; vertical-align: 3px; font-size: 1rem; }
+
+/* ---- 選択肢（丸い札） ---- */
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: var(--s-2); min-width: 0; }
+legend { font-weight: 700; padding: 0; margin-bottom: var(--s-2); line-height: 1.6; }
+.opts { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.opt { position: relative; display: block; }
+.opt input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+.opt span {
+  display: flex; align-items: center; gap: 8px; min-height: var(--tap); background: var(--c-surface); border: 1.5px solid var(--c-line-strong);
+  border-radius: var(--r-pill); padding: 8px 16px; line-height: 1.45;
+}
+.opt input:checked + span { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-primary-ink); font-weight: 700; }
+.opt input:checked + span::before { content: "✓"; font-weight: 700; }
+.opt input:focus-visible + span { outline: 3px solid var(--c-link); outline-offset: 2px; }
+.q-list { display: grid; gap: var(--s-5); }
+.supporter span { border-radius: var(--r-md); border-style: dashed; padding: 12px 16px; display: block; }
+.supporter input:checked + span::before { content: "✓ "; }
+/* 安全の確認は四角いタイル（2列） */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2); }
+.tiles .opt span { border-radius: var(--r-md); min-height: 72px; padding: 10px 12px; align-items: flex-start; font-weight: 700; border-color: var(--c-line-strong); }
+.tiles .opt input:checked + span { background: var(--c-warn-bg); border-color: var(--c-warn); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-warn); }
+.tiles .opt input:checked + span::before { content: "✓"; color: var(--c-warn); }
+
+/* ---- 入力欄 ---- */
+.field { display: grid; gap: var(--s-1); }
+.field label { font-weight: 700; }
+.field input[type="text"], .field input[type="date"], textarea {
+  font: inherit; width: 100%; min-height: var(--tap); padding: 10px 12px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink);
+}
+
+/* ---- 緊急 ---- */
+.urgent { display: grid; grid-template-columns: 10px 1fr; background: var(--c-warn-bg); border-radius: var(--r-md); overflow: hidden; border: 1.5px solid var(--c-warn); }
+.urgent .inner { padding: var(--s-4); display: grid; gap: var(--s-3); min-width: 0; }
+.urgent h3 { color: var(--c-warn); }
+.contact { display: grid; gap: 4px; }
+.contact .who { font-weight: 700; }
+.phone-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.phone { font-family: var(--f-num); font-size: var(--fs-h3); font-weight: 700; letter-spacing: 0.03em; user-select: all; }
+.tel {
+  display: inline-flex; align-items: center; gap: 8px; min-height: var(--tap); padding: 6px 18px 6px 14px; border-radius: var(--r-pill);
+  background: var(--c-primary); color: var(--c-primary-ink); text-decoration: none; font-family: var(--f-num); font-weight: 700; font-size: var(--fs-h3); letter-spacing: 0.03em;
+}
+.tel::before { content: ""; width: 18px; height: 18px; flex: none; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.tel { flex-wrap: wrap; row-gap: 0; }
+.tel .n { white-space: nowrap; }
+.tel small { font-family: var(--f-body); font-weight: 400; font-size: var(--fs-small); }
+.copy {
+  font: inherit; font-size: var(--fs-small); cursor: pointer; min-height: var(--tap); padding: 6px 14px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink);
+}
+.copy.done { border-color: var(--c-ok); color: var(--c-ok); background: var(--c-ok-bg); }
+
+/* ---- 今日やること（いちばん大事なカード） ---- */
+.first { background: var(--c-surface); border-radius: var(--r-md); box-shadow: var(--shadow-1); border: 2px solid var(--c-primary); padding: var(--s-5) var(--s-4) var(--s-4); display: grid; gap: var(--s-3); min-width: 0; position: relative; margin-top: 10px; }
+.first > h2 { position: absolute; top: -15px; left: 14px; font-size: 1rem; background: var(--c-primary); color: var(--c-primary-ink); padding: 3px 14px; border-radius: var(--r-pill); line-height: 1.5; }
+.first .lead2 { font-family: var(--f-display); font-size: var(--fs-lead); font-weight: 700; line-height: 1.55; }
+.notice { background: var(--c-warn-bg); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-2); }
+.notice strong { color: var(--c-warn); }
+.more { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
+
+/* ---- 手順（黄色い道しるべでつなぐ） ---- */
+.plan { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: var(--s-5); }
+.plan::before { content: ""; position: absolute; left: 15px; top: 10px; bottom: 10px; width: 10px; border-radius: 3px; background-color: var(--c-path); background-image: repeating-linear-gradient(0deg, transparent 0 4px, var(--c-path-groove) 4px 6px); }
+.plan > li { position: relative; padding-left: 54px; display: grid; gap: var(--s-2); min-width: 0; }
+.plan .mark { position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--c-primary); color: var(--c-primary-ink); display: grid; place-items: center; font-family: var(--f-num); font-weight: 700; box-shadow: 0 0 0 4px var(--c-bg); }
+.plan .when { font-size: var(--fs-small); font-weight: 700; color: var(--c-ink-soft); letter-spacing: 0.04em; }
+.plan h3 { font-size: var(--fs-h3); }
+.plan li.done h3 { text-decoration: line-through; color: var(--c-ink-soft); }
+.plan li.done .mark { background: var(--c-ok); }
+.donebox { display: inline-flex; align-items: center; gap: 10px; min-height: var(--tap); font-size: var(--fs-small); cursor: pointer; font-weight: 700; }
+.donebox input, .checks input { width: 24px; height: 24px; accent-color: var(--c-primary); flex: none; margin: 0; }
+.say { background: var(--c-sunken); border-left: 6px solid var(--c-path); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-2); min-width: 0; }
+.say .text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-lead); line-height: 1.75; }
+.say .row { display: flex; justify-content: flex-end; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.checks label { display: flex; gap: 10px; align-items: center; min-height: 40px; cursor: pointer; }
+.grp { font-weight: 700; margin-top: var(--s-2); }
+.find-links { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.find-links a, .find-links span { display: inline-flex; align-items: center; min-height: var(--tap); padding: 6px 14px; border-radius: var(--r-pill); font-size: var(--fs-small); border: 1.5px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-link); text-decoration: none; font-weight: 700; }
+.find-links span { color: var(--c-ink-soft); font-weight: 400; }
+.daysleft { display: inline-block; background: var(--c-ink); color: var(--c-bg); border-radius: var(--r-pill); padding: 4px 14px; font-weight: 700; }
+
+/* ---- 制度の候補（たたんで並べる） ---- */
+.cands { display: grid; gap: var(--s-2); }
+details.cand { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-md); padding: 0; min-width: 0; }
+details.cand > summary { list-style: none; padding: 14px 44px 14px 16px; display: grid; gap: 4px; position: relative; min-height: var(--tap); font-weight: 400; }
+details.cand > summary::-webkit-details-marker { display: none; }
+details.cand > summary::after { content: ""; position: absolute; right: 18px; top: 22px; width: 10px; height: 10px; border-right: 2.5px solid var(--c-ink-soft); border-bottom: 2.5px solid var(--c-ink-soft); transform: rotate(45deg); transition: transform .15s; }
+details.cand[open] > summary::after { transform: rotate(225deg); top: 26px; }
+.cand-name { font-family: var(--f-display); font-weight: 700; font-size: var(--fs-h3); line-height: var(--lh-tight); }
+.cand-plain { color: var(--c-ink-soft); font-size: var(--fs-small); line-height: 1.6; }
+.cand-body { padding: 0 16px 16px; display: grid; gap: var(--s-2); }
+.badge { justify-self: start; font-size: 0.8125rem; line-height: 1.6; padding: 0 10px; border-radius: var(--r-pill); background: var(--c-sunken); color: var(--c-ink-soft); white-space: nowrap; }
+.badge.local { background: var(--c-warn-bg); color: var(--c-warn); }
+.cand dl { margin: 0; display: grid; gap: 6px; }
+.cand dt { font-size: var(--fs-small); color: var(--c-ink-soft); font-weight: 700; }
+.cand dd { margin: 0; }
+.cand ul { margin: 0; padding-left: 1.2em; display: grid; gap: 3px; }
+.cand .src { font-size: var(--fs-small); color: var(--c-ink-soft); overflow-wrap: anywhere; }
+.excluded { background: var(--c-sunken); border-radius: var(--r-md); padding: var(--s-3) var(--s-4); display: grid; gap: 6px; }
+.excluded ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+
+/* ---- 相談のあと・記録・メモ ---- */
+.after-out { background: var(--c-surface); border: 1.5px solid var(--c-primary); border-radius: var(--r-md); padding: var(--s-4); display: grid; gap: var(--s-3); }
+.after-out ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.memo-out { white-space: pre-wrap; background: var(--c-surface); border: 1.5px dashed var(--c-line-strong); border-radius: var(--r-sm); padding: var(--s-4); overflow-wrap: anywhere; }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
+.btn { font: inherit; cursor: pointer; min-height: var(--tap); padding: 8px 20px; border-radius: var(--r-pill); border: 1.5px solid var(--c-primary); background: var(--c-surface); color: var(--c-primary); font-weight: 700; }
+.btn.primary { background: var(--c-primary); color: var(--c-primary-ink); }
+.btn.ghost { border-color: var(--c-line-strong); color: var(--c-ink); font-weight: 400; }
+.status { font-size: var(--fs-small); color: var(--c-ok); min-height: 1.4em; }
+.confirm { background: var(--c-warn-bg); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-2); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.log li { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-sm); padding: 10px 14px; display: grid; gap: 2px; overflow-wrap: anywhere; }
+.log .d { font-family: var(--f-num); font-size: var(--fs-small); color: var(--c-ink-soft); }
+.cal { font-size: var(--fs-small); }
+.tip { background: var(--c-sunken); border-radius: var(--r-md); padding: var(--s-4); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--s-3); }
+
+/* ---- たためる箱・ページの終わり ---- */
+details { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-sm); padding: 0 14px; }
+summary { cursor: pointer; font-weight: 700; color: var(--c-ink); min-height: var(--tap); display: flex; align-items: center; padding: 8px 0; }
+details[open] > summary { margin-bottom: 4px; }
+details > :last-child:not(summary) { margin-bottom: 12px; }
+footer { display: grid; gap: var(--s-3); border-top: 1px solid var(--c-line); padding-top: var(--s-5); font-size: var(--fs-small); color: var(--c-ink-soft); }
+.srcs { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6px; overflow-wrap: anywhere; }
+
+/* ---- すぐ閉じる ---- */
+.exit-bar {
+  position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: flex; justify-content: flex-end; align-items: center; gap: var(--s-3);
+  padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  background: var(--c-bg); border-top: 1px solid var(--c-line);
+}
+.quick-exit {
+  font: inherit; font-weight: 700; min-height: var(--tap); padding: 8px 20px; border-radius: var(--r-pill); border: 0; cursor: pointer;
+  background: var(--c-warn); color: var(--c-surface);
+}
+.cover { position: fixed; inset: 0; z-index: 30; background: var(--c-bg); padding: 40px 20px; display: grid; align-content: start; gap: 8px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print {
+  .btn-row, .copy, .promise, #safety, #situation, .donebox, .tip, footer details, #afterOpts, .field, .exit-bar, .hero-art { display: none !important; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .page { gap: 18px; }
+  details { border: 0; } details > *:not(summary) { display: block; } details.cand > summary::after { display: none; }
+  .tel { background: none; color: #000; padding: 0; } .tel::before { display: none; }
+}
+/* ---- v1.2 道しるべ（大胆）：緑の看板・黄色い道・強い枠の緊急タイル ---- */
+.hero { background: var(--c-sign); color: var(--c-sign-ink); gap: var(--s-3);
+  margin: calc(-1 * var(--s-5)) calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0;
+  padding: var(--s-4) max(16px, env(safe-area-inset-left, 0px)) 0; overflow: hidden; }
+@media (min-width: 44rem) { .hero { border-radius: 0 0 var(--r-md) var(--r-md); } }
+.brandrow { display: flex; align-items: center; gap: 8px; }
+.brandrow .logo { width: 30px; height: 30px; flex: none; }
+.brandrow .brand { font-family: var(--f-display); font-weight: 900; font-size: 1.0625rem; letter-spacing: 0.06em; }
+.brandrow .tag { margin-left: auto; font-size: 0.8125rem; font-weight: 700; color: var(--c-sign-ink); border: 1px solid rgba(255,255,255,0.6); padding: 0 10px; border-radius: var(--r-pill); }
+.hero h1 { font-weight: 900; line-height: 1.3; letter-spacing: 0; font-size: clamp(1.75rem, 7.2vw, 2.5rem); }
+.hero h1 em { font-style: normal; color: var(--c-sign-accent); }
+.hero .lead { color: var(--c-sign-ink); }
+.promise li { padding: 4px 12px 4px 10px; background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); color: var(--c-sign-ink); }
+.promise li::before { background: var(--c-sign-accent); }
+.sign-path { display: block; width: calc(100% + 32px); height: 26px; margin: -4px -16px 0; }
+h2 { font-weight: 900; }
+.tiles .opt span { border: 2px solid var(--c-tile-edge); border-radius: 12px; box-shadow: 3px 3px 0 var(--c-tile-edge); }
+.tiles .opt input:checked + span { box-shadow: 3px 3px 0 var(--c-warn), inset 0 0 0 1px var(--c-warn); }
+.tiles .opt input:active + span { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--c-tile-edge); }
+@media (prefers-reduced-motion: reduce) { .tiles .opt input:active + span { transform: none; } }
+@media print { .hero { background: none; color: var(--c-ink); margin: 0; padding: 0; } .hero h1 em, .hero .lead { color: var(--c-ink); } .sign-path, .brandrow .logo { display: none; } .brandrow .tag { color: var(--c-ink); border-color: var(--c-line-strong); } }
+</style>
+</head>
+<body>
+<div class="exit-bar"><span class="small muted">人に見られそうなときは</span><button type="button" class="quick-exit" id="quickExit">すぐ閉じる</button></div>
+<div class="cover" id="cover" hidden><p>天気予報</p><p class="small">読み込んでいます…</p></div>
+<div class="page" id="pageMain">
+
+  <header class="hero">
+    <div class="brandrow">
+      <svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>
+      <span class="brand">くらしの非常口</span><span class="tag">試作版</span>
+    </div>
+    <h1>家賃が払えない。<br><em>今日やること</em>は、ひとつ。</h1>
+    <p class="lead">電話で読める文と、行く先を出します。</p>
+    <ul class="promise" aria-label="このページの約束">
+      <li>お金は求めません</li>
+      <li>入力は送りません</li>
+      <li>決めるのは窓口</li>
+      <li>家族と使えます</li>
+    </ul>
+    <svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>
+  </header>
+
+  <section id="safety" class="stack-lg" aria-labelledby="safety-h">
+    <div class="section-head">
+      <h2 id="safety-h">いま、こんなことはありますか</h2>
+      <p>当てはまれば押してください。すぐ下に行く先を出します。なければ、そのまま下へ。</p>
+    </div>
+    <div class="opts tiles" role="group" aria-label="今すぐの危険">
+      <label class="opt"><input type="checkbox" id="s_night" data-safety="night"><span>今夜、寝る場所がない</span></label>
+      <label class="opt"><input type="checkbox" id="s_food" data-safety="food"><span>今日・明日の食べ物やお金がない</span></label>
+      <label class="opt"><input type="checkbox" id="s_life" data-safety="life"><span>体や心が危ない・死にたいほどつらい</span></label>
+      <label class="opt"><input type="checkbox" id="s_dv" data-safety="dv"><span>暴力から逃げている・逃げたい</span></label>
+    </div>
+    <div id="urgentOut" aria-live="polite"></div>
+  </section>
+
+  <section id="first" class="first" aria-labelledby="first-h">
+    <h2 id="first-h">今日やること</h2>
+    <div id="firstOut" class="stack" aria-live="polite"></div>
+    <div class="field">
+      <label for="city">住んでいる市区町村（入れると、窓口を探すボタンが使えます）</label>
+      <input type="text" id="city" autocomplete="off" placeholder="例：〇〇市、〇〇区、〇〇町">
+      <span class="small muted">検索ボタンを押したときだけ、検索する言葉が Google に送られます。</span>
+    </div>
+    <div id="findOut"></div>
+    <p><a class="more" href="#situation">もっとくわしく：状況に合わせた手順・持ち物・聞くことを作る ↓</a></p>
+  </section>
+
+  <section id="situation" class="stack-lg" aria-labelledby="situation-h">
+    <div class="section-head">
+      <h2 id="situation-h"><span class="stepno">1</span>今の状況を選ぶ</h2>
+      <p>わからないところは飛ばしてかまいません。選ぶたびに、上の「今日やること」と下の手順が変わります。</p>
+    </div>
+    <label class="opt supporter"><input type="checkbox" id="supporter"><span><strong>支える人と一緒に使っている</strong>（家族・友人・支援者が隣にいる、または代わりに操作している）</span></label>
+    <div class="btn-row">
+      <button class="btn ghost" type="button" id="loadExample">例を入れて見てみる</button>
+      <span class="small muted" id="exampleNote" hidden></span>
+    </div>
+    <div class="q-list" id="questions"></div>
+    <div class="field">
+      <label for="payday">次の家賃の支払日（わかれば）</label>
+      <input type="date" id="payday">
+    </div>
+    <details>
+      <summary>電話で言う文に、名前や部屋番号を入れる（入れなくても使えます）</summary>
+      <div class="two" style="margin-top:10px">
+        <div class="field"><label for="pname">名前</label><input type="text" id="pname" autocomplete="off" placeholder="例：山田"></div>
+        <div class="field"><label for="room">部屋番号</label><input type="text" id="room" autocomplete="off" placeholder="例：203"></div>
+        <div class="field" id="relField" hidden><label for="rel">支える人と本人の関係</label><input type="text" id="rel" autocomplete="off" placeholder="例：娘、友人、支援団体の者"></div>
+      </div>
+      <p class="small muted">この端末の中だけで使います。共用の端末では、使い終わったら「全部消す」を押してください。</p>
+    </details>
+  </section>
+
+  <section id="plan" class="stack-lg" aria-labelledby="plan-h">
+    <div class="section-head">
+      <h2 id="plan-h"><span class="stepno">2</span>やること（順番どおり）</h2>
+      <p>上から順に。終わったら「終わった」に印をつけます。言う文は、そのまま読み上げてかまいません。</p>
+      <p id="daysOut"></p>
+    </div>
+    <ol class="plan" id="planOut"></ol>
+  </section>
+
+  <section id="candidates" class="stack-lg" aria-labelledby="cand-h">
+    <div class="section-head">
+      <h2 id="cand-h"><span class="stepno">3</span>窓口で聞いてみる制度</h2>
+      <p>窓口で名前を出して聞いてみる価値がありそうな制度です。押すと、理由と聞くことが開きます。<strong>受けられるかどうかは、窓口で決まります。</strong>金額や上限は地域で違うため、出していません。</p>
+      <p class="small">もっと広く探すとき：<a href="https://sumakoma.mhlw.go.jp/wiki/" target="_blank" rel="noopener">すまこま。（厚生労働省）</a>、<a href="https://top.com-pass.site/" target="_blank" rel="noopener">COMPASS 支援検索ナビ（もやい）</a>、<a href="https://www.notalone-cao.go.jp/" target="_blank" rel="noopener">あなたはひとりじゃない（内閣府）</a></p>
+    </div>
+    <div class="cands" id="candOut" aria-live="polite"></div>
+    <div id="exclOut"></div>
+  </section>
+
+  <section id="after" class="stack-lg" aria-labelledby="after-h">
+    <div class="section-head">
+      <h2 id="after-h"><span class="stepno">4</span>相談のあとで、どうなりましたか</h2>
+      <p>うまくいかなくても大丈夫です。結果を選ぶと、次の一歩を出します。</p>
+    </div>
+    <div class="opts" role="radiogroup" aria-label="相談の結果" id="afterOpts"></div>
+    <div id="afterOut" aria-live="polite"></div>
+    <div class="field">
+      <label for="afterNote">窓口で言われたこと・次の予約日など（自分用のメモ）</label>
+      <textarea id="afterNote" rows="3" placeholder="例：2回目の面談で通帳と給与明細を持っていく。担当は〇〇さん。"></textarea>
+    </div>
+    <div class="field">
+      <label for="nextDate">次の予約日・期限（あれば）</label>
+      <input type="date" id="nextDate">
+    </div>
+    <div class="btn-row"><button class="btn primary" type="button" id="logBtn">この結果を記録する</button></div>
+    <div id="logOut"></div>
+  </section>
+
+  <section id="memo" class="stack-lg" aria-labelledby="memo-h">
+    <div class="section-head">
+      <h2 id="memo-h"><span class="stepno">5</span>窓口や支援者に見せるメモ</h2>
+      <p>窓口の人や、手伝ってくれる支援者に見せる短いメモです。画面を見せても、紙に書き写しても、スクリーンショットを撮ってもかまいません。</p>
+    </div>
+    <label class="opt" id="dvNoteWrap" hidden><input type="checkbox" id="dvNote"><span>メモに「家族や相手に、相談していることや居場所を知られたくない」と入れる</span></label>
+    <div class="memo-out" id="memoOut" aria-live="polite"></div>
+    <div class="btn-row">
+      <button class="btn primary" type="button" id="memoCopy">メモをコピー</button>
+      <button class="btn" type="button" id="saveBtn">この端末に保存</button>
+      <button class="btn ghost" type="button" id="clearBtn">全部消す</button>
+    </div>
+    <div class="confirm" id="clearConfirm" hidden>
+      <span>選んだ内容、チェック、メモをすべて消します。元に戻せません。</span>
+      <div class="btn-row"><button class="btn" type="button" id="clearYes">消す</button><button class="btn ghost" type="button" id="clearNo">やめる</button></div>
+    </div>
+    <p class="status" id="status" role="status"></p>
+    <p class="small muted">保存しないと、このページを閉じたときに内容は消えます。相談のあとでまた使うなら、保存するか、スクリーンショットを撮っておいてください。<strong>暴力をふるう相手などにこの端末を見られるおそれがあるときは、保存しないでください。</strong>人と共用の端末では、使い終わったら「全部消す」を押してください。</p>
+  </section>
+
+  <section class="tip stack small" aria-label="支える人へ">
+    <strong>隣で支える人へ</strong>
+    <p>研究では、制度の情報を見せるだけより、手続きを一緒にする方が利用につながりやすいことが示されています。電話をかけるときに隣にいる、持ち物を一緒にそろえる、窓口に付き添う、が役に立ちます。お金を個人的に貸すことは避け、専門の窓口につなぐ役に徹してください。</p>
+  </section>
+
+  <footer>
+    <p>このページは、プロジェクト「生活再建・機会接続プラットフォーム」の試作版です（第5版、2026年11月13日更新）。制度の内容は、下の出典で確認したものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
+    <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。書類はご本人が作るための手伝いです。</p>
+    <p>このページは、入力された内容をどこにも送りません。外のサイトへのリンク、検索ボタン、電話のボタンは、押したときだけ動きます。</p>
+    <p><strong>お金を求める人に注意してください。</strong>窓口への相談や申請は無料です。手数料や成功報酬を求める業者、決まった住まいや病院を使うことを条件にする人には注意してください。困ったときは、消費者ホットライン <a href="tel:188">188</a> に相談できます。</p>
+    <p><a href="../unei.html">運営者と連絡先</a> ・ <a href="../">支援の新着（くらしの非常口 新着）</a></p>
+    <details>
+      <summary>出典と確認日</summary>
+      <ul class="srcs" id="srcList"></ul>
+    </details>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CHECKED = "2026-11-12";
+  var CHECKED3 = "2026-11-13";
+
+  // ---- data: questions ----
+  var QUESTIONS = [
+    { id: "rent", q: "家賃の状況は", opts: [
+      ["soon", "今月は払えるが、来月以降が不安"],
+      ["now", "次の家賃が払えない"],
+      ["late1", "すでに1か月分たまっている"],
+      ["late2", "2か月分以上たまっている"],
+      ["evict", "出ていくよう言われた・鍵を替えられた"]
+    ]},
+    { id: "reason", q: "収入が減ったきっかけは", opts: [
+      ["jobloss", "仕事を辞めた・失った・店をやめた"],
+      ["cut", "仕事やシフトが減った・休業になった"],
+      ["sick", "病気やけがで働けなくなった"],
+      ["pension", "年金だけでは足りない（仕事は失っていない）"],
+      ["other", "そのほか・わからない"]
+    ]},
+    { id: "when", q: "それはいつごろ", opts: [
+      ["within2", "2年以内"],
+      ["over2", "2年より前"],
+      ["unknown", "わからない"]
+    ]},
+    { id: "money", q: "手持ちのお金（貯金をふくむ）で、あとどのくらい暮らせそう", opts: [
+      ["none", "1週間くらいまで"],
+      ["little", "1か月くらい"],
+      ["some", "数か月はもつ"]
+    ]},
+    { id: "outlook", q: "これから収入が戻る見込みは", opts: [
+      ["back", "近いうちに戻りそう（就職が決まった、など）"],
+      ["no", "見込みがない・わからない"]
+    ]},
+    { id: "work", q: "仕事について", opts: [
+      ["yes", "仕事を探したい・探している"],
+      ["hard", "体調などで、今は探すのが難しい"],
+      ["retired", "年齢などで、仕事は考えていない"]
+    ]},
+    { id: "move", q: "今の家について", opts: [
+      ["no", "今の家に住み続けたい"],
+      ["ok", "家賃の安いところへの引っ越しも考えてもいい"],
+      ["flee", "暴力などの事情で、今の家を出たい"]
+    ]},
+    { id: "debt", q: "家賃のほかに、借金や返せていない支払いは", opts: [
+      ["yes", "ある"],
+      ["no", "ない"]
+    ]},
+    { id: "welfare", q: "今、生活保護を受けていますか", opts: [
+      ["no", "受けていない"],
+      ["yes", "受けている"]
+    ]},
+    { id: "nat", q: "国籍（答えなくてもかまいません。使える制度の説明が変わります）", opts: [
+      ["jp", "日本国籍"],
+      ["foreign", "日本以外の国籍"]
+    ]}
+  ];
+
+  // ---- data: sources ----
+  var SRC = {
+    mhlwKonkyu: { t: "厚生労働省：生活困窮者自立支援制度", u: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html", c: CHECKED },
+    ichiran: { t: "自立相談支援機関 相談窓口一覧（生活困窮者支援情報共有サイト）", u: "https://minna-tunagaru.jp/ichiran/", c: CHECKED },
+    hamamatsu: { t: "浜松市：住居確保給付金（2026年7月2日更新）", u: "https://www.city.hamamatsu.shizuoka.jp/fukushisomu/jyuukyokakuho.html", c: CHECKED },
+    ota: { t: "大田区：住居確保給付金（2026年7月1日更新）", u: "https://www.city.ota.tokyo.jp/seikatsu/fukushi/jyuutaku-kakuho-kyuufu-kin.html", c: CHECKED },
+    fukuoka: { t: "福岡県：住居確保給付金（2026年4月1日更新）", u: "https://www.pref.fukuoka.lg.jp/contents/jyukyokakuho.html", c: CHECKED },
+    jukyoQA: { t: "厚生労働省：住居確保給付金 改正に関するQA（vol4）問8「いわゆる国籍条項は存在せず」", u: "https://www.mhlw.go.jp/content/000626250.pdf", c: CHECKED3 },
+    aichiShakyo: { t: "愛知県社会福祉協議会：緊急小口資金のご案内（2025年7月版。条件は都道府県で違う場合があります）", u: "https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf", c: CHECKED },
+    tokyoShakyo: { t: "東京都：生活福祉資金貸付制度（2026年10月9日更新）", u: "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi", c: CHECKED },
+    mhlwHogo: { t: "厚生労働省：生活保護制度", u: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html", c: CHECKED },
+    chibaHogo: { t: "千葉県：生活保護制度（2025年9月11日更新）", u: "https://www.pref.chiba.lg.jp/kenshidou/seikatsuhogo/seikatsuhogoseido.html", c: CHECKED },
+    bunkyoHogo: { t: "文京区：生活保護（2026年4月8日更新）", u: "https://www.city.bunkyo.lg.jp/b019/p003121.html", c: CHECKED },
+    gaikoku: { t: "昭和29年5月8日 社発第382号「生活に困窮する外国人に対する生活保護の措置について」（鳥取県の掲載資料）", u: "https://www.pref.tottori.lg.jp/secure/1073822/konkyo_1_1.pdf", c: CHECKED3 },
+    gaikokuNews: { t: "熊本日日新聞（共同通信配信）2026年1月23日：外国人の生活保護、見直し検討も", u: "https://kumanichi.com/articles/1949675", c: CHECKED3 },
+    kyujitsu: { t: "厚生労働省 事務連絡（2020年11月24日）：年末年始における生活困窮者支援等に関する協力依頼等について", u: "https://www.mhlw.go.jp/content/000697946.pdf", c: CHECKED3 },
+    nagoya: { t: "名古屋市：住居のない方の生活相談（閉庁中の電話相談、2025年10月17日更新）", u: "https://www.city.nagoya.jp/kenkofukushi/fukushi/1016735/1016740.html", c: CHECKED3 },
+    mhlwTel: { t: "厚生労働省「まもろうよ こころ」電話相談（よりそいホットライン、いのちの電話）", u: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel", c: CHECKED3 },
+    houterasu: { t: "法テラス", u: "https://www.houterasu.or.jp/", c: "2026-10" },
+    pwc: { t: "PwC 法律ニュース：家賃債務保証会社の「追い出し条項」を無効とした最高裁判決（2022年12月12日）", u: "https://www.pwc.com/jp/ja/knowledge/news/legal-news/legal-20230327-3.html", c: CHECKED },
+    hellowork: { t: "厚生労働省：ハローワークの所在地", u: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html", c: "2026-10" },
+    dvNavi: { t: "内閣府男女共同参画局：配偶者からの暴力被害者支援情報（DV相談ナビ #8008）", u: "https://www.gender.go.jp/policy/no_violence/e-vaw/index.html", c: CHECKED },
+    setagayaDv: { t: "世田谷区：DVの相談（DV相談＋ 0120-279-889、2025年6月27日更新）", u: "https://www.city.setagaya.lg.jp/02409/1025.html", c: CHECKED }
+  };
+
+  // ---- data: things to bring (shared, so the same item is listed once) ----
+  var BRING = {
+    id: "本人確認できるもの（なくても相談できます）",
+    contract: "賃貸の契約書（家賃がわかるもの）",
+    income: "収入がわかるもの（給与明細、年金の通知など）",
+    bank: "預金通帳（持っているもの全部）",
+    jobloss: "仕事を失った・収入が減ったことがわかるもの（離職票、給与明細など）",
+    household: "毎月の支払いがわかるもの（家計の見直しの相談に使います）",
+    guarantee: "保証会社との契約書、大家さんや保証会社から届いた手紙や書類",
+    debts: "借金の一覧（会社名と、だいたいの金額）",
+    seal: "印鑑（必要かどうか窓口で確認）",
+    resume: "履歴書（なくても相談できます）",
+    residence: "在留カード（外国籍の人）"
+  };
+
+  // ---- data: programs ----
+  var PROGRAMS = {
+    jiritsu: {
+      name: "生活に困ったときの総合窓口（自立相談支援機関）", where: "総合窓口",
+      plain: "仕事・お金・住まいの困りごとをまとめて聞いてくれる、市区町村の無料の窓口です。家賃の給付金なども、まずここが入口になります。窓口の名前は地域で違います。",
+      ask: ["家賃が払えなくなりそうなときに使える制度を教えてください", "申請までの流れと、持っていくものを教えてください"],
+      bring: ["id", "contract", "income", "bank"],
+      caution: "", local: true, src: ["mhlwKonkyu", "ichiran"]
+    },
+    jukyo: {
+      name: "住居確保給付金（家賃の補助）", where: "総合窓口",
+      plain: "仕事を失ったり収入が大きく減ったりした人に、家賃にあたる額（上限あり）を原則3か月、条件によって最長9か月まで、自治体が大家さんや不動産会社に直接払う制度です。",
+      ask: ["住居確保給付金の対象になるか、収入と貯金で確認してください", "この地域の家賃の上限と、求職活動として必要なこと（回数）を教えてください", "決まるまで、どのくらいかかりますか。その間の家賃はどうすればいいですか"],
+      bring: ["jobloss", "bank", "contract"],
+      caution: "収入と貯金の上限、家賃の上限は自治体ごとに違います。受けている間は、窓口との面談やハローワークでの相談、求人への応募など、決められた求職活動が必要です。国籍の条件はありません（厚生労働省のQ&A）。",
+      local: true, src: ["hamamatsu", "ota", "fukuoka", "jukyoQA"]
+    },
+    tenkyo: {
+      name: "住居確保給付金（家賃の安い家への引っ越し費用の補助）", where: "総合窓口",
+      plain: "家賃の安い住まいに移ることで家計が良くなると認められた場合に、引っ越しの運搬費や、礼金・仲介手数料・保証料などを補助する制度です。2025年度から始まりました。",
+      ask: ["引っ越し費用の補助は、この地域で使えますか。家計の見直しの相談も受けたいです"],
+      bring: ["household"],
+      caution: "敷金、前家賃、家具や家電の購入は対象外です（浜松市・福岡県の案内による）。",
+      local: true, src: ["hamamatsu", "fukuoka"]
+    },
+    koguchi: {
+      name: "緊急小口資金（社会福祉協議会の無利子の貸付）", where: "社会福祉協議会（総合窓口でも聞けます）",
+      plain: "一時的に生活費が足りないときに、少額を無利子で借りられる制度です。申込みは住んでいる市区町村の社会福祉協議会です。",
+      ask: ["緊急小口資金を借りられますか。受け取るまで何日かかり、いつから返しますか"],
+      bring: ["id", "income", "seal", "bank"],
+      caution: "借りたお金は返す必要があります。借金の返済には使えません。原則として、総合窓口（自立相談支援機関）の支援を受けることが条件になっています（愛知県の案内による）。受け取るまで最短でも5営業日ほどかかるとされているため、今日・明日のお金がないときは、福祉事務所にも相談してください。",
+      local: true, src: ["aichiShakyo", "tokyoShakyo"]
+    },
+    hogo: {
+      name: "生活保護（福祉事務所）", where: "福祉事務所",
+      plain: "収入や貯金が国の決めた基準より少ないときに、生活費や家賃などを受けられる制度です。相談と申請は、住んでいる地域の福祉事務所（役所の生活保護の担当）です。",
+      ask: ["生活保護を申請したいです", "家賃が払えていない分はどうなりますか。今の家に住み続けられますか"],
+      bring: ["id", "bank", "contract"],
+      caution: "「生活保護の申請は、国民の権利です」（千葉県）。家族が援助してくれないことを理由に受けられない、ということはありません（文京区）。申請書を出すのが原則ですが、出せない特別な事情があれば、申請書がなくても申請できます（厚生労働省）。家や車を持っていても認められる場合があります（千葉県）。",
+      local: false, src: ["mhlwHogo", "chibaHogo", "bunkyoHogo"],
+      extra: { label: "申請書を前もって作るなら", html: '<a href="https://top.com-pass.site/" target="_blank" rel="noopener">COMPASS の PASS（もやいの生活保護申請書作成）</a>で作った申請書を持っていく方法があります。このページでは申請書は作りません。<br>申請したい気持ちを窓口ではっきり伝えるためのメモは、「相談のあと」で「使えないと言われた」を選ぶと出ます。' }
+    },
+    houterasu: {
+      name: "法テラス（無料の法律相談の案内）", where: "法テラス（電話）",
+      plain: "収入などの条件によっては、弁護士や司法書士に無料で相談できます。借金の整理や、大家さん・保証会社とのトラブルを相談できます。",
+      ask: ["家賃を滞納していて、出ていくように言われています。どうすればいいですか", "借金があり、返せなくなっています。無料で相談できますか"],
+      bring: ["guarantee", "debts", "contract"],
+      caution: "家賃保証会社の契約にあった「追い出し条項」を、最高裁が2022年12月に無効と判断した例があります。一方的に鍵を替えられた、荷物を出されたなどのときは、一人で判断せず相談してください。",
+      local: false, src: ["houterasu", "pwc"],
+      phone: { num: "0570-078374", note: "法テラス・サポートダイヤル。平日9時〜21時、土曜9時〜17時（2026年10月確認）" }
+    },
+    hellowork: {
+      name: "ハローワーク（仕事さがし・職業訓練）", where: "ハローワーク",
+      plain: "仕事の紹介と、無料の職業訓練の案内を受けられます。住居確保給付金を受けるときの求職活動も、ここでの相談がふくまれます。",
+      ask: ["すぐに働ける仕事を探しています。住居確保給付金の求職活動としての相談もしたいです"],
+      bring: ["id", "resume"],
+      caution: "", local: true, src: ["hellowork"]
+    }
+  };
+
+  function freshState() { return { a: {}, safety: {}, done: {}, checks: {}, after: "", payday: "", city: "", name: "", room: "", rel: "", dvNote: false, afterNote: "", nextDate: "", supporter: false, log: [] }; }
+  var state = freshState();
+  var exampleArmed = false;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function $(id) { return document.getElementById(id); }
+  function has(k, v) { return state.a[k] === v; }
+  function any(k, arr) { return arr.indexOf(state.a[k]) >= 0; }
+  function unset(k) { return !state.a[k]; }
+
+  // ---- time: is the town hall likely open now? (weekday daytime; holidays are not detected) ----
+  var WD = ["日", "月", "火", "水", "木", "金", "土"];
+  function officeOpen() {
+    var n = new Date(), d = n.getDay(), m = n.getHours() * 60 + n.getMinutes();
+    return d >= 1 && d <= 5 && m >= 8 * 60 + 30 && m < 17 * 60;
+  }
+  function nextWeekdayLabel() {
+    var n = new Date(), d = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var m = n.getHours() * 60 + n.getMinutes();
+    if (!(d.getDay() >= 1 && d.getDay() <= 5 && m < 8 * 60 + 30)) d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日（" + WD[d.getDay()] + "）の朝";
+  }
+  function jpDate(s) {
+    if (!s) return "";
+    var d = new Date(s + "T00:00:00"); if (isNaN(d)) return s;
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日（" + WD[d.getDay()] + "）";
+  }
+
+  // ---- phone links ----
+  function telHref(num) { return "tel:" + num.replace(/-/g, "").replace(/#/g, "%23"); }
+  function telBtn(num, label) {
+    return '<a class="tel" href="' + telHref(num) + '"><span class="n">' + esc(num) + '</span>' + (label ? ' <small>' + esc(label) + '</small>' : '') + '</a>';
+  }
+  function contact(who, num, note) {
+    return '<div class="contact">' + (who ? '<span class="who">' + esc(who) + '</span>' : '') + '<span class="phone-row">' + telBtn(num, "に電話する") + '<button class="copy" type="button" data-copy="' + esc(num) + '">番号をコピー</button></span>' + (note ? '<span class="small muted">' + esc(note) + '</span>' : '') + '</div>';
+  }
+  var YORISOI = ["0120-279-338", "よりそいホットライン。24時間・無料。どんな悩みでも話を聞いてもらえます。ガイダンスで外国語も選べます（厚生労働省のページで2026年11月13日確認）"];
+
+  // ---- render questions ----
+  function renderQuestions() {
+    var html = "";
+    QUESTIONS.forEach(function (q) {
+      html += '<fieldset><legend>' + esc(q.q) + '</legend><div class="opts">';
+      q.opts.forEach(function (o) {
+        var id = "q_" + q.id + "_" + o[0];
+        html += '<label class="opt"><input type="radio" name="q_' + q.id + '" id="' + id + '" value="' + o[0] + '" data-q="' + q.id + '"><span>' + esc(o[1]) + '</span></label>';
+      });
+      html += '</div></fieldset>';
+    });
+    $("questions").innerHTML = html;
+  }
+
+  // ---- scripts (what to say) ----
+  function urgentScript() {
+    var s = state.safety;
+    if (s.night && s.food) return "今夜寝る場所がなく、手持ちのお金もほとんどありません。生活保護を申請したいです。";
+    if (s.night) return "今夜寝る場所がありません。生活保護を申請したいです。";
+    return "手持ちのお金がほとんどなく、今日・明日の食べ物にも困っています。生活保護を申請したいです。";
+  }
+  function situationSentence() {
+    var s = [];
+    var r = { soon: "今月は払えますが、来月以降の家賃が払えなくなりそうです", now: "次の家賃が払えません", late1: "家賃を1か月分滞納しています", late2: "家賃を2か月分以上滞納しています", evict: "家賃を滞納していて、出ていくよう言われています" }[state.a.rent];
+    var why = { jobloss: "仕事を失った（辞めた）ため、収入が減りました", cut: "仕事やシフトが減ったため、収入が減りました", sick: "病気やけがで働けなくなり、収入が減りました", pension: "年金だけでは生活費と家賃が足りません", other: "" }[state.a.reason];
+    if (why) s.push(why);
+    if (r) s.push(r);
+    return s.length ? s.join("。") + "。" : "収入が減って、家賃が払えなくなりそうです。";
+  }
+  function callerIsSupporter() { return state.supporter; }
+  function supIntro() {
+    var who = state.name.trim() ? state.name.trim() + "さん" : "相談したい本人";
+    return who + "の" + (state.rel.trim() || "家族") + "です。本人がとなりにいて、本人の了解を得てお電話しています。";
+  }
+  function callScript() {
+    var foreign = has("nat", "foreign") ? "日本以外の国籍です。" : "";
+    if (callerIsSupporter()) {
+      return supIntro() + "本人の状況をお伝えします。" + situationSentence() + foreign + "住居確保給付金など、使える制度について相談したいです。相談の予約はできますか。持っていくものも教えてください。当日は私も一緒に行ってもかまいませんか。";
+    }
+    var me = state.name.trim() ? state.name.trim() + "と申します。" : "";
+    return me + "家賃のことで相談したくて電話しました。" + situationSentence() + foreign + "住居確保給付金など、使える制度について相談したいです。相談の予約はできますか。持っていくものも教えてください。";
+  }
+  var EVICT_SCRIPT = "家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少なく、無料で相談できる方法を教えてください。";
+  var DAIHYO = "生活のことで困っています。家賃が払えず、相談できる窓口につないでください。（自立相談支援機関、または生活困窮の相談窓口、と言われる窓口です）";
+  function isLate() {
+    var dl = daysLeft();
+    return any("rent", ["late1", "late2", "evict"]) || (dl !== null && dl < 0);
+  }
+  function landlordScript() {
+    var who = (state.room.trim() ? state.room.trim() + "号室の" : "") + (state.name.trim() || "");
+    var intro = who ? who + "です。" : "";
+    if (has("rent", "evict")) return intro + "家賃が遅れていることは承知しています。収入が減ったためです。いま役所の窓口と、法律の相談窓口に相談しています。結果が出るまで、少しお待ちいただけないでしょうか。結果がわかり次第ご連絡します。";
+    if (isLate()) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いの方法について、ご相談させてください。";
+    if (has("rent", "soon")) return intro + "収入が減り、来月以降の家賃のお支払いが難しくなりそうです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+    return intro + "収入が減り、次の家賃を期日までにお支払いできない見込みです。いま役所の窓口で、家賃の補助の制度について相談しています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+  }
+  function sayBox(id, text, label) {
+    return '<div class="say"><span class="small muted">' + esc(label || "言うこと（そのまま読んでかまいません）") + '</span><p class="text" id="say_' + id + '">' + esc(text) + '</p><div class="row"><button class="copy" type="button" data-copy-from="say_' + id + '">この文をコピー</button></div></div>';
+  }
+
+  // ---- urgent ----
+  function nightBlock() {
+    // Shown when town hall is likely closed and the person has no place / no money tonight.
+    return '<div class="notice"><strong>いまは役所が閉まっている時間かもしれません</strong>' +
+      '<span>多くの役所は平日の昼間だけ開いています（祝日は休み）。今夜できることは次のとおりです。</span>' +
+      '<ol style="margin:0;padding-left:1.2em;display:grid;gap:6px">' +
+      '<li>住んでいる（いる場所の）<strong>市区町村の代表番号</strong>に電話して「今夜寝る場所がありません。緊急の生活の相談をしたいです」と伝える。国は、役所が閉まる年末年始などに、当番の職員が連絡を受けられる体制をつくるよう自治体に依頼しています（厚生労働省）。夜間・土曜の専用の電話窓口がある自治体もあります（例：名古屋市）。<strong>すべての自治体・時間で対応しているわけではありません。</strong></li>' +
+      '<li>つながらないとき、一人でいるのがつらいときは、24時間の電話相談で話を聞いてもらう。' + contact("", YORISOI[0], YORISOI[1]) + '</li>' +
+      '<li>危険が迫っているときは 110。体の具合が悪いときは 119。</li>' +
+      '<li>' + esc(nextWeekdayLabel()) + 'いちばんに、福祉事務所へ行く（上の文を言う）。</li>' +
+      '</ol></div>';
+  }
+  function renderUrgent() {
+    var s = state.safety, parts = [], yShown = false;
+    if (s.night || s.food) {
+      parts.push('<div class="contact"><span class="who">住んでいる（いる場所の）市区町村の福祉事務所（役所の生活保護の担当）へ</span><span>住まいのない人に、一時的な宿泊場所と食事を用意する事業がある地域もあります。福祉事務所のない町村は、町村役場でも申請できます。</span></div>');
+      parts.push(sayBox("urgent", urgentScript(), "福祉事務所で言うこと"));
+      if (!officeOpen()) { parts.push(nightBlock()); yShown = true; }
+      else if (!s.life) { parts.push(contact("つらいとき・話を聞いてほしいとき", YORISOI[0], YORISOI[1])); yShown = true; }
+    }
+    if (s.life) {
+      parts.push(contact("命の危険があるとき", "119", "救急"));
+      if (!yShown) parts.push(contact("死にたいほどつらいとき・話を聞いてほしいとき", YORISOI[0], YORISOI[1]));
+      else parts.push('<span class="small">死にたいほどつらいときは、上のよりそいホットライン（24時間）にも電話できます。</span>');
+      parts.push(contact("", "0120-783-556", "いのちの電話。毎日16時〜21時、無料。毎月10日は朝8時から翌朝8時まで（厚生労働省のページで2026年11月13日確認）"));
+    }
+    if (s.dv) {
+      parts.push(contact("暴力から逃げたいとき（危険が迫っているときは 110）", "#8008", "DV相談ナビ。近くの相談窓口につながります（内閣府）。受付時間は窓口ごとに違います"));
+      parts.push(contact("", "0120-279-889", "DV相談＋（プラス）。24時間。チャットやメールの相談もあります"));
+      parts.push('<span class="small">相手にこのページを見られそうなときは、画面の下の「すぐ閉じる」を押してください。画面と選んだ内容を消して、別のページに切り替えます。ブラウザの閲覧履歴には残るので、必要なら履歴も消してください。「この端末に保存」は押さないでください。</span>');
+      parts.push('<span class="small">逃げた先でも、生活保護や住まいの相談はできます。家族に居場所を知られたくない事情は、窓口で伝えてください（親族への連絡を見合わせられる場合があります）。下の「窓口に見せるメモ」に、その一文を入れることもできます。</span>');
+    }
+    if (!parts.length) { $("urgentOut").innerHTML = ""; return; }
+    var html = parts.join("");
+    $("urgentOut").innerHTML = '<div class="urgent"><span class="dots" aria-hidden="true"></span><div class="inner"><h3>今すぐ行く先</h3>' + html + '<span class="small">この下の質問は、落ち着いてからで大丈夫です。</span></div></div>';
+  }
+
+  // ---- candidate logic ----
+  function decide() {
+    var c = [], ex = [];
+    var urgent = state.safety.night || state.safety.food;
+    var onHogo = has("welfare", "yes");
+    var foreign = has("nat", "foreign");
+    var pensionOnly = has("reason", "pension");
+    var retired = has("work", "retired");
+    c.push({ id: "jiritsu", why: "家賃や生活の困りごとは、まずここが入口です。どの答えでも出しています。" });
+
+    if (onHogo) {
+      ex.push("生活保護を受けている場合、住居確保給付金は対象外とする自治体があります（大田区は明記）。家賃のことは、担当のケースワーカーに相談してください。");
+    } else if (pensionOnly) {
+      ex.push("住居確保給付金は、仕事を失った人や、仕事が減って収入が大きく減った人のための制度です。年金だけでは足りない場合は、総合窓口や福祉事務所（生活保護）で相談してください。");
+    } else if (has("when", "over2")) {
+      ex.push("住居確保給付金は、原則として仕事を失った（収入が減った）日から2年以内が対象です。ただし病気などで求職活動ができなかった期間は加えられる場合があるので、総合窓口で事情を話してください。");
+    } else {
+      var why = "収入が減って家賃が払えない人のための制度です。";
+      if (has("reason", "sick")) why += "病気で仕事を辞めた場合も対象になることがありますが、受けている間は求職活動が必要です。";
+      if (retired) why += "受けている間は求職活動が必要なため、仕事を考えていない場合は、窓口でほかの制度も聞いてください。";
+      if (unset("reason") || unset("when")) why += "（まだ選んでいない質問があるため、広めに出しています）";
+      c.push({ id: "jukyo", why: why });
+      if (has("move", "ok")) c.push({ id: "tenkyo", why: "引っ越しも考えられると選んだためです。家賃が下がって家計が良くなる場合の補助です。" });
+    }
+
+    if (!onHogo && !pensionOnly && !retired && (has("money", "little") || has("outlook", "back"))) {
+      c.push({ id: "koguchi", why: has("outlook", "back") ? "収入が戻る見込みがあり、それまでの一時的な不足を補う使い方に合います。" : "手持ちが1か月ほどのため、一時的な不足を補う選択肢として出しています。返す必要があります。" });
+    }
+    if (!onHogo && (has("money", "none") || has("work", "hard") || urgent || pensionOnly || (retired && !has("money", "some")))) {
+      var w = [];
+      if (has("money", "none")) w.push("手持ちのお金が1週間ほどまで");
+      if (has("work", "hard")) w.push("今は仕事を探すのが難しい");
+      if (pensionOnly) w.push("年金だけでは足りない");
+      else if (retired) w.push("年齢などで仕事は考えていない");
+      if (urgent) w.push("今日・明日の寝る場所やお金がない");
+      var hw = w.join("、") + "と選んだためです。収入や貯金が国の基準より少なければ、受けられる可能性があります。";
+      if (foreign) hw += "外国籍の人は、在留資格などによって対象にならない場合があります（下の「知っておくこと」）。まず総合窓口か福祉事務所で確かめてください。";
+      c.push({ id: "hogo", why: hw });
+    }
+    if (has("debt", "yes") || has("rent", "evict")) {
+      c.push({ id: "houterasu", why: has("rent", "evict") ? "出ていくよう言われた・鍵を替えられたと選んだためです。法律の相談先です。" : "借金や返せていない支払いがあると選んだためです。" });
+    }
+    if (has("work", "yes")) {
+      c.push({ id: "hellowork", why: "仕事を探したいと選んだためです。住居確保給付金の求職活動にも関わります。" });
+    }
+    return { c: c, ex: ex };
+  }
+
+  function srcLinks(ids) {
+    return ids.map(function (k) { var s = SRC[k]; return '<a href="' + s.u + '" target="_blank" rel="noopener">' + esc(s.t) + '</a>'; }).join("、");
+  }
+  var FOREIGN_HOGO = "外国籍の人について：生活保護法の対象は日本国民です。外国籍の人には、昭和29年の国の通知により、法律ではなく「行政措置」として保護が行われています（法律上の権利ではないため、不服申立てはできないとされています）。対象は、報道によれば永住者・定住者など一定の在留資格の人や、難民と認定された人です。在留資格ごとの範囲は、このページでは国の資料で確かめられていません。2026年1月には、政府が対象となる在留資格の見直しを検討すると報じられています。";
+
+  function renderCandidates(d) {
+    var html = "";
+    d.c.forEach(function (x) {
+      var p = PROGRAMS[x.id];
+      var caution = p.caution, src = p.src;
+      if (x.id === "hogo") { caution = (has("nat", "foreign") ? FOREIGN_HOGO + " " : "") + caution + (has("nat", "foreign") ? "" : " 外国籍の人は条件が違います（国籍の質問で「日本以外」を選ぶと説明が出ます）。"); src = src.concat(["gaikoku", "gaikokuNews"]); }
+      html += '<details class="cand"><summary><span class="cand-name">' + esc(p.name) + '</span><span class="cand-plain">' + esc(p.plain) + '</span>' + (p.local ? '<span class="badge local">地域で中身が違う</span>' : '<span class="badge">全国共通の制度</span>') + '</summary><div class="cand-body"><dl>';
+      html += '<dt>候補に出した理由</dt><dd>' + esc(x.why) + '</dd>';
+      if (x.id === "hogo" && has("nat", "foreign")) html += '<dt>外国籍の人へ</dt><dd>' + esc(FOREIGN_HOGO) + '</dd>';
+      if (p.extra) html += '<dt>' + esc(p.extra.label) + '</dt><dd>' + p.extra.html + '</dd>';
+
+      html += '<dt>窓口で聞くこと</dt><dd><ul>' + p.ask.map(function (a) { return "<li>" + esc(a) + "</li>"; }).join("") + '</ul></dd>';
+      if (caution) html += '<dt>知っておくこと</dt><dd>' + esc(caution) + '</dd>';
+      if (p.phone) html += '<dt>電話</dt><dd><span class="phone-row">' + telBtn(p.phone.num, "に電話する") + '<button class="copy" type="button" data-copy="' + esc(p.phone.num) + '">番号をコピー</button></span><span class="small muted">' + esc(p.phone.note) + '</span></dd>';
+      html += '</dl><p class="src">出典：' + srcLinks(src) + '</p></div></details>';
+    });
+    $("candOut").innerHTML = html;
+    $("exclOut").innerHTML = d.ex.length ? '<div class="excluded small"><strong>候補から外したもの（あきらめる必要はありません）</strong><ul>' + d.ex.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + '</ul></div>' : "";
+  }
+
+  // ---- finding the office ----
+  function searchLinks(terms) {
+    var city = state.city.trim();
+    if (!city) return '<p class="small muted">上の欄に市区町村名を入れると、ここに検索ボタンが出ます。</p>';
+    return '<div class="find-links">' + terms.map(function (t) {
+      return '<a href="https://www.google.com/search?q=' + encodeURIComponent(city + " " + t) + '" target="_blank" rel="noopener">検索：' + esc(city + " " + t) + '</a>';
+    }).join("") + '</div>';
+  }
+  function renderFind() {
+    var urgentNow = (state.safety.night || state.safety.food);
+    var terms = urgentNow ? ["福祉事務所 生活保護", "代表電話"] : ["自立相談支援機関", "代表電話"];
+    $("findOut").innerHTML = '<div class="stack"><strong>窓口の電話番号の探し方</strong>' + searchLinks(terms) +
+      '<p class="small"><a href="https://minna-tunagaru.jp/ichiran/" target="_blank" rel="noopener">全国の総合窓口の一覧（都道府県別）</a></p>' +
+      '<details><summary>番号が見つからないとき</summary><p style="margin-top:8px">市役所・区役所・町村役場の<strong>代表番号</strong>（役所のホームページのいちばん下や、ごみの日の案内などに載っている番号）に電話して、こう言ってください。</p>' + sayBox("daihyo", DAIHYO, "代表番号で言うこと") + '</details></div>';
+  }
+
+  // ---- first step (top card) ----
+  function renderFirst() {
+    var urgent = state.safety.night || state.safety.food;
+    var open = officeOpen();
+    var dvFirst = !urgent && (state.safety.dv || has("move", "flee"));
+    var html = "";
+    if (urgent) {
+      html += '<p class="lead2">' + (open ? "福祉事務所（役所の生活保護の担当）に行く" : "今夜できることをする。役所が開いたら福祉事務所に行く") + '</p><p>言う文と行く先は、<a href="#safety">上の「今すぐ行く先」</a>にあります。</p>';
+    } else if (dvFirst) {
+      html += '<p class="lead2">DVの相談窓口に電話して、家を出ることと、住まい・お金のことを相談する</p>' +
+        contact("DV相談ナビ（近くの相談窓口につながります）", "#8008", "受付時間は窓口ごとに違います（内閣府）") + contact("DV相談＋（プラス）", "0120-279-889", "24時間。チャットやメールの相談もあります") +
+        '<p class="small">家賃や生活費のことは、そのあと総合窓口でも相談できます（下の手順）。相手に見られそうなときは「すぐ閉じる」を押してください。</p>';
+    } else if (has("rent", "evict")) {
+      html += '<p class="lead2">法テラスに電話して、出ていくよう言われていることを相談する</p>' +
+        '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '</p><p class="small muted">平日9時〜21時、土曜9時〜17時（2026年10月確認）。その場で書類にサインしないでください。</p>' +
+        sayBox("first_law", EVICT_SCRIPT) + '<p class="small">鍵を替えられた・荷物を出されたときは、そのことも伝えてください。</p>' +
+        '<p>同じ日に、総合窓口にも電話します（下の手順2）。</p>';
+    } else {
+      html += '<p class="lead2">' + (callerIsSupporter() ? "支える人が" : "") + '市区町村の総合窓口（自立相談支援機関）に電話して、相談の予約をする</p>' +
+        sayBox("first_call", callScript());
+    }
+    if (!open && !urgent) {
+      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスは平日9時〜21時と土曜9時〜17時、役所の窓口は平日の昼間だけです。開いている時間に電話してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文をスクリーンショットするか、紙に書き写しておくと安心です。</p>') +
+        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI[0], "よりそいホットライン（24時間）") + '</p>';
+    }
+    $("firstOut").innerHTML = html;
+  }
+
+  // ---- plan ----
+  function checkList(id, items) {
+    return '<ul class="checks">' + items.map(function (it, i) {
+      var cid = "chk_" + id + "_" + i;
+      return '<li><label><input type="checkbox" id="' + cid + '" data-chk="' + cid + '"' + (state.checks[cid] ? " checked" : "") + '><span>' + esc(it) + '</span></label></li>';
+    }).join("") + '</ul>';
+  }
+  function daysLeft() {
+    if (!state.payday) return null;
+    var p = new Date(state.payday + "T00:00:00");
+    if (isNaN(p)) return null;
+    var t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((p - t) / 86400000);
+  }
+
+  function renderPlan(d) {
+    var ids = d.c.map(function (x) { return x.id; });
+    var steps = [];
+    var urgent = state.safety.night || state.safety.food;
+    var evict = has("rent", "evict");
+    var rentTrouble = any("rent", ["now", "late1", "late2", "evict"]) || isLate();
+    var lawScript = evict ? EVICT_SCRIPT : "借金があって返せなくなっています。収入が少なく、無料で相談できる方法を教えてください。";
+    var lawBody = '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '<button class="copy" type="button" data-copy="0570-078374">番号をコピー</button></p><p class="small muted">平日9時〜21時、土曜9時〜17時（2026年10月確認）</p>' + sayBox("law", lawScript) +
+      (evict ? '<p class="small"><strong>出ていくよう言われた・鍵を替えられたとき：</strong>その場で書類にサインせず、言われたことと日時をメモしておきます。</p>' : "");
+
+    if (state.supporter) {
+      steps.push({ id: "sup", when: "はじめに（支える人）", title: "支える人の役割を、本人と決める", body:
+        '<p>決めるのは本人です。支える人は、手間を減らし、一人にしない役です。電話は、本人の了解を得て支える人がかけてもかまいません。そのときの文は、いちばん上の「今日やること」に出しています（支える人用の文になっています）。</p>' +
+        checkList("sup", ["本人に、どこまで手伝ってほしいかを聞いた", "電話のときに隣にいる（または本人の了解を得て代わりにかける）", "相談の日に付き添えるか決めた", "書類を一緒にそろえる日を決めた", "お金を個人的に貸さないことを決めた", "自分が無理なく関われる範囲を決めた"]) });
+    }
+
+    if (urgent) {
+      steps.push({ id: "fukushi", when: officeOpen() ? "今日" : nextWeekdayLabel(), title: "福祉事務所に行く", body:
+        '<p>今日・明日の寝る場所やお金がないときは、まず役所の福祉事務所（生活保護の担当）へ。言う文は、いちばん上の「今日やること」にあります。</p>' + searchLinks(["福祉事務所 生活保護"]) });
+    }
+    if (!urgent && (state.safety.dv || has("move", "flee"))) {
+      steps.push({ id: "dv", when: "まず", title: "DVの相談窓口に電話する", body: '<p>家を出ること、逃げた先の住まいやお金のことを相談できます。番号は<a href="#first">いちばん上の「今日やること」</a>にあります。家賃の給付金や生活保護は、逃げた先の市区町村でも相談できます。</p>' });
+    }
+    if (evict) steps.push({ id: "law", when: "すぐに（今日か明日）", title: "法テラスに電話する", body: lawBody });
+
+    steps.push({ id: "call", when: urgent ? "福祉事務所のあと" : (evict ? "法テラスと同じ日に" : "今日か明日（平日の昼間）"), title: "総合窓口（自立相談支援機関）に電話して、相談の予約をする", body:
+      '<p>家賃の給付金も、生活保護以外の多くの制度も、ここが入口です。言う文と、番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。電話がこわいときは、支える人に隣にいてもらうか、直接窓口に行ってもかまいません。</p>' +
+      checkList("call", ["相談の日時をメモした", "担当の人の名前をメモした", "持っていくものを聞いた"]) });
+
+    if (ids.indexOf("hogo") >= 0 && !urgent) {
+      steps.push({ id: "hogo", when: "総合窓口と同じ週に", title: "福祉事務所で、生活保護の相談をする", body:
+        '<p>手持ちのお金が少ないときや、働くのが難しいときは、生活保護も一緒に考えます。総合窓口で「生活保護の相談もしたい」と言えば、つないでもらえることもあります。</p>' +
+        sayBox("hogo", "生活保護の相談をしたいです。" + situationSentence() + "申請も考えています。") + searchLinks(["福祉事務所 生活保護"]) });
+    }
+
+    if (rentTrouble) {
+      var lateNow = isLate();
+      steps.push({ id: "landlord", when: evict ? "法律相談のあと" : (lateNow ? "早めに（今週中）" : "支払日の前に"), title: evict ? "大家さん・管理会社・保証会社とのやりとり" : "大家さん・管理会社に連絡する", body:
+        (evict ? '<p>まず法テラスなどで相談してから連絡すると安心です。書類にはその場でサインしないでください。</p>' : lateNow ? '<p>遅れていても、黙っているより連絡した方が話し合いの余地が残りやすくなります。払えない金額の約束は、無理にしないでください。</p>' : '<p>払えないとわかった時点で、支払日より前に伝える方が、話し合いの余地が残りやすくなります。払えない金額の約束は、無理にしないでください。</p>') +
+        ((state.room.trim() || state.name.trim()) ? "" : '<p class="small muted">はじめに、自分の名前と部屋番号を言ってください（「状況を選ぶ」の欄に入れると、文に入ります）。</p>') +
+        sayBox("landlord", landlordScript()) });
+    }
+
+    if (!evict && ids.indexOf("houterasu") >= 0) steps.push({ id: "law", when: "1週間以内", title: "法テラスに電話する", body: lawBody });
+
+    // bring: one list, no duplicates
+    var keys = [];
+    ids.forEach(function (k) { PROGRAMS[k].bring.forEach(function (b) { if (keys.indexOf(b) < 0) keys.push(b); }); });
+    if (has("nat", "foreign")) keys.push("residence");
+    var bringItems = keys.map(function (k) { return BRING[k]; }).concat(["このページの「窓口で見せるメモ」（画面かスクリーンショットか書き写し）"]);
+    steps.push({ id: "bring", when: "相談の前", title: "持ち物をそろえる", body:
+      '<p>そろわなくても相談には行けます。足りないものは窓口で教えてもらえます。</p>' + checkList("bring", bringItems) });
+
+    // asks: grouped by where to ask
+    var groups = [], gmap = {};
+    ids.forEach(function (k) {
+      var w = PROGRAMS[k].where;
+      if (!gmap[w]) { gmap[w] = []; groups.push(w); }
+      PROGRAMS[k].ask.forEach(function (a) { gmap[w].push(a); });
+    });
+    var askHtml = groups.map(function (w, gi) { return '<p class="grp">' + esc(w) + 'で</p>' + checkList("visit" + gi, gmap[w]); }).join("");
+    steps.push({ id: "visit", when: "相談の日", title: "相談に行き、聞くことを聞く", body:
+      '<p>窓口ごとに聞くことを分けています。聞いたら印をつけると、聞き忘れが減ります。言われたことは、下の「相談のあと」のメモ欄に書いておきます。</p>' + askHtml });
+
+    steps.push({ id: "keep", when: "このページを閉じる前に", title: "手順を手元に残す", body:
+      '<p>このページは、保存しないと閉じたときに消えます。<a href="#memo">「この端末に保存」</a>を押すか、スクリーンショットを撮るか、紙に書き写してください。暴力をふるう相手などに端末を見られるおそれがあるときは、保存しないでください。</p>' });
+
+    steps.push({ id: "after", when: "相談のあと", title: "結果を記録して、次の一歩を決める", body:
+      '<p>下の「<a href="#after">相談のあとで、どうなりましたか</a>」で結果を選んでください。</p>' });
+
+    var html = "";
+    steps.forEach(function (s, i) {
+      var done = !!state.done[s.id];
+      html += '<li class="' + (done ? "done" : "") + '"><span class="mark" aria-hidden="true">' + (i + 1) + '</span><span class="when">' + esc(s.when) + '</span><h3>' + esc(s.title) + '</h3>' + s.body +
+        '<label class="donebox"><input type="checkbox" id="done_' + s.id + '" data-done="' + s.id + '"' + (done ? " checked" : "") + '>終わった</label></li>';
+    });
+    $("planOut").innerHTML = html;
+
+    var dl = daysLeft();
+    if (dl === null) $("daysOut").innerHTML = "";
+    else if (dl >= 0) $("daysOut").innerHTML = '<span class="daysleft num">支払日（' + esc(jpDate(state.payday)) + '）まで あと ' + dl + ' 日</span> <span class="small muted">住居確保給付金は、申請から決まるまでに時間がかかることがあります。早めに相談してください。</span><br>' + calLink(state.payday, "家賃の支払日（その前に大家さんへ連絡）");
+    else $("daysOut").innerHTML = '<span class="daysleft num">支払日（' + esc(jpDate(state.payday)) + '）を ' + (-dl) + ' 日すぎています</span> <span class="small muted">すぎていても相談できます。総合窓口への相談と、大家さん・管理会社への連絡を急いでください。</span>';
+  }
+
+  // ---- after ----
+  var AFTER = [
+    ["applied", "申請できた"],
+    ["next", "次の予約をした・書類を集めることになった"],
+    ["other", "別の窓口を案内された"],
+    ["refused", "使えないと言われた"],
+    ["notyet", "まだ行けていない・電話できていない"]
+  ];
+  var AFTER_TEXT = {
+    applied: ["結果の連絡がいつ来るかを、メモ欄に書いておきます。", "住居確保給付金の場合、受けている間は決められた求職活動（面談、職業相談、応募など）が必要です。回数と期限をメモしておきます。", "大家さん・管理会社に「申請した」ことと、結果が出る見込みの時期を伝えます。", "決まるまでの生活費が足りないときは、総合窓口に「その間の生活費」について相談します。"],
+    next: ["次の日時と持ち物を、メモ欄に書いておきます。", "そろえにくい書類（離職票など）は、どこで手に入るかを窓口で聞いておきます。", "支払日が近いときは、大家さん・管理会社に「相談中」であることを伝えます。"],
+    other: ["案内された窓口の名前と電話番号をメモします。", "電話では「〇〇（最初の窓口）の〇〇さんから案内されて電話しました」と伝えると話が早くなります。", "たらい回しのように感じたら、最初の窓口に「どこに、何を頼めばいいか」をもう一度確認してかまいません。"],
+    refused: ["「どの条件に当てはまらなかったのか」を聞いて、メモしておきます。条件が変わったら、もう一度相談できます。", "ほかの制度がないか、同じ窓口で聞きます（緊急小口資金、生活保護、家計の相談など）。", "生活保護は、申請したいとはっきり伝えれば申請できます。申請書を出すのが原則ですが、出せない特別な事情があれば申請書がなくても申請できると、厚生労働省は説明しています。", "一人で行くのがつらいときは、家族や友人、支援団体の人に付き添ってもらってかまいません。"],
+    notyet: ["電話だけでも一歩です。いちばん上の「今日やること」にある、総合窓口に電話する文を、そのまま読み上げてください。", "番号が見つからないときは、役所の代表番号に電話して、つないでもらう方法もあります（「今日やること」の「番号が見つからないとき」）。", "電話がこわいときは、支える人に隣にいてもらうか、代わりにかけてもらう方法もあります。", "気持ちがつらいときは、よりそいホットライン（0120-279-338、24時間・無料）でも話を聞いてもらえます。", "支払日が近いときは、大家さん・管理会社への連絡だけでも先にしておきます。"]
+  };
+  function renderAfterOpts() {
+    $("afterOpts").innerHTML = AFTER.map(function (o) {
+      return '<label class="opt"><input type="radio" name="after" id="after_' + o[0] + '" value="' + o[0] + '" data-after="1"><span>' + esc(o[1]) + '</span></label>';
+    }).join("");
+  }
+  var INTENT = "福祉事務所長　様\n\n私は、生活保護の申請をします。\n\n申請する日：　　年　　月　　日\n住所：\n氏名：\n連絡先：\n\n今の状況：";
+  function renderAfter() {
+    var k = state.after;
+    if (!k) { $("afterOut").innerHTML = ""; return; }
+    var label = AFTER.filter(function (o) { return o[0] === k; })[0][1];
+    var extra = "";
+    if (k === "refused") {
+      extra = '<p class="small"><strong>生活保護を申請したいときに見せるメモ（下書き）</strong>　空いているところは自分で書きます。正式な申請書は窓口でもらえます（<a href="https://top.com-pass.site/" target="_blank" rel="noopener">もやいの PASS</a> で前もって作ることもできます）。このメモは、申請したい気持ちをはっきり伝えるためのものです。' + (has("nat", "foreign") ? "外国籍の人は、在留資格によって対象にならない場合があります。" : "") + '</p>' +
+        '<div class="say"><p class="text" id="say_intent">' + esc(INTENT + situationSentence()) + '</p><div class="row"><button class="copy" type="button" data-copy-from="say_intent">この文をコピー</button></div></div>';
+    }
+    $("afterOut").innerHTML = '<div class="after-out"><strong>「' + esc(label) + '」のときの次の一歩</strong><ul>' + AFTER_TEXT[k].map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>' + extra + '</div>';
+  }
+
+  function calLink(dateStr, title) {
+    if (!dateStr) return "";
+    var d = dateStr.replace(/-/g, "");
+    var n = new Date(dateStr + "T00:00:00"); n.setDate(n.getDate() + 1);
+    var e = n.getFullYear() + String(n.getMonth() + 1).padStart(2, "0") + String(n.getDate()).padStart(2, "0");
+    return '<a class="cal" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) + '&dates=' + d + '/' + e + '" target="_blank" rel="noopener">Googleカレンダーに予定を入れる</a><span class="small muted">（押すと、予定の名前と日付だけが Google に送られます）</span>';
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function renderLog() {
+    if (!state.log.length) { $("logOut").innerHTML = '<p class="small muted">記録はまだありません。相談のたびに記録すると、次の相談で前回のことを伝えやすくなります。</p>'; return; }
+    $("logOut").innerHTML = '<p class="small"><strong>これまでの記録</strong>（新しい順）</p><ul class="log">' + state.log.slice().reverse().map(function (r) {
+      return '<li><span class="d">' + esc(jpDate(r.d)) + '</span><strong>' + esc(r.o) + '</strong>' + (r.n ? '<span>' + esc(r.n) + '</span>' : '') + (r.next ? '<span class="small">次の予約・期限：' + esc(jpDate(r.next)) + '</span>' + calLink(r.next, "相談の予約・期限") : '') + '</li>';
+    }).join("") + '</ul>';
+  }
+  function addLog() {
+    if (!state.after && !state.afterNote.trim()) { setStatus("結果を選ぶか、メモを書いてから記録してください。"); return; }
+    var label = state.after ? AFTER.filter(function (o) { return o[0] === state.after; })[0][1] : "メモ";
+    state.log.push({ d: today(), o: label, n: state.afterNote.trim(), next: state.nextDate });
+    state.afterNote = ""; state.nextDate = ""; $("afterNote").value = ""; $("nextDate").value = "";
+    renderLog(); $("memoOut").textContent = memoText(decide());
+    setStatus("記録しました。残すには「この端末に保存」を押すか、スクリーンショットを撮ってください。");
+  }
+
+  // ---- memo ----
+  function memoText(d) {
+    var lines = [];
+    lines.push("【相談したいこと】");
+    lines.push(situationSentence());
+    var m = { none: "手持ちのお金で暮らせるのは1週間くらいまでです。", little: "手持ちのお金で暮らせるのは1か月くらいです。", some: "手持ちのお金で数か月は暮らせます。" }[state.a.money];
+    if (m) lines.push(m);
+    if (has("work", "yes")) lines.push("仕事を探したいです。");
+    if (has("work", "hard")) lines.push("体調などで、今は仕事を探すのが難しいです。");
+    if (has("work", "retired")) lines.push("年齢などで、仕事は考えていません。");
+    if (has("debt", "yes")) lines.push("家賃のほかに、借金や返せていない支払いがあります。");
+    if (has("move", "ok")) lines.push("家賃の安いところへの引っ越しも考えています。");
+    if (has("move", "flee")) lines.push("事情があり、今の家を出たいと考えています。");
+    if (has("nat", "foreign")) lines.push("日本以外の国籍です（在留資格：　　　　　）。");
+    var dl = daysLeft();
+    if (state.payday) {
+      if (dl !== null && dl < 0) lines.push("家賃の支払日（" + jpDate(state.payday) + "）を過ぎていて、まだ払えていません。");
+      else lines.push("次の家賃の支払日：" + jpDate(state.payday) + (dl !== null ? "（あと" + dl + "日）" : ""));
+    }
+    if (state.dvNote) { lines.push(""); lines.push("【大切なお願い】事情（暴力）があり、家族や相手に、ここに相談していることや居場所を知られたくありません。連絡しないでください。"); }
+    lines.push("");
+    lines.push("【聞きたい制度】");
+    d.c.forEach(function (x) { lines.push("・" + PROGRAMS[x.id].name); });
+    lines.push("");
+    lines.push("【お願い】");
+    lines.push("使える制度と、申請までの流れ、持っていくものを教えてください。");
+    var recent = state.log.slice(-3);
+    if (recent.length) {
+      lines.push(""); lines.push("【これまでの相談の記録】");
+      recent.forEach(function (r) { lines.push("・" + jpDate(r.d) + " " + r.o + (r.n ? "：" + r.n : "") + (r.next ? "（次：" + jpDate(r.next) + "）" : "")); });
+    }
+    if (state.afterNote.trim()) { lines.push(""); lines.push("【前回の相談で言われたこと】"); lines.push(state.afterNote.trim()); }
+    if (state.supporter) { lines.push(""); lines.push("※今日は、本人の了解を得て、支える人が付き添っています。"); }
+    return lines.join("\n");
+  }
+
+  // ---- sources ----
+  function renderSources() {
+    $("srcList").innerHTML = Object.keys(SRC).map(function (k) {
+      var s = SRC[k];
+      return '<li><a href="' + s.u + '" target="_blank" rel="noopener">' + esc(s.t) + '</a>（確認：' + esc(s.c) + '）</li>';
+    }).join("");
+  }
+
+  function renderAll() {
+    renderUrgent();
+    var d = decide();
+    renderFirst();
+    renderFind();
+    renderCandidates(d);
+    renderPlan(d);
+    renderAfter();
+    renderLog();
+    $("dvNoteWrap").hidden = !(state.safety.dv || has("move", "flee"));
+    if ($("dvNoteWrap").hidden) state.dvNote = false;
+    $("dvNote").checked = !!state.dvNote;
+    $("relField").hidden = !state.supporter;
+    $("memoOut").textContent = memoText(d);
+  }
+
+  // ---- storage (opt-in only) ----
+  var KEY = "yachin-tsugi-no-ippo-v1";
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); setStatus("この端末のブラウザに保存しました。"); }
+    catch (e) { setStatus("このブラウザでは保存できませんでした。メモをコピーするか、スクリーンショットを撮って残してください。"); }
+  }
+  function load() {
+    try { var raw = localStorage.getItem(KEY); if (raw) { var s = JSON.parse(raw); if (s && s.a) { state = Object.assign(freshState(), s); return true; } } } catch (e) {}
+    return false;
+  }
+  function clearAll() {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    state = freshState();
+    syncInputs(); renderAll(); $("exampleNote").hidden = true;
+    setStatus("すべて消しました。");
+  }
+  function setStatus(t) { $("status").textContent = t; }
+
+  function syncInputs() {
+    QUESTIONS.forEach(function (q) {
+      q.opts.forEach(function (o) { var el = $("q_" + q.id + "_" + o[0]); if (el) el.checked = state.a[q.id] === o[0]; });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-safety]"), function (el) { el.checked = !!state.safety[el.getAttribute("data-safety")]; });
+    AFTER.forEach(function (o) { $("after_" + o[0]).checked = state.after === o[0]; });
+    $("payday").value = state.payday || "";
+    $("city").value = state.city || "";
+    $("pname").value = state.name || "";
+    $("room").value = state.room || "";
+    $("rel").value = state.rel || "";
+    $("afterNote").value = state.afterNote || "";
+    $("nextDate").value = state.nextDate || "";
+    $("supporter").checked = !!state.supporter;
+  }
+
+  // ---- events ----
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.hasAttribute("data-q")) { state.a[t.getAttribute("data-q")] = t.value; renderAll(); }
+    else if (t.hasAttribute("data-safety")) { state.safety[t.getAttribute("data-safety")] = t.checked; renderAll(); }
+    else if (t.hasAttribute("data-done")) { state.done[t.getAttribute("data-done")] = t.checked; t.closest("li").classList.toggle("done", t.checked); }
+    else if (t.hasAttribute("data-chk")) { state.checks[t.getAttribute("data-chk")] = t.checked; }
+    else if (t.hasAttribute("data-after")) { state.after = t.value; renderAfter(); }
+    else if (t.id === "payday") { state.payday = t.value; renderAll(); }
+    else if (t.id === "nextDate") { state.nextDate = t.value; }
+    else if (t.id === "supporter") { state.supporter = t.checked; renderAll(); }
+    else if (t.id === "dvNote") { state.dvNote = t.checked; $("memoOut").textContent = memoText(decide()); }
+  });
+  var textTimer = null;
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    var map = { city: "city", pname: "name", room: "room", rel: "rel" };
+    if (map[t.id]) {
+      state[map[t.id]] = t.value;
+      clearTimeout(textTimer);
+      textTimer = setTimeout(function () { var d = decide(); renderFirst(); if (t.id === "city") renderFind(); renderPlan(d); }, 250);
+    }
+    else if (t.id === "afterNote") { state.afterNote = t.value; $("memoOut").textContent = memoText(decide()); }
+  });
+
+  function copyText(text, btn) {
+    function ok() { var o = btn.textContent; btn.textContent = "コピーしました"; btn.classList.add("done"); setTimeout(function () { btn.textContent = o; btn.classList.remove("done"); }, 1600); }
+    function fallback(el) {
+      if (!el) return;
+      var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = "選択しました。長押しでコピーしてください";
+    }
+    try {
+      navigator.clipboard.writeText(text).then(ok, function () { fallback(btn._target); });
+    } catch (e) { fallback(btn._target); }
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.matches && t.matches("button.copy")) {
+      var from = t.getAttribute("data-copy-from");
+      var el = from ? $(from) : null;
+      t._target = el;
+      copyText(from ? el.textContent : t.getAttribute("data-copy"), t);
+    }
+  });
+  $("memoCopy").addEventListener("click", function () { var b = $("memoCopy"); b._target = $("memoOut"); copyText($("memoOut").textContent, b); });
+  $("saveBtn").addEventListener("click", save);
+  $("logBtn").addEventListener("click", addLog);
+  $("quickExit").addEventListener("click", function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    state = freshState();
+    $("pageMain").innerHTML = "";
+    $("quickExit").hidden = true;
+    $("cover").hidden = false;
+    try { window.location.replace("https://tenki.jp/"); } catch (e) {}
+  });
+  $("clearBtn").addEventListener("click", function () { $("clearConfirm").hidden = false; });
+  $("clearNo").addEventListener("click", function () { $("clearConfirm").hidden = true; });
+  $("clearYes").addEventListener("click", function () { $("clearConfirm").hidden = true; clearAll(); });
+  $("loadExample").addEventListener("click", function () {
+    var hasInput = Object.keys(state.a).length > 0 || state.payday;
+    if (hasInput && !exampleArmed) {
+      exampleArmed = true;
+      $("exampleNote").textContent = "入力した答えが、例に置きかわります。よければ、もう一度押してください。";
+      $("exampleNote").hidden = false;
+      return;
+    }
+    exampleArmed = false;
+    state.a = { rent: "now", reason: "cut", when: "within2", money: "little", outlook: "no", work: "yes", move: "no", debt: "no", welfare: "no" };
+    var d = new Date(); d.setDate(d.getDate() + 12);
+    state.payday = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    syncInputs(); renderAll();
+    $("exampleNote").textContent = "いま表示しているのは、架空の例です（30代・一人暮らし・シフトが減って次の家賃が払えない人）。";
+    $("exampleNote").hidden = false;
+  });
+
+  renderQuestions();
+  renderAfterOpts();
+  renderSources();
+  if (load()) setStatus("この端末に保存していた内容を読み込みました。");
+  syncInputs();
+  renderAll();
+})();
+</script>
+</body>
+</html>
