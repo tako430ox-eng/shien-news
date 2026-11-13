@@ -85,3 +85,10 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .foot a { display: inline-flex; align-items: center; min-height: var(--tap); }
 .stack { display: grid; gap: var(--s-4); }
 .jump { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
+/* 暮らしに役立つお知らせと、会議などの話し合いを分ける */
+.sec { font-size: var(--fs-h2); }
+.talk { background: var(--c-sunken); border-color: var(--c-line); }
+.talk h2 { display: flex; align-items: baseline; gap: var(--s-2); flex-wrap: wrap; }
+.talk .n { font-family: var(--f-num); font-size: var(--fs-small); color: var(--c-ink-soft); font-weight: 400; }
+.talk-list { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); }
+.more-link { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }

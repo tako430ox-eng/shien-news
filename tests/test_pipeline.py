@@ -103,6 +103,12 @@ class TestClassify(unittest.TestCase):
         self.assertEqual(self.c("第5回ひとり親家庭支援ワーキンググループの開催について")["kind"], "discussion")
         self.assertEqual(self.c("生活保護の申請を装った詐欺にご注意ください")["kind"], "warning")
         self.assertIn("foreign", self.c("生活オリエンテーション動画（ショート版）を配信しています")["topics"])
+        # 会議・調査は「話し合い」の種類になる（2026-11-13 の本番データの例）
+        for t in ["第13回自殺総合対策の推進に関する有識者会議資料", "第26回成年後見制度利用促進専門家会議　開催案内",
+                  "補償金・優生手術等一時金認定審査部会（第21回）の議事要旨を掲載しました", "育成就労に関する二国間取決め（協力覚書）",
+                  "令和８年度に実施した出入国在留管理行政に係る関係者ヒアリングの結果概要を掲載しました。"]:
+            self.assertIn(self.c(t)["kind"], ("discussion", "survey"), t)
+        self.assertEqual(self.c("生活保護の申請を装った詐欺にご注意ください")["kind"], "warning")
         # 2026-11-13 の本番取得で見つかった誤り：システムの「障害」を障害の分野にしていた
         self.assertNotIn("disability", self.c("Microsoft365の大規模障害について")["topics"])
         self.assertTrue(self.c("マイクロソフト社の障害によりメール不着等となる事象について")["excluded"])
@@ -185,6 +191,12 @@ class TestEndToEnd(unittest.TestCase):
         self.assertIn("住居確保給付金の支給要件の見直し", index)
         self.assertIn("出典：厚生労働省ホームページ", index)
         self.assertIn("生活オリエンテーション動画", index)
+        # 会議は「暮らしに役立つお知らせ」に混ぜず、「国で話し合っていること」に分ける
+        useful_part = index.split("国で話し合っていること")[0]
+        self.assertNotIn("ひとり親家庭支援ワーキンググループ", useful_part)
+        self.assertIn("ひとり親家庭支援ワーキンググループ", (out / "talk.html").read_text(encoding="utf-8"))
+        self.assertIn("まだ決まっていないことで、いま使える支援ではありません", index)
+        self.assertNotIn("ワーキンググループ", (out / "feed.xml").read_text(encoding="utf-8"))
         # 2回続けて失敗した情報源は画面に警告を出す
         self.assertIn("デジタル庁の新着が、いま自動で取れていません", index)
         # 分野ページ・フィード・サイトマップ

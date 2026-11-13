@@ -49,6 +49,10 @@ class Site:
         self.kinds = {k["id"]: k for k in self.rules["kinds"]}
         self.kinds[self.rules["default_kind"]["id"]] = self.rules["default_kind"]
         self.items = [it for it in self.store["items"] if visible(it)]
+        talk_kinds = {k["id"] for k in self.rules["kinds"] if k.get("group") == "talk"}
+        # 「暮らしに役立つお知らせ」と「国で話し合っていること（会議・意見募集・調査）」に分ける
+        self.useful = [it for it in self.items if it["kind"] not in talk_kinds]
+        self.talk = [it for it in self.items if it["kind"] in talk_kinds]
         self.built = now_jst()
         oks = [h.get("last_ok") for h in self.health.get("sources", {}).values() if h.get("last_ok")]
         # 「最後に情報源から実際に取れた時刻」。ページを作り直しただけでは新しくならない
@@ -137,17 +141,17 @@ class Site:
     def chips(self, depth: int, current: str | None) -> str:
         up = "../" * depth
         counts = {t: 0 for t in self.topics}
-        for it in self.items:
+        for it in self.useful:
             for t in it["topics"]:
                 counts[t] = counts.get(t, 0) + 1
         out = ['<nav class="chips" aria-label="分野で絞る">']
         cls = ' aria-current="page"' if current is None else ""
         out.append(f'<a class="chip" href="{up}index.html"{cls}>すべて</a>')
         for slug, t in self.topics.items():
-            if not counts.get(slug):
+            if not counts.get(slug) and not any(slug in it["topics"] for it in self.talk):
                 continue
             cls = ' aria-current="page"' if current == slug else ""
-            out.append(f'<a class="chip" href="{up}t/{slug}.html"{cls}>{e(t["label"])}<span class="n">{counts[slug]}</span></a>')
+            out.append(f'<a class="chip" href="{up}t/{slug}.html"{cls}>{e(t["label"])}<span class="n">{counts.get(slug, 0)}</span></a>')
         out.append("</nav>")
         return "\n".join(out)
 
@@ -172,9 +176,22 @@ class Site:
  <p class="credit">{e(src.get('credit', '出典：' + it['source_name']))}（<a href="{e(it['url'])}" rel="noopener">公式ページ</a>）</p>
 </li>"""
 
+    def talk_box(self, depth: int, items: list[dict], scope: str = "") -> str:
+        """会議・意見募集・調査をまとめた囲み。最新3件と、一覧ページへのリンク。"""
+        up = "../" * depth
+        if not items:
+            return ""
+        latest = "".join(f'<li><a href="{e(it["url"])}" rel="noopener">{e(it["title"])}</a><span class="small">（{e(it["source_name"])}・{e(jdate(it.get("published")))}）</span></li>' for it in items[:3])
+        return f"""<section class="box talk">
+ <h2>{e(scope)}国で話し合っていること<span class="n">{len(items)}件</span></h2>
+ <p class="small">審議会や検討会の開催、意見募集、調査の結果です。<b>まだ決まっていないことで、いま使える支援ではありません。</b>これから制度が変わるかもしれない「予告」として見てください。</p>
+ <ul class="talk-list">{latest}</ul>
+ <a class="more-link" href="{up}talk.html">話し合いの一覧を見る</a>
+</section>"""
+
     def list_by_day(self, items: list[dict], depth: int, limit: int | None = None) -> str:
         if not items:
-            return '<p class="empty">この分野の新着は、いまのところありません。下の「困ったときの相談先」もご覧ください。</p>'
+            return '<p class="empty">いまのところ、この欄に出せる新しいお知らせはありません。国の新着の多くは会議の開催などで、暮らしにすぐ役立つお知らせが出ない週もあります。下の「困ったときの相談先」もご覧ください。</p>'
         out = []
         cur = None
         for it in items[:limit] if limit else items:
@@ -218,9 +235,11 @@ class Site:
         body.append(f'<p class="small">{e(desc)} 見出しは公式のまま、リンク先は公式ページです。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
-        body.append(self.list_by_day(self.items, 0, limit=60))
-        if len(self.items) > 60:
+        body.append('<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。</p>')
+        body.append(self.list_by_day(self.useful, 0, limit=60))
+        if len(self.useful) > 60:
             body.append('<p class="more">もっと前のお知らせは、上の分野ボタンから見られます。</p>')
+        body.append(self.talk_box(0, self.talk))
         body.append(self.help_html(0))
         body.append("</main>")
         body.append(self.footer(0))
@@ -228,17 +247,32 @@ class Site:
 
     def page_topic(self, slug: str) -> str:
         t = self.topics[slug]
-        items = [it for it in self.items if slug in it["topics"]]
+        items = [it for it in self.useful if slug in it["topics"]]
+        talk = [it for it in self.talk if slug in it["topics"]]
         desc = f"「{t['label']}」に関わる国の支援やお知らせの新着です。公式ページから毎日自動で集めています。"
         body = [self.head(f"{t['label']}の新着｜{self.cfg['name']}", desc, f"t/{slug}.html", 1), self.header(1)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">{e(t["label"])}の新着</h1><p class="lead">{e(desc)}</p>')
         body.append(self.chips(1, slug))
+        body.append('<h2 class="sec">暮らしに役立つお知らせ</h2>')
         body.append(self.list_by_day(items, 1))
+        body.append(self.talk_box(1, talk, f"{t['label']}について、"))
         body.append(self.help_html(1, slug))
         body.append("</main>")
         body.append(self.footer(1))
+        return "\n".join(body)
+
+    def page_talk(self) -> str:
+        desc = "審議会・検討会の開催、意見募集、調査の結果など、国で話し合っていることの一覧です。まだ決まっていないことで、いま使える支援ではありません。"
+        body = [self.head(f"国で話し合っていること｜{self.cfg['name']}", desc, "talk.html", 0), self.header(0)]
+        body.append('<main id="main" class="stack">')
+        body.append(self.source_warnings())
+        body.append(f'<h1 class="h1">国で話し合っていること</h1><p class="lead">{e(desc)}</p>')
+        body.append(self.list_by_day(self.talk, 0, limit=150))
+        body.append(self.help_html(0))
+        body.append("</main>")
+        body.append(self.footer(0))
         return "\n".join(body)
 
     def page_about(self) -> str:
@@ -285,7 +319,7 @@ class Site:
         base = self.cfg["base_url"]
         upd = self.store.get("updated") or self.built.isoformat(timespec="seconds")
         entries = []
-        for it in self.items[:50]:
+        for it in self.useful[:50]:
             d = (it.get("published") or it["first_seen"][:10]) + "T00:00:00+09:00"
             k = self.kinds.get(it["kind"], self.rules["default_kind"])["label"]
             tl = "・".join(self.topics[t]["label"] for t in it["topics"] if t in self.topics)
@@ -306,7 +340,8 @@ class Site:
         shutil.copytree(ROOT / "assets", out / "assets")
         (out / "index.html").write_text(self.page_index(), encoding="utf-8")
         (out / "about.html").write_text(self.page_about(), encoding="utf-8")
-        pages = ["index.html", "about.html"]
+        (out / "talk.html").write_text(self.page_talk(), encoding="utf-8")
+        pages = ["index.html", "talk.html", "about.html"]
         for slug in self.topics:
             (out / "t" / f"{slug}.html").write_text(self.page_topic(slug), encoding="utf-8")
             pages.append(f"t/{slug}.html")
