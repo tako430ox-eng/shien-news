@@ -25,6 +25,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 起動のきっかけになったコミットではなく、その時点の main の最新を使う。
+          # 続けてマージしたとき、ひとつ前の run が保存した data/ を古いまま上書きしないため
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -38,11 +42,18 @@ jobs:
         run: |
           git config user.name "shien-news-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/items.json data/health.json
-          if ! git diff --cached --quiet; then
-            git commit -m "新着の取得 $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
-            git pull --rebase && git push
-          fi
+          # 同じ時間に別の run が data/ を保存していたら、その上で取り直して保存し直す（3回まで）
+          for i in 1 2 3; do
+            git add data/items.json data/health.json
+            git diff --cached --quiet && exit 0
+            git commit -q -m "新着の取得 $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
+            git push -q && exit 0
+            echo "push が衝突したので、最新の main の上で取り直します（$i 回目）"
+            git fetch -q origin main && git reset -q --hard origin/main
+            SHIEN_SLEEP=1 python scripts/update.py > /dev/null
+            python scripts/build.py --out site
+          done
+          exit 1
       - name: 取れない情報源があれば Issue で知らせる（3回続けて失敗したとき）
         env:
           GH_TOKEN: ${{ github.token }}

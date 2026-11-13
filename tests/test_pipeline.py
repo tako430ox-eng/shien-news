@@ -191,7 +191,12 @@ class TestEndToEnd(unittest.TestCase):
         # 関係のあるものは出す。公式へのリンクと出典つき
         self.assertIn("住居確保給付金の支給要件の見直し", index)
         self.assertIn("出典：厚生労働省ホームページ", index)
-        self.assertIn("生活オリエンテーション動画", index)
+        # 役立つ欄は「制度の変更・募集/申請・相談窓口・注意」の4種類だけ。行事や広報は「そのほかのお知らせ」へ
+        self.assertNotIn("生活オリエンテーション動画", index.split("そのほかのお知らせ")[0])
+        self.assertIn("生活オリエンテーション動画", (out / "other.html").read_text(encoding="utf-8"))
+        self.assertNotIn("生活オリエンテーション動画", (out / "feed.xml").read_text(encoding="utf-8"))
+        self.assertIn("other.html", (out / "sitemap.xml").read_text(encoding="utf-8"))
+        self.assertTrue(all(it["kind"] in {"change", "apply", "consult", "warning"} for it in site.useful))
         # 会議は「暮らしに役立つお知らせ」に混ぜず、「国で話し合っていること」に分ける
         useful_part = index.split("国で話し合っていること")[0]
         self.assertNotIn("ひとり親家庭支援ワーキンググループ", useful_part)
@@ -207,6 +212,19 @@ class TestEndToEnd(unittest.TestCase):
         # 鮮度の基準は「最後に実際に取れた時刻」
         self.assertIn(f'data-generated="{site.fresh}"', index)
         self.assertTrue(site.fresh)
+
+    def test_rules_applied_to_old_items(self):
+        """規則を変えたら、もう一覧から消えた記事にも新しい規則が当たる。"""
+        (self.tmp / "items.json").write_text(json.dumps({"updated": None, "items": [{
+            "id": "old1", "source": "isa", "source_name": "出入国在留管理庁", "title": "在留許可手数料の額の改定がされます。",
+            "url": "https://www.moj.go.jp/isa/x.html", "published": "2099-01-01", "category": "", "first_seen": "2099-01-01T00:00:00+09:00",
+            "last_seen": "2099-01-01T00:00:00+09:00", "publish": "auto", "topics": ["foreign"], "kind": "notice", "excluded": False, "business": False}]}),
+            encoding="utf-8")
+        with FixtureServer() as srv:
+            os.environ["SHIEN_SOURCE_OVERRIDE"] = json.dumps({k: {"url": srv.url("missing.html")} for k in SOURCES})
+            update.run(ROOT / "config" / "sources.json", self.tmp)
+        it = json.loads((self.tmp / "items.json").read_text(encoding="utf-8"))["items"][0]
+        self.assertEqual(it["kind"], "change")
 
     def test_html_escape(self):
         (self.tmp / "items.json").write_text(json.dumps({"updated": None, "items": [{

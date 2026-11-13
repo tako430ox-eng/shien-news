@@ -88,6 +88,11 @@ def run(sources_path: Path, data_dir: Path = DATA, today: date | None = None) ->
             summary["sources"][src["id"]] = {"ok": False, "error": str(e)[:300]}
         time.sleep(float(os.environ.get("SHIEN_SLEEP", "2")))
 
+    # 規則（rules.json）を変えたときに、もう一覧から消えた古い記事にも新しい規則を当てる
+    srcs = {s["id"]: s for s in cfg["sources"]}
+    for it in by_id.values():
+        it.update(classify(it["title"], rules, it.get("category", ""), srcs.get(it.get("source"), {}).get("default_topics", [])))
+
     # 古いものを捨てる（掲載日がない場合は最初に見た日で判断）
     limit = today - timedelta(days=rules.get("max_age_days", 120))
     kept = []
