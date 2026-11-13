@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import JST, ROOT, load_json, now_jst, save_json  # noqa: E402
 
 WD = "月火水木金土日"
+PLACEHOLDER = "【未記入"
 
 
 def e(s) -> str:
@@ -76,9 +77,7 @@ class Site:
 <meta property="og:url" content="{e(canon)}">
 <meta name="theme-color" content="#fffaf2">
 <link rel="alternate" type="application/atom+xml" title="{e(self.cfg['name'])}" href="{up}feed.xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700&display=swap">
+<link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
 <link rel="stylesheet" href="{up}assets/site.css">
 </head>
@@ -304,7 +303,7 @@ class Site:
 <li><b>分野と種類は、見出しの言葉から機械的に付けています</b>。たとえば見出しに「審議会」があれば「検討中」とします。外れることがあります。</li>
 <li>「やさしい説明」や「もうすぐ締め切り」は、<b>人が公式ページを読んで確かめたものだけ</b>を、確かめた日と一緒に載せています。</li>
 <li>職員の採用、入札、議事録、記者会見など、暮らしの支援と関わりが薄いお知らせは除いています。</li>
-<li>このページは利用する人の情報を集めていません。アクセス解析や広告のプログラムも入れていません。ただし見出しの文字（Zen Maru Gothic）をGoogle Fontsから読み込むため、表示するときにGoogleのサーバーへ接続します。</li>
+<li>このページは利用する人の情報を集めていません。アクセス解析や広告のプログラムも入れていません。見出しの文字（Zen Maru Gothic）もこのサイトの中に置いているので、ページを開いてもほかの会社のサーバーには接続しません（公開に使っている GitHub を除く）。</li>
 </ul>
 <h2>種類の見方</h2>
 <ul>{kinds}</ul>
@@ -336,6 +335,35 @@ class Site:
 </feed>
 """
 
+    def copy_pages(self, out: Path, src: Path | None = None) -> list[str]:
+        """pages/（行動支援の試作と運営者ページ）を site/ にそのまま写す。写したHTMLのパスを返す。
+
+        運営者ページに「【未記入】」が残っている間は、どれも写さない（仮のまま公開しないため）。
+        生成したページと同じ名前のファイルは上書きしない。
+        """
+        src = src or ROOT / "pages"
+        if not src.is_dir():
+            return []
+        unei = src / "unei.html"
+        if not unei.exists() or PLACEHOLDER in unei.read_text(encoding="utf-8"):
+            print(f"pages/ は公開しません：運営者ページ（pages/unei.html）に「{PLACEHOLDER}」が残っています", file=sys.stderr)
+            return []
+        copied = []
+        for f in sorted(src.rglob("*")):
+            if not f.is_file():
+                continue
+            rel = f.relative_to(src)
+            dst = out / rel
+            if dst.exists():
+                print(f"pages/{rel.as_posix()} は生成したページと同じ名前なので写しません", file=sys.stderr)
+                continue
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dst)
+            if f.suffix == ".html":
+                p = rel.as_posix()
+                copied.append(p[: -len("index.html")] if p.endswith("/index.html") else p)
+        return copied
+
     def build(self, out: Path) -> None:
         if out.exists():
             shutil.rmtree(out)
@@ -349,6 +377,7 @@ class Site:
             (out / "t" / f"{slug}.html").write_text(self.page_topic(slug), encoding="utf-8")
             pages.append(f"t/{slug}.html")
         (out / "feed.xml").write_text(self.feed(), encoding="utf-8")
+        pages += self.copy_pages(out)
         base = self.cfg["base_url"]
         lastmod = self.built.date().isoformat()
         urls = "".join(f"<url><loc>{e(urljoin(base, p))}</loc><lastmod>{lastmod}</lastmod></url>" for p in pages)

@@ -51,3 +51,10 @@ config/rules.json の topics（分野）と kinds（種類）の keywords に言
 
 - 更新を止めるなら、サイトのトップに「更新を終了しました」と出し、古い情報が新しく見えないようにする（Pages を止める、または config/site.json の tagline を変えて build）。
 - 引き継ぐなら、リポジトリの所有者を移すだけで動く（秘密の鍵や有料の契約はない）。
+
+## 行動支援の試作（/yachin/）と運営者ページ（/unei.html）
+
+- 置き場所：`pages/`。build.py が最後に `site/` へそのまま写す（生成したページと同じ名前のファイルは写さない）。
+- **`pages/unei.html` に「【未記入」が残っている間は、`pages/` を一切公開しない。** 活動名と専用メールアドレスを書き込むと、次の自動実行で公開される。
+- 試作の正本は `/mnt/project-files/action-support/app/index.html`（デザインのスレッドが更新）。公開版は直接直さず、`python scripts/publish_app.py <正本>` で作り直す。Google Fonts の読み込みを外し、`assets/fonts.css`（自前のフォントの部分集合）に替える。
+- ページを開いただけで外のサーバーに接続するものを入れない（テスト `TestPages` が確かめる）。

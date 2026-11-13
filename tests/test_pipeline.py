@@ -5,6 +5,7 @@
 import http.server
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -243,6 +244,66 @@ class TestWatch(unittest.TestCase):
             state = json.loads((tmp / "state.json").read_text(encoding="utf-8"))
             self.assertNotIn("家賃", json.dumps(state, ensure_ascii=False))  # 本文は保存しない
         shutil.rmtree(tmp)
+
+
+class TestPages(unittest.TestCase):
+    """pages/（行動支援の試作と運営者ページ）の公開。運営者ページが仮のままなら公開しない。外部から読み込まない。"""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        shutil.copytree(ROOT / "pages", self.tmp / "pages")
+        self.site = build.Site(ROOT / "data")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def fill(self):
+        u = self.tmp / "pages" / "unei.html"
+        u.write_text(u.read_text(encoding="utf-8").replace(build.PLACEHOLDER, "【記入済み"), encoding="utf-8")
+
+    def test_not_copied_while_placeholder(self):
+        u = self.tmp / "pages" / "unei.html"
+        u.write_text(u.read_text(encoding="utf-8") + "<!-- " + build.PLACEHOLDER + "：テスト】 -->", encoding="utf-8")
+        out = self.tmp / "site"
+        out.mkdir()
+        self.assertEqual(self.site.copy_pages(out, self.tmp / "pages"), [])
+        self.assertFalse((out / "yachin").exists())
+        self.assertFalse((out / "unei.html").exists())
+
+    def test_copied_when_filled_and_no_overwrite(self):
+        self.fill()
+        (self.tmp / "pages" / "index.html").write_text("偽物", encoding="utf-8")
+        out = self.tmp / "site"
+        out.mkdir()
+        (out / "index.html").write_text("生成したページ", encoding="utf-8")
+        got = self.site.copy_pages(out, self.tmp / "pages")
+        self.assertIn("yachin/", got)
+        self.assertIn("unei.html", got)
+        self.assertNotIn("index.html", got)
+        self.assertEqual((out / "index.html").read_text(encoding="utf-8"), "生成したページ")
+        self.assertTrue((out / "yachin" / "index.html").exists())
+
+    def test_no_external_loads(self):
+        """ページを開いただけで外のサーバーに接続するもの（フォント・スクリプト・CSS・画像）がない。"""
+        bad = re.compile(r'<(?:script|link|img|iframe)[^>]+(?:src|href)="(?:https?:)?//|@import|url\((?:["\']?)(?:https?:)?//', re.I)
+        files = list((ROOT / "pages").rglob("*.html")) + list((ROOT / "assets").glob("*.css"))
+        self.assertTrue(files)
+        for f in files:
+            text = f.read_text(encoding="utf-8")
+            hits = [m.group(0) for m in bad.finditer(text) if 'rel="canonical"' not in text[max(0, m.start() - 5):m.end() + 40]]
+            self.assertEqual(hits, [], f.name)
+        css = (ROOT / "assets" / "fonts.css").read_text(encoding="utf-8")
+        for name in re.findall(r'url\("fonts/([^"]+)"\)', css):
+            self.assertTrue((ROOT / "assets" / "fonts" / name).exists(), name)
+        self.assertTrue((ROOT / "assets" / "fonts" / "OFL.txt").exists())
+
+    def test_generated_pages_load_nothing_external(self):
+        out = self.tmp / "site"
+        self.site.build(out)
+        for f in out.rglob("*.html"):
+            text = f.read_text(encoding="utf-8")
+            self.assertNotIn("fonts.googleapis.com", text, f.name)
+            self.assertNotRegex(text, r'<script[^>]+src="https?://', f.name)
 
 
 if __name__ == "__main__":
