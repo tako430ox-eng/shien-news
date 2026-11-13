@@ -1,0 +1,36 @@
+{
+ "sources": {
+  "mhlw": {
+   "name": "厚生労働省",
+   "failures": 0,
+   "url": "https://www.mhlw.go.jp/stf/new-info/index.html",
+   "last_ok": "2026-11-13T17:57:30+09:00",
+   "last_count": 520,
+   "last_error": null
+  },
+  "cfa": {
+   "name": "こども家庭庁",
+   "failures": 1,
+   "url": "https://www.cfa.go.jp/news",
+   "last_error": "1件も読み取れませんでした（ページの作りが変わった可能性）",
+   "last_fail": "2026-11-13T17:57:30+09:00"
+  },
+  "isa": {
+   "name": "出入国在留管理庁",
+   "failures": 0,
+   "url": "https://www.moj.go.jp/isa/publications/newslist/index.html",
+   "last_ok": "2026-11-13T17:57:30+09:00",
+   "last_count": 119,
+   "last_error": null
+  },
+  "digital": {
+   "name": "デジタル庁",
+   "failures": 0,
+   "url": "https://www.digital.go.jp/rss/news.xml",
+   "last_ok": "2026-11-13T17:57:30+09:00",
+   "last_count": 40,
+   "last_error": null
+  }
+ },
+ "checked": "2026-11-13T17:57:30+09:00"
+}
