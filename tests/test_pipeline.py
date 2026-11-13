@@ -73,7 +73,7 @@ class TestHtmlLists(unittest.TestCase):
 
     def test_isa_shift_jis_and_date_before(self):
         items = parse_fixture("isa", "isa_newslist.html")
-        self.assertEqual(len(items), 3)  # 年別一覧へのリンクは除外
+        self.assertEqual(len(items), 3)  # 年別一覧へのリンクと、日付のないメニューのリンクは除外
         self.assertEqual(items[0]["date"], "2026-11-11")
         self.assertEqual(items[0]["category"], "調達・採用情報")
         self.assertEqual(items[1]["title"], "生活オリエンテーション動画（ショート版）を配信しています！")
@@ -103,6 +103,10 @@ class TestClassify(unittest.TestCase):
         self.assertEqual(self.c("第5回ひとり親家庭支援ワーキンググループの開催について")["kind"], "discussion")
         self.assertEqual(self.c("生活保護の申請を装った詐欺にご注意ください")["kind"], "warning")
         self.assertIn("foreign", self.c("生活オリエンテーション動画（ショート版）を配信しています")["topics"])
+        # 2026-11-13 の本番取得で見つかった誤り：システムの「障害」を障害の分野にしていた
+        self.assertNotIn("disability", self.c("Microsoft365の大規模障害について")["topics"])
+        self.assertTrue(self.c("マイクロソフト社の障害によりメール不着等となる事象について")["excluded"])
+        self.assertIn("disability", self.c("障害者の就労支援について")["topics"])
 
     def test_excluded(self):
         self.assertTrue(self.c("上野厚生労働大臣 閣議後記者会見のお知らせ")["excluded"])

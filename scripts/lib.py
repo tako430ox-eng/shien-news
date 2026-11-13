@@ -136,10 +136,13 @@ class _Walker(HTMLParser):
         self.tokens: list[dict] = []
         self._skip = 0
         self._a: dict | None = None
+        self._skip_tags: list[str] = []
 
     def handle_starttag(self, tag, attrs):
-        if tag in self.SKIP:
+        # リンクの中の header（こども家庭庁のカードの見出し部分）は読む。ページ全体の header だけ読まない
+        if tag in self.SKIP and not (tag in ("header", "footer") and self._a is not None):
             self._skip += 1
+            self._skip_tags.append(tag)
             return
         if self._skip:
             return
@@ -151,7 +154,8 @@ class _Walker(HTMLParser):
                 self._a["text"] += " "
 
     def handle_endtag(self, tag):
-        if tag in self.SKIP:
+        if self._skip_tags and tag == self._skip_tags[-1]:
+            self._skip_tags.pop()
             self._skip = max(0, self._skip - 1)
             return
         if self._skip:
@@ -169,7 +173,7 @@ class _Walker(HTMLParser):
             self.tokens.append({"type": "text", "text": data})
 
 
-def parse_html_list(html: str, base_url: str, item_href: str, strip_prefixes=(), exclude_href: str | None = None) -> list[dict]:
+def parse_html_list(html: str, base_url: str, item_href: str, strip_prefixes=(), exclude_href: str | None = None, require_date: bool = True) -> list[dict]:
     """新着一覧ページから {title, url, date, category} を取り出す。
 
     日付の見つけ方：リンクの文字の中に日付があればそれを使う（こども家庭庁型）。
@@ -221,7 +225,8 @@ def parse_html_list(html: str, base_url: str, item_href: str, strip_prefixes=(),
                     changed = True
         if not category and last_text and len(last_text) <= 12:
             category = last_text
-        if len(text) < 6 or url in seen:
+        d0 = d_in or last_date
+        if len(text) < 6 or url in seen or (require_date and d0 is None):
             continue
         seen.add(url)
         d = d_in or last_date
