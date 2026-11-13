@@ -1,0 +1,19 @@
+# 手動で動かす点検用：指定したページのリンクと文字の並びをログに出す（取り込めないときの原因調べ）。
+name: ページの点検
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "調べるページのURL"
+        required: true
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 点検
+        env:
+          TARGET: ${{ inputs.url }}
+        run: python scripts/inspect_page.py "$TARGET"
