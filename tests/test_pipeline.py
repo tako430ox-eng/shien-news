@@ -114,6 +114,9 @@ class TestClassify(unittest.TestCase):
         self.assertNotIn("disability", self.c("Microsoft365の大規模障害について")["topics"])
         self.assertTrue(self.c("マイクロソフト社の障害によりメール不着等となる事象について")["excluded"])
         self.assertIn("disability", self.c("障害者の就労支援について")["topics"])
+        # 「取組開始から8年目」のような言い回しを「制度の変更」にしない（2026-11-13 の本番データの例）
+        self.assertNotEqual(self.c("応援サポーターが登場　取組開始から8年目")["kind"], "change")
+        self.assertEqual(self.c("令和８年１０月１日付け永住許可に関するガイドラインを改定しました。")["kind"], "change")
 
     def test_excluded(self):
         self.assertTrue(self.c("上野厚生労働大臣 閣議後記者会見のお知らせ")["excluded"])
