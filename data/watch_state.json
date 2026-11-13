@@ -2336,10 +2336,6 @@
    "checked": "2026-11-13T18:01:38+09:00",
    "first_seen": "2026-11-13T18:01:38+09:00"
   },
-  "https://www.city.funabashi.lg.jp/kenkou/korena/001/p087737.html": {
-   "unreachable_since": "2026-11-13T18:01:38+09:00",
-   "error": "取得できませんでした: https://www.city.funabashi.lg.jp/kenkou/korena/001/p087737.html: HTTP Error 404: Not Found"
-  },
   "https://www.city.bunkyo.lg.jp/b019/p003121.html": {
    "digest": "0661050e1240624992b4ba5ce7831645fb163caf3a720f6276cc6dbb3d1a0a8d",
    "lines": [
