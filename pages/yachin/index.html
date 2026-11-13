@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 正本: /mnt/project-files/action-support/app/index.html（sha256 先頭 b5b9209e4150）。scripts/publish_app.py で作った。直接は編集しない。 -->
+<!-- 正本: /mnt/project-files/action-support/app/index.html（sha256 先頭 d0c382be885a）。scripts/publish_app.py で作った。直接は編集しない。 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -267,12 +267,10 @@ h2 { font-weight: 900; }
       <span class="brand">くらしの非常口</span><span class="tag">試作版</span>
     </div>
     <h1>家賃が払えない。<br><em>今日やること</em>は、ひとつ。</h1>
-    <p class="lead">電話で言うことと、相談先を出します。</p>
+    <p class="lead">どこに電話して、何と言えばいいかを示します。</p>
     <ul class="promise" aria-label="このページの約束">
-      <li>お金は求めません</li>
-      <li>入力は送りません</li>
-      <li>使えるかは窓口で</li>
-      <li>家族と使えます</li>
+      <li>無料です。費用は一切かかりません</li>
+      <li>入力した内容は、どこにも送信されません</li>
     </ul>
     <svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>
   </header>
@@ -641,7 +639,8 @@ h2 { font-weight: 900; }
   function callerIsSupporter() { return state.supporter; }
   function supIntro() {
     var who = state.name.trim() ? state.name.trim() + "さん" : "相談したい人";
-    return who + "の" + (state.rel.trim() || "家族") + "です。本人の了解を得て、隣にいる本人に代わってお電話しています。";
+    var rel = state.rel.trim();
+    return (rel ? who + "の" + rel + "です。" : who + "を手伝っている者です。") + "本人の了解を得て、隣にいる本人に代わってお電話しています。";
   }
   function callScript() {
     var foreign = has("nat", "foreign") ? "国籍は日本ではありません。" : "";
