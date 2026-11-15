@@ -4,7 +4,7 @@
 
 - 運営の目的：既存の支援制度と、それを必要とする人との間の障壁を小さくすること（プロジェクト「社会的弱者の救済」）。
 - 費用：0円（GitHub の公開リポジトリで、GitHub Actions と GitHub Pages を使う）。
-- 外部ライブラリ：なし（Python 3.12 の標準ライブラリだけ）。
+- 外部ライブラリ：なし（公開・取得処理は Python 3.12 の標準ライブラリだけ。家賃編の自動テストは Node.js 22 の標準機能を使用）。
 
 ## しくみ
 
@@ -29,7 +29,7 @@
 | 見出しは公式のまま。機械（AIを含む）で要約しない | 要約の誤りを防ぐ | lib.tidy（空白だけ整える）、テスト |
 | 分野・種類は見出しの言葉で機械的に付け、「自動の分類」と表示する | 判断の根拠を説明できるようにする | config/rules.json |
 | 「検討中（審議会など）」「意見募集」は、まだ決まっていないことを明示する | 決まったと誤解させない | rules.json の hint |
-| 「暮らしに役立つお知らせ」には、制度の変更・募集/申請・相談窓口・注意の4種類だけを出す。会議・調査は talk.html、行事・広報などは other.html に分ける | 役に立つものを埋もれさせない（2026-11-13 利用者の判断） | rules.json の useful_kinds、build.py |
+| 「暮らしに役立つお知らせ」には、会議・調査以外のお知らせを出す。4種類への限定は外している | 2026-11-14 の利用者の判断を維持 | rules.json、build.py |
 | やさしい説明・締め切りは、人が公式ページで確かめたものだけ、確認日つきで載せる | 自動では正確さを保証できない | data/notes.json、data/deadlines.json |
 | 更新が止まったら画面に警告を出す（最後に実際に取れた時刻から72時間） | 古い情報を新しいと思わせない | assets/site.js、build.py の fresh |
 | 取れない情報源は画面と Issue で知らせる | 静かに壊れるのを防ぐ | update.py の health、health_report.py |
@@ -38,7 +38,8 @@
 ## 手元で動かす
 
 ```
-python -m unittest discover -s tests      # テスト（ネットワーク不要）
+python -m unittest discover -s tests      # 取得・生成のテスト
+node --test tests/test_yachin.cjs         # 家賃編の分岐・保存のテスト（ネットワーク不要）
 python scripts/update.py                  # 実際に取得（ネットワークが必要）
 python scripts/build.py                   # site/ を作る
 python tests/sample/make_sample.py /tmp/d && python scripts/build.py --data /tmp/d --out /tmp/s --sample   # 見本で画面確認
@@ -52,3 +53,9 @@ python tests/sample/make_sample.py /tmp/d && python scripts/build.py --data /tmp
 4. 公開されたURL（`https://<アカウント名>.github.io/<リポジトリ名>/`）を config/site.json の base_url に書く。
 
 詳しい運用は docs/operations.md。
+
+## 点検と利用テスト
+
+- [2026-11-14 点検結果](docs/review-20261114.md)
+- [案内と根拠の対応表](docs/evidence-20261114.md)
+- [利用テスト手順・記録様式](docs/usability-test.md)

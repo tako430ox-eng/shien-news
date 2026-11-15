@@ -145,6 +145,7 @@ class FixtureServer:
 
     def __exit__(self, *a):
         self.httpd.shutdown()
+        self.httpd.server_close()
         shutil.rmtree(self.dir)
 
 
@@ -202,7 +203,7 @@ class TestEndToEnd(unittest.TestCase):
         useful_part = index.split("国で話し合っていること")[0]
         self.assertNotIn("ひとり親家庭支援ワーキンググループ", useful_part)
         self.assertIn("ひとり親家庭支援ワーキンググループ", (out / "talk.html").read_text(encoding="utf-8"))
-        self.assertIn("まだ決まっていないことで、いま使える支援ではありません", index)
+        self.assertIn("検討段階の案と、すでに公表された調査結果などを含みます", index)
         self.assertNotIn("ワーキンググループ", (out / "feed.xml").read_text(encoding="utf-8"))
         # 2回続けて失敗した情報源は画面に警告を出す
         self.assertIn("デジタル庁の新着が、いま自動で取れていません", index)
@@ -327,3 +328,23 @@ class TestPages(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class TestReviewRegression(unittest.TestCase):
+    def test_medical_headline_is_findable_in_health(self):
+        result = lib.classify('OTC類似薬の保険給付の在り方の見直しについて', RULES)
+        self.assertIn('health', result['topics'])
+
+    def test_fetch_time_does_not_advance_on_failed_attempt(self):
+        site = build.Site(ROOT / 'data')
+        site.store['updated'] = '2030-01-01T00:00:00+09:00'
+        site.fresh = '2026-11-13T07:00:00+09:00'
+        self.assertIn('2026年11月13日', site.updated_text())
+        self.assertNotIn('2030', site.footer(0))
+
+    def test_statistics_not_declared_undecided(self):
+        site = build.Site(ROOT / 'data')
+        self.assertNotIn('まだ決まっていないことで', site.page_talk())
+        self.assertIn('調査結果', site.page_talk())
+
+    def test_current_broad_notice_policy_preserved(self):
+        self.assertNotIn('useful_kinds', RULES)

@@ -124,7 +124,7 @@ class Site:
         return f"""<footer class="foot">
   <p>このページは、国の機関の公式ページに出た新着情報を、プログラムで毎日自動で集めて並べたものです。国が作ったページではありません。見出しは公式ページのままで、内容の要約や判断はしていません。申請できるか、いつまでかなどは、必ずリンク先の公式ページか窓口で確かめてください。</p>
   <p><a href="{up}about.html">このページについて（出典・しくみ・情報源の状態）</a> ・ <a href="{up}feed.xml">新着をRSSで受け取る</a></p>
-  <p>最後に確認した時刻：{e(self.updated_text())}</p>
+  <p>情報源から最後に取得できた時刻：{e(self.updated_text())}</p>
 </footer>
 </div>
 <script src="{up}assets/site.js" defer></script>
@@ -133,7 +133,7 @@ class Site:
 """
 
     def updated_text(self) -> str:
-        u = self.store.get("updated")
+        u = self.fresh
         if not u:
             return "まだ取得していません"
         d = datetime.fromisoformat(u).astimezone(JST)
@@ -192,7 +192,7 @@ class Site:
         latest = "".join(f'<li><a href="{e(it["url"])}" rel="noopener">{e(it["title"])}</a><span class="small">（{e(it["source_name"])}・{e(jdate(it.get("published")))}）</span></li>' for it in items[:3])
         return f"""<section class="box talk">
  <h2>{e(scope)}国で話し合っていること<span class="n">{len(items)}件</span></h2>
- <p class="small">審議会や検討会の開催、意見募集、調査の結果です。<b>まだ決まっていないことで、いま使える支援ではありません。</b>これから制度が変わるかもしれない「予告」として見てください。</p>
+ <p class="small">審議会や検討会の開催、意見募集、調査の結果です。<b>検討段階の案と、すでに公表された調査結果などを含みます。支援を利用できるかは、公式ページで確かめてください。</b>会議の見出しだけで、制度が決まった・変わったとは判断しないでください。</p>
  <ul class="talk-list">{latest}</ul>
  <a class="more-link" href="{up}talk.html">話し合いの一覧を見る</a>
 </section>"""
@@ -287,7 +287,7 @@ class Site:
         return "\n".join(body)
 
     def page_talk(self) -> str:
-        desc = "審議会・検討会の開催、意見募集、調査の結果など、国で話し合っていることの一覧です。まだ決まっていないことで、いま使える支援ではありません。"
+        desc = "審議会・検討会の開催、意見募集、調査の結果など、国で話し合っていることの一覧です。検討段階の案と、すでに公表された調査結果などを含みます。支援を利用できるかは、公式ページで確かめてください。"
         body = [self.head(f"国で話し合っていること（審議会・意見募集）｜{self.cfg.get('brand', self.cfg['name'])}", desc, "talk.html", 0), self.header(0)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())

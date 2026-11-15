@@ -1,6 +1,6 @@
 {
  "_説明": "行動支援の試作（家賃の次の一歩）が出典にしている公式ページ。内容が変わったら、人が試作の文面を見直すために知らせる。公開はしない（変化の検知だけ）。ignore は毎回変わってしまう部分（アクセス数など）を無視する正規表現。",
- "used_by": "/mnt/project-files/action-support/app/index.html",
+ "used_by": "pages/yachin/index.html",
  "pages": [
   {
    "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html",
@@ -89,6 +89,42 @@
   {
    "url": "https://www.city.bunkyo.lg.jp/b019/p003121.html",
    "what": "文京区のページ"
+  },
+  {
+   "url": "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html",
+   "what": "厚生労働省：住居確保給付金（家賃補助）の制度概要"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/content/10200000/001391556.pdf",
+   "what": "厚生労働省：住居確保給付金における転居費用の支給"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/content/11907000/001738883.pdf",
+   "what": "厚生労働省：生活困窮者自立支援制度（令和8年度説明資料、転居費用補助を含む）"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html",
+   "what": "厚生労働省：生活保護を申請したい方へ"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/content/001684937.pdf",
+   "what": "厚生労働省：生活保護における外国人の取扱いについて"
+  },
+  {
+   "url": "https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html",
+   "what": "内閣府：国民の祝日（2026・2027年）"
+  },
+  {
+   "url": "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html",
+   "what": "法テラス：サポートダイヤル（受付時間・通話料・案内の範囲）"
+  },
+  {
+   "url": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr7_000024.html",
+   "what": "国土交通省：家賃債務保証業者登録制度（最高裁判決を受けた周知）"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/hellotraining/about/",
+   "what": "ハロートレーニングの費用と対象"
   }
  ],
  "ignore": [
