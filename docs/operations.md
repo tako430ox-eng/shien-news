@@ -56,5 +56,8 @@ config/rules.json の topics（分野）と kinds（種類）の keywords に言
 
 - 置き場所：`pages/`。build.py が最後に `site/` へそのまま写す（生成したページと同じ名前のファイルは写さない）。
 - **`pages/unei.html` に「【未記入」が残っている間は、`pages/` を一切公開しない。** 活動名と専用メールアドレスを書き込むと、次の自動実行で公開される。
-- 試作の正本は `/mnt/project-files/action-support/app/index.html`（デザインのスレッドが更新）。公開版は直接直さず、`python scripts/publish_app.py <正本>` で作り直す。Google Fonts の読み込みを外し、`assets/fonts.css`（自前のフォントの部分集合）に替える。
+- 2026-11-14 の点検修正以降、公開版の正本はこのリポジトリの `pages/yachin/index.html`。以前の作業環境 `/mnt/project-files/action-support/app/index.html` とは自動同期されない。別の AI も、まず main の最新版と点検結果を読む。
+- `scripts/publish_app.py` は以前の Artifact から取り込むための変換用。古い正本からそのまま実行すると今回の修正が消える。再取り込みする場合は差分を比較し、`node --test tests/test_yachin.cjs` と Python のテストを両方通す。
+- 祝日一覧は 2027 年まで。内閣府の翌年分公表後に `HOLIDAYS` を更新して境界日をテストする。未登録年は開庁日の断定を避ける。自治体ごとの時間や臨時開庁は個別確認が必要。
+- 旧版で保存した持ち物・質問のチェック印は、意味の取り違えを防ぐため自動継承されない。回答・メモ・相談記録は引き継ぐ。
 - ページを開いただけで外のサーバーに接続するものを入れない（テスト `TestPages` が確かめる）。
