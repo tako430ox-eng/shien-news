@@ -340,6 +340,8 @@ class TestSearch(unittest.TestCase):
         shutil.rmtree(self.tmp)
 
     def test_canonical_and_sitemap(self):
+        # 確認用の設定が空のときの動きも確かめるため、ここでは空にして作る
+        self.site.cfg = dict(self.site.cfg, google_site_verification="", google_site_verification_file="")
         out = self.tmp / "site"
         self.site.build(out)
         base = self.site.cfg["base_url"]
@@ -365,6 +367,14 @@ class TestSearch(unittest.TestCase):
         # 確認用の設定が空なら、確認タグもファイルも出さない
         self.assertNotIn("google-site-verification", index)
         self.assertEqual(list(out.glob("google*.html")), [])
+
+    def test_configured_verification_is_valid(self):
+        # いま config/site.json に書いてある値で build が通り、トップにタグが出る
+        token = self.site.cfg.get("google_site_verification", "")
+        if token:
+            out = self.tmp / "site"
+            self.site.build(out)
+            self.assertIn(f'<meta name="google-site-verification" content="{token}">', (out / "index.html").read_text(encoding="utf-8"))
 
     def test_verification_meta_and_file(self):
         self.site.cfg = dict(self.site.cfg, google_site_verification="abcDEF_123-xyz456",
