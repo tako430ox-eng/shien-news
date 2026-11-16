@@ -1,6 +1,6 @@
 {
  "_説明": "行動支援の試作（家賃の次の一歩）が出典にしている公式ページ。内容が変わったら、人が試作の文面を見直すために知らせる。公開はしない（変化の検知だけ）。ignore は毎回変わってしまう部分（アクセス数など）を無視する正規表現。",
- "used_by": "pages/yachin/index.html",
+ "used_by": "pages/yachin/index.html, pages/sasaeru/（scripts/make_sasaeru.py）",
  "pages": [
   {
    "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html",
@@ -125,6 +125,14 @@
   {
    "url": "https://www.mhlw.go.jp/hellotraining/about/",
    "what": "ハロートレーニングの費用と対象"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/content/000746078.pdf",
+   "what": "扶養照会の判断基準の事務連絡（厚生労働省、PDF）"
+  },
+  {
+   "url": "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/faq.html",
+   "what": "住居確保給付金 よくある質問（厚生労働省）"
   }
  ],
  "ignore": [

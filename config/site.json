@@ -6,6 +6,16 @@
  "_検索の説明": "Google Search Console の所有確認。「HTMLタグ」で確認するなら、表示された <meta name=\"google-site-verification\" content=\"…\"> の content の中身だけを google_site_verification に書く。「HTMLファイル」で確認するなら、配られたファイルの名前（google…….html）を google_site_verification_file に書く。どちらか一方でよい。確認が済んだあとも消さない（消すと所有確認が外れる）。",
  "google_site_verification": "EjISdqvj7YWJeLN8qAVdxuy7Nn1ccS1G4GB2V6EGLdQ",
  "google_site_verification_file": "",
+ "_アンケートの説明": "感想のアンケート（任意）。url が空のあいだは、どのページにもアンケートを出さない。url には Google フォームの「回答者に送信するリンク」（https://docs.google.com/forms/d/e/…/viewform）を書く。page_entry には、事前入力リンクに出る「どのページを使いましたか」の entry.数字 を書くと、開いたページが最初から選ばれた状態になる（空でもよい）。page_values の文字は、フォームの選択肢と一字一句同じにする。手順は docs/survey.md。",
+ "survey": {
+  "url": "https://docs.google.com/forms/d/e/1FAIpQLSfNaOPD5nYzRIhKL_ifdKAG1mWGZGR-moQAhD82HJEAqEVKhg/viewform",
+  "service": "Google フォーム",
+  "page_entry": "entry.563584129",
+  "page_values": {
+   "yachin": "家賃が払えないとき（家賃編）",
+   "news": "支援の新着"
+  }
+ },
  "repo_url": "https://github.com/tako430ox-eng/shien-news",
  "stale_hours": 72,
  "help_links": [
