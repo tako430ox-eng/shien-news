@@ -8,9 +8,9 @@
  "google_site_verification_file": "",
  "_アンケートの説明": "感想のアンケート（任意）。url が空のあいだは、どのページにもアンケートを出さない。url には Google フォームの「回答者に送信するリンク」（https://docs.google.com/forms/d/e/…/viewform）を書く。page_entry には、事前入力リンクに出る「どのページを使いましたか」の entry.数字 を書くと、開いたページが最初から選ばれた状態になる（空でもよい）。page_values の文字は、フォームの選択肢と一字一句同じにする。手順は docs/survey.md。",
  "survey": {
-  "url": "",
+  "url": "https://docs.google.com/forms/d/e/1FAIpQLSfNaOPD5nYzRIhKL_ifdKAG1mWGZGR-moQAhD82HJEAqEVKhg/viewform",
   "service": "Google フォーム",
-  "page_entry": "",
+  "page_entry": "entry.563584129",
   "page_values": {
    "yachin": "家賃が払えないとき（家賃編）",
    "news": "支援の新着"
