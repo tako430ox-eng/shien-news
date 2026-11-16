@@ -494,3 +494,35 @@ class TestSurvey(unittest.TestCase):
         self.configure(page_entry="entry.1&x=1")
         with self.assertRaises(ValueError):
             self.site.build(self.tmp / "bad2")
+
+
+class TestSasaeru(unittest.TestCase):
+    """支える人向けの場面別ページ（pages/sasaeru/）。生成元と一致し、検索向けの項目と出典があり、使わない言葉がない。"""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import make_sasaeru
+        self.m = make_sasaeru
+        self.pages = make_sasaeru.render()
+
+    def test_files_match_generator(self):
+        for rel, text in self.pages.items():
+            f = ROOT / "pages" / "sasaeru" / rel
+            self.assertEqual(f.read_text(encoding="utf-8"), text, f"{rel} が古い：python scripts/make_sasaeru.py を実行")
+
+    def test_search_fields_sources_and_words(self):
+        base = json.loads((ROOT / "config" / "site.json").read_text(encoding="utf-8"))["base_url"]
+        for rel, text in self.pages.items():
+            url = base + "sasaeru/" + rel[: -len("index.html")]
+            self.assertIn(f'<link rel="canonical" href="{url}">', text)
+            self.assertRegex(text, r"<title>[^<]+</title>")
+            self.assertRegex(text, r'<meta name="description" content="[^"]{40,}">')
+            self.assertIn("出典と確認日", text)
+            for w in ("申請代行", "申請サポート", "受給できます", "noindex"):
+                self.assertNotIn(w, text, rel)
+            # 外のサーバーから読み込むもの（script・画像・外部CSS）を入れない
+            self.assertNotRegex(text, r'<(script|img|iframe)\b')
+            self.assertNotRegex(text, r'<link rel="stylesheet" href="https?:')
+        for s in self.m.SCENES:
+            for k in s["srcs"]:
+                self.assertIn(k, self.m.SRC)

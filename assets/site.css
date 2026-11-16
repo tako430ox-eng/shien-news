@@ -110,3 +110,15 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .sign-path { display: block; width: calc(100% + 32px); height: 26px; margin: -4px -16px 0; }
 h2 { font-weight: 900; }
 @media print { .hero { background: none; color: var(--c-ink); margin: 0; padding: 0; } .hero h1 em, .hero .lead, .hero .jump, .brandrow .brand { color: var(--c-ink); } .sign-path, .brandrow .logo { display: none; } .brandrow .tag { color: var(--c-ink); border-color: var(--c-line-strong); } .promise li { color: var(--c-ink); background: none; } }
+
+/* ---- 支える人へ（pages/sasaeru/）：電話でそのまま言える文と、道具への入口 ---- */
+.hero-sub h1 { font-size: clamp(1.5rem, 6.4vw, 2.125rem); }
+.hero-sub .lead { font-size: var(--fs-body); }
+.prose ol { margin: 0; padding-left: 1.4em; display: grid; gap: var(--s-2); }
+.prose ul ul { margin-top: var(--s-2); }
+.say { background: var(--c-primary-soft); border-left: 6px solid var(--c-primary); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-1); }
+.say-h { font-size: var(--fs-small); font-weight: 700; color: var(--c-ink-soft); }
+.cta { justify-self: start; display: inline-flex; align-items: center; min-height: var(--tap); background: var(--c-primary); color: var(--c-primary-ink); text-decoration: none; font-weight: 700; border-radius: var(--r-pill); padding: 8px 20px; margin-top: var(--s-3); }
+.prose ul.cards { padding-left: 0; }
+.cards .card a.title { display: inline-flex; align-items: center; min-height: var(--tap); }
+.srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
