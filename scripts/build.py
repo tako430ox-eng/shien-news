@@ -12,7 +12,7 @@ import shutil
 import sys
 from datetime import date, datetime
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import quote, urljoin
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import JST, ROOT, load_json, now_jst, save_json  # noqa: E402
@@ -22,6 +22,10 @@ PLACEHOLDER = "【未記入"
 # Search Console の所有確認。meta タグの content の中身と、HTML ファイルの名前の形
 VERIFY_TOKEN = re.compile(r"[A-Za-z0-9_-]{10,100}")
 VERIFY_FILE = re.compile(r"google[0-9a-f]{8,32}\.html")
+# 感想のアンケート。pages/ のHTMLに置いた目印を、設定があれば案内に、なければ空に置き換える
+SURVEY_MARK = re.compile(r"<!--survey:([a-z]+)-->")
+SURVEY_URL = re.compile(r"https://[A-Za-z0-9.-]+/[^\s\"'<>]*")
+SURVEY_ENTRY = re.compile(r"entry\.[0-9]{3,20}")
 
 
 def e(s) -> str:
@@ -144,13 +148,76 @@ class Site:
         return f"""<footer class="foot">
   <p>このページは、国の機関の公式ページに出た新着情報を、プログラムで毎日自動で集めて並べたものです。国が作ったページではありません。見出しは公式ページのままで、内容の要約や判断はしていません。申請できるか、いつまでかなどは、必ずリンク先の公式ページか窓口で確かめてください。</p>
   <p><a href="{up}about.html">このページについて（出典・しくみ・情報源の状態）</a> ・ <a href="{up}feed.xml">新着をRSSで受け取る</a></p>
-  <p>情報源から最後に取得できた時刻：{e(self.updated_text())}</p>
+{self.survey_foot(up)}  <p>情報源から最後に取得できた時刻：{e(self.updated_text())}</p>
 </footer>
 </div>
 <script src="{up}assets/site.js" defer></script>
 </body>
 </html>
 """
+
+    # ------------------------------------------------------------ 感想のアンケート
+    def survey(self) -> dict:
+        """config/site.json の survey。url が空なら {}（どこにもアンケートを出さない）。形が違えば止める。"""
+        sv = self.cfg.get("survey") or {}
+        url = sv.get("url", "")
+        if not url:
+            return {}
+        if not SURVEY_URL.fullmatch(url):
+            raise ValueError("config/site.json の survey.url は https:// で始まるアンケートのアドレスだけを書いてください")
+        entry = sv.get("page_entry", "")
+        if entry and not SURVEY_ENTRY.fullmatch(entry):
+            raise ValueError("config/site.json の survey.page_entry は entry.数字 の形で書いてください（事前入力リンクから写す）")
+        return sv
+
+    def survey_url(self, page: str) -> str:
+        """アンケートのアドレス。page_entry があれば、開いたページを最初から選んだ状態にする。"""
+        sv = self.survey()
+        url, entry = sv["url"], sv.get("page_entry", "")
+        value = (sv.get("page_values") or {}).get(page, "")
+        if entry and value:
+            url += ("&" if "?" in url else "?") + "usp=pp_url&" + entry + "=" + quote(value)
+        return url
+
+    def survey_note(self, up: str) -> str:
+        sv = self.survey()
+        return (f'押すと、{e(sv.get("service", "外部のフォーム"))}が別の画面で開きます。このページで選んだ内容やメモは送られません。'
+                'アンケートの答えは、送信を押したときだけ運営者に届きます。名前や連絡先は聞きません。'
+                f'返事はできないので、困っていることは相談先に連絡してください。<a href="{up}unei.html#kansou">アンケートについて</a>')
+
+    def survey_block(self, page: str, depth: int) -> str:
+        """pages/ のページ（家賃編など）の最後に置く案内。設定がなければ空。"""
+        if not self.survey():
+            return ""
+        up = "../" * depth
+        return f"""<section class="survey stack small" aria-labelledby="survey-h">
+    <strong id="survey-h">使ってみて、どうでしたか</strong>
+    <p>ページを直すために、1分ほどのアンケートに答えてもらえると助かります。答えなくても、このページはそのまま使えます。</p>
+    <p><a class="survey-link" href="{e(self.survey_url(page))}" target="_blank" rel="noopener">感想のアンケートに答える（任意）</a></p>
+    <p class="muted">{self.survey_note(up)}</p>
+  </section>"""
+
+    def survey_unei(self) -> str:
+        """運営者ページに置く、アンケートで何がどこへ送られるかの説明。設定がなければ空。"""
+        sv = self.survey()
+        if not sv:
+            return ""
+        svc = e(sv.get("service", "外部のフォーム"))
+        return f"""<h2 id="kansou">感想のアンケートについて</h2>
+<ul>
+<li>ページを直すための、任意のアンケートです。答えなくても、どのページもそのまま使えます。</li>
+<li>{svc}（Google社のサービス）を使っています。アンケートを開いたときと送信したときに Google社のサーバーに接続し、答えは Google社のサーバーに保存されます。</li>
+<li>運営者に届くのは、送信したアンケートの答えだけです。このサイトで選んだ内容やメモは送られません。メールアドレスは集めない設定にしています。どのページから開いたかは、最初から選んだ状態で開きます（変えられます）。</li>
+<li>名前・住所・電話番号・メールアドレスや、相談の具体的な中身は書かないでください。書かれていた場合は、運営者が見つけしだい消します。</li>
+<li>アンケートには返事ができません。困っていることは、下の相談先か、お住まいの市区町村の窓口に連絡してください。</li>
+<li>答えはページを直すためだけに使います。外に出すときは、人数や割合と、だれのものか分からないように直した要点だけにします。</li>
+<li>アンケートで、お金、パスワード、名前や電話番号を聞くことはありません。<a href="{e(sv['url'])}" rel="noopener">アンケートを開く</a></li>
+</ul>"""
+
+    def survey_foot(self, up: str) -> str:
+        if not self.survey():
+            return ""
+        return f'  <p><a href="{e(self.survey_url("news"))}" target="_blank" rel="noopener">感想のアンケートに答える（任意・1分）</a><br>{self.survey_note(up)}</p>\n'
 
     def updated_text(self) -> str:
         u = self.fresh
@@ -346,6 +413,8 @@ class Site:
                         f'<td><a href="{e(s["license_url"])}" rel="noopener">{e(s["license"])}</a></td></tr>')
         kinds = "".join(f'<li><b>{e(k["label"])}</b>：{e(k["hint"])}</li>' for k in list(self.kinds.values()))
         desc = "このページのしくみ、出典、情報源の状態、利用条件について。"
+        survey_li = ('<li>感想のアンケート（任意）は、押した人だけが外部のフォームを開きます。くわしくは'
+                     '<a href="unei.html#kansou">アンケートについて</a>。</li>') if self.survey() else ""
         body = [self.head(f"このページについて｜{self.cfg.get('brand', self.cfg['name'])}", desc, "about.html", 0), self.header(0)]
         body.append(f"""<main id="main" class="prose">
 <h1 class="h1">このページについて</h1>
@@ -356,7 +425,7 @@ class Site:
 <li><b>分野と種類は、見出しの言葉から機械的に付けています</b>。たとえば見出しに「審議会」があれば「検討中」に分けます。分け方が外れることもあります。</li>
 <li>「やさしい説明」や「もうすぐ締め切り」は、<b>人が公式ページを読んで確かめたものだけ</b>を、確かめた日と一緒に載せています。</li>
 <li>職員の採用、入札、議事録、記者会見など、暮らしの支援と関わりが薄いお知らせは除いています。</li>
-<li>このページは利用する人の情報を集めていません。アクセス解析や広告のプログラムも入れていません。見出しに使っている書体（Zen Maru Gothic）もこのサイトの中に置いているので、ページを開いてもほかの会社のサーバーには接続しません（公開に使っている GitHub を除く）。</li>
+<li>このページは利用する人の情報を集めていません。アクセス解析や広告のプログラムも入れていません。見出しに使っている書体（Zen Maru Gothic）もこのサイトの中に置いているので、ページを開いてもほかの会社のサーバーには接続しません（公開に使っている GitHub を除く）。</li>{survey_li}
 </ul>
 <h2>種類の見方</h2>
 <ul>{kinds}</ul>
@@ -411,7 +480,13 @@ class Site:
                 print(f"pages/{rel.as_posix()} は生成したページと同じ名前なので写しません", file=sys.stderr)
                 continue
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(f, dst)
+            if f.suffix == ".html":
+                depth = len(rel.parts) - 1
+                text = f.read_text(encoding="utf-8")
+                text = SURVEY_MARK.sub(lambda m: self.survey_unei() if m.group(1) == "unei" else self.survey_block(m.group(1), depth), text)
+                dst.write_text(text, encoding="utf-8")
+            else:
+                shutil.copy2(f, dst)
             if f.suffix == ".html":
                 p = rel.as_posix()
                 copied.append(p[: -len("index.html")] if p.endswith("/index.html") else p)
