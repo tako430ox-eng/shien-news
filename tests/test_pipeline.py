@@ -329,6 +329,64 @@ class TestPages(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+class TestSearch(unittest.TestCase):
+    """検索エンジン向け：正規URL・サイトマップ・Search Console の所有確認。"""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.site = build.Site(ROOT / "data")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_canonical_and_sitemap(self):
+        out = self.tmp / "site"
+        self.site.build(out)
+        base = self.site.cfg["base_url"]
+        index = (out / "index.html").read_text(encoding="utf-8")
+        # トップの正規URLは index.html を付けない形
+        self.assertIn(f'<link rel="canonical" href="{base}">', index)
+        self.assertNotIn("noindex", index)
+        sm = (out / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn(f"<loc>{base}</loc>", sm)
+        self.assertNotIn("index.html</loc>", sm)
+        # サイトマップの URL はすべて公開先の下で、各ページの canonical と一致する
+        locs = re.findall(r"<loc>([^<]+)</loc>", sm)
+        self.assertTrue(locs)
+        for loc in locs:
+            self.assertTrue(loc.startswith(base), loc)
+            rel = loc[len(base):]
+            f = out / (rel + "index.html" if rel == "" or rel.endswith("/") else rel)
+            self.assertIn(f'<link rel="canonical" href="{loc}">', f.read_text(encoding="utf-8"), rel)
+        # lastmod は日付の形だけ。毎回の生成日を一律に付けない
+        for m in re.findall(r"<lastmod>([^<]+)</lastmod>", sm):
+            self.assertRegex(m, r"^\d{4}-\d{2}-\d{2}$")
+        self.assertIn(f"<loc>{base}yachin/</loc></url>", sm)
+        # 確認用の設定が空なら、確認タグもファイルも出さない
+        self.assertNotIn("google-site-verification", index)
+        self.assertEqual(list(out.glob("google*.html")), [])
+
+    def test_verification_meta_and_file(self):
+        self.site.cfg = dict(self.site.cfg, google_site_verification="abcDEF_123-xyz456",
+                             google_site_verification_file="google0123456789abcdef.html")
+        out = self.tmp / "site"
+        self.site.build(out)
+        index = (out / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<meta name="google-site-verification" content="abcDEF_123-xyz456">', index)
+        v = out / "google0123456789abcdef.html"
+        self.assertEqual(v.read_text(encoding="utf-8"), "google-site-verification: google0123456789abcdef.html")
+        self.assertNotIn("google0123456789abcdef", (out / "sitemap.xml").read_text(encoding="utf-8"))
+
+    def test_verification_rejects_whole_tag(self):
+        # タグを丸ごと貼ったなど、形が違うときは黙って壊れたページを出さずに止まる
+        self.site.cfg = dict(self.site.cfg, google_site_verification='<meta name="google-site-verification" content="x">')
+        with self.assertRaises(ValueError):
+            self.site.build(self.tmp / "site")
+        self.site.cfg = dict(self.site.cfg, google_site_verification="", google_site_verification_file="../evil.html")
+        with self.assertRaises(ValueError):
+            self.site.build(self.tmp / "site2")
+
+
 class TestReviewRegression(unittest.TestCase):
     def test_medical_headline_is_findable_in_health(self):
         result = lib.classify('OTC類似薬の保険給付の在り方の見直しについて', RULES)

@@ -61,3 +61,11 @@ config/rules.json の topics（分野）と kinds（種類）の keywords に言
 - 祝日一覧は 2027 年まで。内閣府の翌年分公表後に `HOLIDAYS` を更新して境界日をテストする。未登録年は開庁日の断定を避ける。自治体ごとの時間や臨時開庁は個別確認が必要。
 - 旧版で保存した持ち物・質問のチェック印は、意味の取り違えを防ぐため自動継承されない。回答・メモ・相談記録は引き継ぐ。
 - ページを開いただけで外のサーバーに接続するものを入れない（テスト `TestPages` が確かめる）。
+
+## 検索エンジン（Google Search Console）
+
+- 登録の種類は「URL プレフィックス」で `https://tako430ox-eng.github.io/shien-news/`。github.io はドメインの持ち主ではないので「ドメイン」の種類は使えない。
+- 所有確認は config/site.json に書く。「HTMLタグ」なら content の中身だけを `google_site_verification` に、「HTMLファイル」ならファイル名（google…….html）を `google_site_verification_file` に。build.py がトップなど生成ページの head にタグを入れる、またはそのファイルを作る。確認後も消さない。形が違う値を書くと build が止まり、前の公開版がそのまま残る。
+- サイトマップは build.py が毎回 `sitemap.xml` を作る。Search Console の「サイトマップ」に `https://tako430ox-eng.github.io/shien-news/sitemap.xml` を送る。pages/ の HTML も自動で載る。lastmod は、お知らせの一覧なら載っている中でいちばん新しい日付、about は生成日、pages/ のページは書かない。
+- 各ページの題名・説明文・正規URL（canonical）は、生成ページは build.py の head()、pages/ のページは各ファイルに直接書いてある。新しいページを pages/ に足すときは、title・description・canonical（公開URLそのもの）を必ず書く（TestSearch が確かめる）。
+- `robots.txt` も作っているが、プロジェクトサイト（…/shien-news/）ではホスト直下ではないので検索エンジンは読まない。独自ドメインに移したときのために残している。
