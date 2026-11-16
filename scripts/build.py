@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import re
 import shutil
 import sys
 from datetime import date, datetime
@@ -18,6 +19,9 @@ from lib import JST, ROOT, load_json, now_jst, save_json  # noqa: E402
 
 WD = "月火水木金土日"
 PLACEHOLDER = "【未記入"
+# Search Console の所有確認。meta タグの content の中身と、HTML ファイルの名前の形
+VERIFY_TOKEN = re.compile(r"[A-Za-z0-9_-]{10,100}")
+VERIFY_FILE = re.compile(r"google[0-9a-f]{8,32}\.html")
 
 
 def e(s) -> str:
@@ -65,9 +69,25 @@ class Site:
         self.fresh = max(oks) if oks else ""
 
     # ------------------------------------------------------------ 部品
+    def url(self, path: str) -> str:
+        """公開URL。トップは index.html を付けない形（人がリンクやブックマークに使う形）に揃える。"""
+        if path == "index.html" or path.endswith("/index.html"):
+            path = path[: -len("index.html")]
+        return urljoin(self.cfg["base_url"], path)
+
+    @staticmethod
+    def newest(items: list[dict]) -> str | None:
+        """一覧に載っているお知らせのうち、いちばん新しい日付（サイトマップの lastmod に使う）。"""
+        days = [(it.get("published") or it.get("first_seen") or "")[:10] for it in items]
+        days = [d for d in days if d]
+        return max(days) if days else None
+
     def head(self, title: str, desc: str, path: str, depth: int) -> str:
         up = "../" * depth
-        canon = urljoin(self.cfg["base_url"], path)
+        canon = self.url(path)
+        verify = self.cfg.get("google_site_verification", "")
+        if verify and not VERIFY_TOKEN.fullmatch(verify):
+            raise ValueError("config/site.json の google_site_verification は content=\"…\" の中身だけを書いてください")
         return f"""<!doctype html>
 <html lang="ja">
 <head>
@@ -80,7 +100,7 @@ class Site:
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{e(canon)}">
-<meta name="theme-color" content="#fffaf2">
+{f'<meta name="google-site-verification" content="{e(verify)}">' + chr(10) if verify else ""}<meta name="theme-color" content="#fffaf2">
 <link rel="alternate" type="application/atom+xml" title="{e(self.cfg['name'])}" href="{up}feed.xml">
 <link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
@@ -405,20 +425,32 @@ class Site:
         (out / "index.html").write_text(self.page_index(), encoding="utf-8")
         (out / "about.html").write_text(self.page_about(), encoding="utf-8")
         (out / "talk.html").write_text(self.page_talk(), encoding="utf-8")
-        pages = ["index.html", "talk.html", "about.html"]
+        # サイトマップの lastmod は「中身が実際に変わった日」に近づける（毎回の生成日にすると Google が当てにしなくなる）。
+        # お知らせの一覧は載っている中でいちばん新しい日付、情報源の状態を出す about は生成日、
+        # pages/ から写すページは変わった日をここでは知れないので書かない（書かなくてもよい項目）。
+        pages = [("index.html", self.newest(self.useful + self.other + self.talk)),
+                 ("talk.html", self.newest(self.talk)),
+                 ("about.html", self.built.date().isoformat())]
         if self.other:
             (out / "other.html").write_text(self.page_other(), encoding="utf-8")
-            pages.append("other.html")
+            pages.append(("other.html", self.newest(self.other)))
         for slug in self.topics:
             (out / "t" / f"{slug}.html").write_text(self.page_topic(slug), encoding="utf-8")
-            pages.append(f"t/{slug}.html")
+            pages.append((f"t/{slug}.html", self.newest([it for it in self.items if slug in it["topics"]])))
         (out / "feed.xml").write_text(self.feed(), encoding="utf-8")
-        pages += self.copy_pages(out)
+        pages += [(p, None) for p in self.copy_pages(out)]
         base = self.cfg["base_url"]
-        lastmod = self.built.date().isoformat()
-        urls = "".join(f"<url><loc>{e(urljoin(base, p))}</loc><lastmod>{lastmod}</lastmod></url>" for p in pages)
+        urls = "".join(f"<url><loc>{e(self.url(p))}</loc>" + (f"<lastmod>{m}</lastmod>" if m else "") + "</url>" for p, m in pages)
         (out / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n', encoding="utf-8")
+        # 注意：github.io のプロジェクトサイト（…/shien-news/）では、検索エンジンが読むのはホスト直下の robots.txt だけなので
+        # この robots.txt は効かない。独自ドメインに移したときのために残している。サイトマップは Search Console から送る。
         (out / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {urljoin(base, 'sitemap.xml')}\n", encoding="utf-8")
+        vfile = self.cfg.get("google_site_verification_file", "")
+        if vfile:
+            if not VERIFY_FILE.fullmatch(vfile):
+                raise ValueError("config/site.json の google_site_verification_file は google…….html というファイル名だけを書いてください")
+            # Google が配る確認用ファイルと同じ中身（サイトマップには載せない）
+            (out / vfile).write_text(f"google-site-verification: {vfile}", encoding="utf-8")
         (out / ".nojekyll").write_text("", encoding="utf-8")
         save_json(out / "items.json", {"updated": self.store.get("updated"), "license_note": "見出しとリンクは各機関のホームページから（公共データ利用規約 第1.0版）", "items": self.items})
 

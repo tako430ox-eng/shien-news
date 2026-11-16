@@ -3,6 +3,9 @@
  "name": "くらしの非常口 新着",
  "tagline": "国の支援やお知らせの新着を、毎日自動で集めています",
  "base_url": "https://tako430ox-eng.github.io/shien-news/",
+ "_検索の説明": "Google Search Console の所有確認。「HTMLタグ」で確認するなら、表示された <meta name=\"google-site-verification\" content=\"…\"> の content の中身だけを google_site_verification に書く。「HTMLファイル」で確認するなら、配られたファイルの名前（google…….html）を google_site_verification_file に書く。どちらか一方でよい。確認が済んだあとも消さない（消すと所有確認が外れる）。",
+ "google_site_verification": "EjISdqvj7YWJeLN8qAVdxuy7Nn1ccS1G4GB2V6EGLdQ",
+ "google_site_verification_file": "",
  "repo_url": "https://github.com/tako430ox-eng/shien-news",
  "stale_hours": 72,
  "help_links": [
