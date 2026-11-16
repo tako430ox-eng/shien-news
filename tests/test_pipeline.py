@@ -416,3 +416,81 @@ class TestReviewRegression(unittest.TestCase):
 
     def test_current_broad_notice_policy_preserved(self):
         self.assertNotIn('useful_kinds', RULES)
+
+
+class TestSurvey(unittest.TestCase):
+    """感想のアンケート。設定が空なら何も出さず、設定があれば押した人だけが外部のフォームを開く形で出す。"""
+
+    FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdTEST_form-ID/viewform"
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.site = build.Site(ROOT / "data")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def configure(self, **kw):
+        sv = dict(self.site.cfg.get("survey") or {}, url=self.FORM, page_entry="entry.1234567")
+        sv.update(kw)
+        self.site.cfg = dict(self.site.cfg, survey=sv)
+
+    def read(self, out, rel):
+        return (out / rel).read_text(encoding="utf-8")
+
+    def test_markers_exist_in_pages(self):
+        # 目印が消えると、設定してもアンケートが出なくなる
+        self.assertIn("<!--survey:yachin-->", (ROOT / "pages" / "yachin" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("<!--survey:unei-->", (ROOT / "pages" / "unei.html").read_text(encoding="utf-8"))
+
+    def test_nothing_shown_when_not_configured(self):
+        self.site.cfg = dict(self.site.cfg, survey=dict(self.site.cfg.get("survey") or {}, url=""))
+        out = self.tmp / "site"
+        self.site.build(out)
+        for f in out.rglob("*.html"):
+            text = f.read_text(encoding="utf-8")
+            self.assertNotIn("<!--survey", text, f.name)
+            self.assertNotIn("アンケートに答える", text, f.name)
+            self.assertNotIn("docs.google.com/forms", text, f.name)
+
+    def test_shown_with_disclosure_when_configured(self):
+        self.configure()
+        out = self.tmp / "site"
+        self.site.build(out)
+        yachin = self.read(out, "yachin/index.html")
+        prefill = self.FORM + "?usp=pp_url&amp;entry.1234567=" + build.quote("家賃が払えないとき（家賃編）")
+        self.assertIn(f'href="{prefill}" target="_blank" rel="noopener"', yachin)
+        self.assertNotIn("<!--survey", yachin)
+        # 押す前に、何が送られて何が送られないかを書いている
+        self.assertIn("このページで選んだ内容やメモは送られません", yachin)
+        self.assertIn('href="../unei.html#kansou"', yachin)
+        # 案内はフッターの前、支える人への案内のあと（緊急の案内の途中に割り込まない）
+        self.assertLess(yachin.index("隣で支える人へ"), yachin.index("survey-h"))
+        self.assertLess(yachin.index("survey-h"), yachin.index("<footer>"))
+        unei = self.read(out, "unei.html")
+        self.assertIn('<h2 id="kansou">', unei)
+        self.assertIn("メールアドレスは集めない", unei)
+        self.assertIn("返事ができません", unei)
+        index = self.read(out, "index.html")
+        self.assertIn(build.quote("支援の新着"), index)
+        self.assertIn('href="unei.html#kansou"', index)
+        self.assertIn('href="../unei.html#kansou"', next((out / "t").glob("*.html")).read_text(encoding="utf-8"))
+        self.assertIn("unei.html#kansou", self.read(out, "about.html"))
+        # ページを開いただけでフォームに接続するもの（埋め込み）は出さない
+        for f in out.rglob("*.html"):
+            self.assertNotRegex(f.read_text(encoding="utf-8"), r"<iframe", f.name)
+
+    def test_without_page_entry_links_plain_form(self):
+        self.configure(page_entry="")
+        out = self.tmp / "site"
+        self.site.build(out)
+        self.assertIn(f'href="{self.FORM}" target="_blank"', self.read(out, "yachin/index.html"))
+
+    def test_rejects_bad_settings(self):
+        for bad in ("javascript:alert(1)", "http://docs.google.com/forms/x", 'https://x.example/"><script>', "<iframe src=x>"):
+            self.configure(url=bad)
+            with self.assertRaises(ValueError, msg=bad):
+                self.site.build(self.tmp / "bad")
+        self.configure(page_entry="entry.1&x=1")
+        with self.assertRaises(ValueError):
+            self.site.build(self.tmp / "bad2")

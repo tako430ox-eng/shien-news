@@ -203,6 +203,8 @@ details.cand[open] > summary::after { transform: rotate(225deg); top: 26px; }
 .log .d { font-family: var(--f-num); font-size: var(--fs-small); color: var(--c-ink-soft); }
 .cal { font-size: var(--fs-small); }
 .tip { background: var(--c-sunken); border-radius: var(--r-md); padding: var(--s-4); }
+.survey { border: 1.5px solid var(--c-line-strong); border-radius: var(--r-md); padding: var(--s-4); }
+.survey-link { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
 .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--s-3); }
 
 /* ---- たためる箱・ページの終わり ---- */
@@ -227,7 +229,7 @@ footer { display: grid; gap: var(--s-3); border-top: 1px solid var(--c-line); pa
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 @media print {
-  .btn-row, .copy, .promise, #safety, #situation, .donebox, .tip, footer details, #afterOpts, .field, .exit-bar, .hero-art { display: none !important; }
+  .btn-row, .copy, .promise, #safety, #situation, .donebox, .tip, .survey, footer details, #afterOpts, .field, .exit-bar, .hero-art { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .page { gap: 18px; }
   details { border: 0; } details > *:not(summary) { display: block; } details.cand > summary::after { display: none; }
@@ -447,6 +449,8 @@ textarea.memo-out:focus { outline: 3px solid var(--c-link); outline-offset: 2px;
     <strong>隣で支える人へ</strong>
     <p>研究では、制度の情報を見せるだけより、手続きを一緒にする方が利用につながりやすいことが示されています。電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことが役に立ちます。お金を個人的に貸すのは避けてください。支える人の役目は、専門の窓口につなぐことです。</p>
   </section>
+
+  <!--survey:yachin-->
 
   <footer>
     <p>このページは「くらしの非常口」の試作版です（第6.1版、2026年11月14日更新）。制度の内容は、下の出典で確認したものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
