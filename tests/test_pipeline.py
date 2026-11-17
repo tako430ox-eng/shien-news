@@ -442,6 +442,8 @@ class TestSurvey(unittest.TestCase):
         # 目印が消えると、設定してもアンケートが出なくなる
         self.assertIn("<!--survey:yachin-->", (ROOT / "pages" / "yachin" / "index.html").read_text(encoding="utf-8"))
         self.assertIn("<!--survey:unei-->", (ROOT / "pages" / "unei.html").read_text(encoding="utf-8"))
+        for f in (ROOT / "pages" / "sasaeru").rglob("index.html"):
+            self.assertIn("<!--survey:sasaeru-->", f.read_text(encoding="utf-8"), f)
 
     def test_nothing_shown_when_not_configured(self):
         self.site.cfg = dict(self.site.cfg, survey=dict(self.site.cfg.get("survey") or {}, url=""))
@@ -467,6 +469,13 @@ class TestSurvey(unittest.TestCase):
         # 案内はフッターの前、支える人への案内のあと（緊急の案内の途中に割り込まない）
         self.assertLess(yachin.index("隣で支える人へ"), yachin.index("survey-h"))
         self.assertLess(yachin.index("survey-h"), yachin.index("<footer>"))
+        # 支える人のページ：本文のあと、フッターの前。緊急の案内より後ろ
+        for rel in ("sasaeru/index.html", "sasaeru/denwa/index.html"):
+            text = self.read(out, rel)
+            self.assertNotIn("<!--survey", text)
+            self.assertLess(text.index("今夜泊まる場所がない"), text.index("survey-h"))
+            self.assertLess(text.index("survey-h"), text.index("<footer"))
+            self.assertIn("unei.html#kansou", text)
         unei = self.read(out, "unei.html")
         self.assertIn('<h2 id="kansou">', unei)
         self.assertIn("メールアドレスは集めない", unei)
