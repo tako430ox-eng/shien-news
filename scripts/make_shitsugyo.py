@@ -1,0 +1,409 @@
+"""仕事を失った・辞めた人向けの行動支援ページを作る。
+
+出力：pages/shitsugyo/index.html
+（pages/ は build.py がそのまま公開先へ写す。サイトマップにも自動で載る）
+
+文章はこのファイルの中にある。直すときはここを直して
+  python scripts/make_shitsugyo.py
+を実行し、できた pages/shitsugyo/ もいっしょに保存する。テスト TestShitsugyo が一致を確かめる。
+
+決まり（docs/shitsugyo.md に、案内と根拠の対応表がある）
+- 制度について書くことは、公式資料（国・日本年金機構・協会けんぽ・自治体）で確かめたものだけ。
+  確かめた資料は SRC に、確かめた日と一緒に書き、ページの下に出典として出す。
+- 自治体で運用が違うことは「例：〇〇市」と書き、全国一律のようには書かない。
+- 当サイトの判断は「当サイトの判断です」と書く。
+- 「申請代行」「申請サポート」「受給できます」は使わない（共通デザインの決まり 9）。
+- ページを開いただけで外のサーバーに接続するものを入れない。選んだ内容はどこにも送らず、保存もしない。
+"""
+from __future__ import annotations
+
+import html
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "pages" / "shitsugyo"
+BASE = "https://tako430ox-eng.github.io/shien-news/"
+PATH = "shitsugyo/"
+UPDATED = "2026年11月18日"
+
+# ---------------------------------------------------------------- 出典
+# (名前, URL, 確かめた日)。名前の中の更新日は、そのページに書いてあったもの。
+SRC = {
+    "hwKihon": ("ハローワークインターネットサービス：基本手当について（受給要件・受給期間）",
+                "https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html", "2026-11-17"),
+    "hwTetsuzuki": ("ハローワークインターネットサービス：雇用保険の具体的な手続き（持ち物・待期・離職理由の判定・不正受給）",
+                    "https://www.hellowork.mhlw.go.jp/insurance/insurance_procedure.html", "2026-11-17"),
+    "kyushoku": ("厚生労働省：求職者支援制度のご案内",
+                 "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyushokusha_shien/index.html", "2026-11-17"),
+    "kaiko": ("厚生労働省 確かめよう労働条件：退職・解雇（解雇予告と解雇予告手当）",
+              "https://www.check-roudou.mhlw.go.jp/study/roudousya_taisyoku.html", "2026-11-17"),
+    "corner": ("厚生労働省：総合労働相談コーナーのご案内",
+               "https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html", "2026-11-17"),
+    "kokuhoRyo": ("厚生労働省：国民健康保険の保険料・保険税について（非自発的失業者の軽減、減免）",
+                  "https://www.mhlw.go.jp/stf/newpage_21517.html", "2026-11-17"),
+    "saitama": ("さいたま市：国民健康保険税の軽減（非自発的失業者）（2023年4月1日更新。対象・期間・持ち物の例）",
+                "https://www.city.saitama.lg.jp/001/153/002/004/p010048.html", "2026-11-17"),
+    "yokohama": ("横浜市：会社を退職して国民健康保険に加入したいのですが（2025年1月15日更新。14日以内の届出・持ち物の例）",
+                 "https://www.city.yokohama.lg.jp/faq/kukyoku/kenko/hoken-nenkin/20211014092646834.html", "2026-11-17"),
+    "nini": ("全国健康保険協会（協会けんぽ）：任意継続",
+             "https://www.kyoukaikenpo.or.jp/benefit/voluntary_continuation/", "2026-11-17"),
+    "nenkinKirikae": ("日本年金機構：会社を退職したときの国民年金の手続き（2025年9月11日更新）",
+                      "https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-04.html", "2026-11-17"),
+    "nenkinHaigu": ("日本年金機構：国民年金の種別変更（配偶者の手続き）（2024年7月1日更新）",
+                    "https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html", "2026-11-17"),
+    "nenkinMenjo": ("日本年金機構：失業等による保険料免除・納付猶予の特例（2026年11月5日更新）",
+                    "https://www.nenkin.go.jp/service/kokunen/menjo/20150428.html", "2026-11-17"),
+    "hogoSeido": ("厚生労働省：生活保護制度",
+                  "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html", "2026-11-17"),
+    "hogoApply": ("厚生労働省：生活保護を申請したい方へ",
+                  "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html", "2026-11-16"),
+    "konkyu": ("厚生労働省：生活困窮者自立支援制度",
+               "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html", "2026-11-16"),
+    "ichiran": ("自立相談支援機関 相談窓口一覧（生活困窮者支援情報共有サイト）",
+                "https://minna-tunagaru.jp/ichiran/", "2026-11-12"),
+    "jukyo": ("厚生労働省：住居確保給付金（家賃補助）の制度概要",
+              "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html", "2026-11-16"),
+    "aichiShakyo": ("愛知県社会福祉協議会：緊急小口資金のご案内（2025年7月版。条件は都道府県で違う場合があります）",
+                    "https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf", "2026-11-16"),
+    "mhlwTel": ("厚生労働省「まもろうよ こころ」電話相談",
+                "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel", "2026-11-13"),
+    "dv": ("内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋",
+           "https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/", "2026-11-14"),
+}
+
+TITLE = "仕事を失った・辞めたとき、今日から2週間でやること"
+DESC = ("会社を辞めた・仕事を失ったときに、期限のある手続きを順番に案内します。健康保険と国民年金の切り替え（14日以内）、"
+        "任意継続（20日以内）、会社都合で辞めた人の国民健康保険料の軽減、国民年金保険料の失業による免除、ハローワークの失業給付、"
+        "雇用保険がない人の求職者支援制度、お金が足りないときの相談先と、窓口でそのまま言える文。厚生労働省・日本年金機構などの資料で確かめました。")
+
+
+def e(s: str) -> str:
+    return html.escape(s, quote=True)
+
+
+LOGO = '<svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>'
+SIGN = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>'
+
+
+def say(sid: str, label: str, text: str) -> str:
+    """窓口や電話でそのまま読める文。コピーのボタンは、スクリプトが動くときだけ出す。"""
+    return (f'<div class="say"><p class="say-h">{label}</p><p id="say_{sid}">{text}</p>'
+            f'<p class="copy-row" hidden><button type="button" class="copy" data-copy="say_{sid}">この文をコピー</button></p></div>')
+
+
+def radio(name: str, opts: list[tuple[str, str]], legend: str) -> str:
+    items = "".join(
+        f'<label class="opt"><input type="radio" name="{name}" value="{v}"><span>{t}</span></label>' for v, t in opts)
+    return f'<fieldset class="q"><legend>{legend}</legend><div class="opts">{items}</div></fieldset>'
+
+
+# ---------------------------------------------------------------- 本文
+SAFETY = """<div class="notice stack">
+<p><b>今夜寝る場所がない、今日食べるものやお金がないとき</b>は、この先の手続きより先に、いま居る場所の市区町村の<b>福祉事務所</b>（役所の生活保護の窓口）に、そのことを伝えてください。住むところがなくても、生活保護は申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
+<p>命の危険があるときは <a href="tel:119">119番</a>・<a href="tel:110">110番</a>。死にたいほどつらいときは、<a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel" rel="noopener">電話やSNSの相談窓口（まもろうよ こころ・厚生労働省）</a>へ。暴力から逃げたいときは <a href="tel:%238008">#8008</a>（DV相談ナビ・内閣府）。</p>
+</div>"""
+
+TOOL = (
+    '<section id="tool" class="choose stack" aria-labelledby="tool-h">\n'
+    '<h2 id="tool-h">あなたの場合を選ぶ（どれも任意）</h2>\n'
+    '<p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。選んだ内容はこの画面の中だけで使い、どこにも送らず、保存もしません。</p>\n'
+    + radio("why", [("company", "会社の都合（解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた）"),
+                    ("self", "自分から辞めた"),
+                    ("notyet", "まだ辞めていない（辞めるように言われている）"),
+                    ("unknown", "分からない")], "1. 辞めた理由")
+    + radio("ins", [("yes", "入っていた（給与明細で「雇用保険」が引かれていた）"),
+                    ("no", "入っていなかった・自営業やフリーランスだった"),
+                    ("unknown", "分からない")], "2. 雇用保険")
+    + radio("kenpo", [("company", "会社の健康保険（保険証に協会けんぽや健康保険組合の名前）"),
+                      ("kokuho", "もともと国民健康保険"),
+                      ("family", "家族の健康保険の扶養に入っている"),
+                      ("unknown", "分からない")], "3. 辞める前の健康保険")
+    + radio("money", [("short", "家賃や今月の生活費が足りない・足りなくなりそう"),
+                      ("ok", "しばらくは暮らせる")], "4. お金")
+    + '<div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>\n'
+    '<div id="todayOut" class="today stack" aria-live="polite">'
+    '<h3>今日やること</h3>'
+    '<p>会社の健康保険に入っていた人は、<b>退職日の翌日から14日以内</b>に、住んでいる市区町村の役所で国民健康保険と国民年金の切り替えをします（任意継続を選ぶなら20日以内）。'
+    '雇用保険に入っていた人は、離職票が届いたら住所地のハローワークへ。お金が足りないときは、<a href="#money">5. お金が足りないとき</a>を先に読んでください。</p>'
+    '</div>\n'
+    '<div id="datesOut" aria-live="polite"></div>\n'
+    '<p class="btn-row" hidden id="toolBtns"><button type="button" class="btn" id="printBtn">このページを印刷する</button> '
+    '<button type="button" class="btn ghost" id="resetBtn">選んだ内容を消す</button></p>\n'
+    '<p class="status small" id="status" role="status"></p>\n'
+    '</section>'
+)
+
+BODY = f"""
+<p>仕事を失った直後は、気持ちも生活も揺れています。それでも、<b>期限が短い手続き</b>がいくつかあります。上から順に、一つずつ進めてください。全部を一度にやらなくて大丈夫です。</p>
+
+{TOOL}
+
+<h2 id="kenpo">1. 健康保険を切り替える（期限：14日・20日）</h2>
+<p>会社の健康保険は、退職日の翌日に使えなくなります。次のどれかに入り直します。<b>もともと国民健康保険の人や、家族の扶養に入っている人は、この手続きは要りません。</b></p>
+<ul>
+<li><b>国民健康保険</b>：住んでいる市区町村の役所（国民健康保険の窓口）で届け出ます。届出は14日以内とする自治体があります（例：横浜市）。持ち物の例は、会社や健康保険が出した「健康保険資格喪失証明書」（いつ、何の保険をやめたかが分かる書類）と本人確認書類です（横浜市の例。自治体で違います）。</li>
+<li><b>任意継続</b>（会社の健康保険を最長2年続ける）：退職日までに2か月以上続けて入っていた人が使えます。申し出は<b>退職日の翌日から20日以内</b>（20日目が土日・祝日なら翌営業日）。保険料は、退職時の健康保険料の2倍が目安です（上限あり）。協会けんぽの場合です。健康保険組合の人は、組合に確かめてください。</li>
+<li><b>家族の健康保険の扶養に入る</b>：入れるかどうかは収入などで決まります。家族の勤め先に聞いてください。</li>
+</ul>
+<p><b>会社の都合で辞めた人は、国民健康保険料が大きく軽くなる場合があります。</b>倒産・解雇などで辞めた人（雇用保険の「特定受給資格者」）や、契約が更新されなかった人・正当な理由で自分から辞めた人（「特定理由離職者」）は、前年の給与所得を<b>100分の30</b>とみなして国民健康保険料を計算します。期間は、辞めた時から翌年度の終わりまでです（厚生労働省）。</p>
+<ul>
+<li>離職の時に65歳未満の人が対象で、<b>申請が必要</b>です。ハローワークで受け取る「雇用保険受給資格者証」か「雇用保険受給資格通知」の離職理由のコードで判断されます（さいたま市の例）。</li>
+<li>だから、国民健康保険と任意継続のどちらが安いかは、この軽減を入れて比べないと分かりません。<b>役所の国民健康保険の窓口で、軽減を入れた保険料を聞いてから選ぶ</b>のがよいと考えます（当サイトの判断です）。</li>
+<li>国民健康保険料は前年の所得で決まるので、収入がなくなっても高く感じることがあります。払えないときは、市区町村の国民健康保険の窓口に相談してください。特別な事情があるときは、減免や納付猶予を受けられる場合があります（厚生労働省）。</li>
+</ul>
+
+<h2 id="nenkin">2. 国民年金を切り替え、保険料の免除を申請する（期限：14日）</h2>
+<ul>
+<li>会社の厚生年金に入っていた20歳以上60歳未満の人は、国民年金（第1号被保険者）に切り替えます。届出先は<b>住んでいる市区町村の役所</b>、期限は<b>退職日の翌日から14日以内</b>です。離職票など、会社を辞めた日が分かる書類が必要な場合があります（日本年金機構）。</li>
+<li>あなたの扶養に入っていた配偶者も、あなたが辞めると切り替えの手続きが必要です（日本年金機構）。</li>
+<li><b>失業による免除の特例</b>：失業・倒産などが確認できると、<b>前年の所得にかかわらず</b>、保険料の免除・納付猶予を受けられる特例があります。申請は役所の国民年金の窓口（年金事務所や郵送でも可）で、離職票の写しや、雇用保険受給資格者証・受給資格通知の写しを添えます（日本年金機構）。</li>
+<li><b>払えないまま放っておかないでください。</b>免除の手続きをせずに未納にすると、その期間は年金の受給に必要な期間にも数えられません。また、事故や病気が起きてから後で申請しても、障害基礎年金の保険料の条件には数えられません（日本年金機構）。</li>
+</ul>
+
+<h2 id="hellowork">3. ハローワークで失業給付（雇用保険の基本手当）の手続きをする</h2>
+<p>雇用保険に入っていた人は、仕事を探している間の生活費として、基本手当を受けられる場合があります。主な条件は、辞める前の2年間に雇用保険に入っていた期間が通算12か月以上あること（倒産・解雇などで辞めた人や、契約が更新されなかった人などは、辞める前の1年間に6か月以上）です。働く意思と能力があり、仕事を探していることも条件です（ハローワーク）。</p>
+<ol>
+<li><b>会社から「離職票」（-1と-2）が届くのを待つ</b>。届かないとき、会社と連絡が取れないときは、住んでいる地域のハローワークに問い合わせてください（ハローワーク）。</li>
+<li><b>住所地のハローワークで「求職の申込み」をし、離職票を出す</b>。持ち物：離職票-1・-2、マイナンバーが分かるもの、本人確認書類、写真2枚（縦3.0cm×横2.4cm。マイナンバーカードを見せれば省略できます）、本人名義の通帳かキャッシュカード（ハローワーク）。受付は平日の8時30分〜17時15分です。</li>
+<li><b>辞めた理由に納得できないとき</b>：たとえば、会社に辞めるよう勧められたのに「自己都合」とされているときは、ハローワークに相談してください。ハローワークが事実を調べて、離職理由を判定します（ハローワーク）。離職理由によって、受け取れる日数や、支給が始まる時期が変わります。</li>
+<li>申込みのあと7日間（待期）は支給されません。自分から辞めた人などは、離職理由によって、さらにしばらく支給されない期間（給付制限）があります。長さは辞めた時期や回数によって違うので、ハローワークで確かめてください。</li>
+<li>その後は、原則4週間に1回、ハローワークで「失業の認定」を受け、認定の日から通常5営業日で振り込まれます（ハローワーク）。</li>
+</ol>
+<ul>
+<li><b>早めに行ってください。</b>受け取れるのは、原則として離職した日の翌日から1年の間です（病気・けが・妊娠・出産・育児などで30日以上働けないときは延長できます）（ハローワーク）。手続きが遅れると、日数が残っていても1年を過ぎた分は受け取れないおそれがあります（当サイトの判断です）。</li>
+<li>受け取っている間に、アルバイト・パート・試用期間などで働いたり、内職や手伝いをしたりしたときは、必ず失業認定申告書で申告してください。申告しないと不正受給になり、支給が止まり、厳しい処分があります（ハローワーク）。</li>
+</ul>
+
+<h3 id="kyushoku">雇用保険に入っていなかった人・受け取りが終わった人：求職者支援制度</h3>
+<p>雇用保険の失業給付を受けられない人（雇用保険に入っていなかった人、自営業・フリーランスをやめた人、受け取りが終わった人など）は、<b>無料の職業訓練</b>を受けられます。条件を満たすと、訓練の間<b>月10万円</b>の給付金と交通費（上限あり）が出ます（厚生労働省）。</p>
+<ul>
+<li>給付金の主な条件：本人の収入が月8万円以下、世帯の収入が月30万円以下、世帯の金融資産が300万円以下、いま住んでいる所のほかに土地・建物を持っていない、訓練に全部出席する（やむを得ない欠席を含めて8割以上）など（厚生労働省）。</li>
+<li>給付金の条件に当たらなくても、訓練は無料で受けられます（厚生労働省）。</li>
+<li>窓口は、住所地のハローワークです。</li>
+</ul>
+
+<h2 id="notyet">4. まだ辞めていない・「辞めてほしい」と言われたとき</h2>
+<ul>
+<li>会社から渡された退職届や合意書に、<b>その場で署名しないでください</b>。持ち帰って考えたいと伝えてかまいません。いつ・誰が・何と言ったかを、その日のうちにメモしておきます（当サイトの判断です）。</li>
+<li>解雇するとき、会社は少なくとも30日前に予告しなければなりません。予告がないときは、30日分以上の平均賃金（解雇予告手当）を受け取る権利があります（日数が足りない予告なら、足りない日数分）。例外もあります（厚生労働省）。</li>
+<li>都道府県の労働局などにある<b>総合労働相談コーナー</b>は、解雇・雇止め・いじめ・嫌がらせなど、働くことのあらゆる相談を受けています。<b>予約は不要で、無料</b>です。面談か電話で相談でき、必要なら労働基準監督署などにつないでくれます（厚生労働省）。</li>
+</ul>
+
+<h2 id="money">5. お金が足りないとき</h2>
+<ul>
+<li><b>市区町村の自立相談支援機関</b>（「くらしの相談窓口」など、名前は地域で違います）は、仕事や家賃、生活費の困りごとを聞き、一緒に支援の計画を作る窓口です（厚生労働省）。窓口は<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関の一覧</a>か、「（市区町村名） 自立相談支援」で探せます。</li>
+<li><b>家賃が払えない・払えなくなりそうなとき</b>：仕事を失ってから2年以内なら、家賃の補助（住居確保給付金）の対象になる場合があります。収入・預貯金・求職活動の条件があります（厚生労働省）。<a href="{{up}}yachin/">家賃が払えないときの道具</a>で、電話で言う文と順番を出せます。</li>
+<li><b>給付が出るまでの急ぎのお金</b>：社会福祉協議会の緊急小口資金は、急にお金が足りなくなったときの無利子の小口の貸付です。返す必要があり、審査があります（愛知県の案内では、10万円以内、申し込みから最短でも5営業日）。条件は都道府県で違う場合があります。</li>
+<li><b>手持ちのお金がほとんどないとき</b>：生活保護も相談できます。窓口は市区町村の福祉事務所です。失業給付などほかの収入があっても、国が決める最低限の生活費に足りなければ、足りない分が支給される仕組みです（厚生労働省）。</li>
+</ul>
+
+<h2 id="say">窓口でそのまま言える文</h2>
+<p>〇〇のところを書き換えて、読み上げるか、画面を見せてください。</p>
+{say("yakusho", "市区町村の役所（国民健康保険・国民年金の窓口）で",
+     "〇月〇日に会社を退職しました。国民健康保険と国民年金の切り替えをしたいです。会社の都合で辞めた人の国民健康保険料の軽減と、国民年金保険料の失業による免除についても教えてください。今日そろっていない書類があれば、何を、いつまでに持ってくればよいか教えてください。")}
+{say("hw", "ハローワークで",
+     "〇月〇日に退職しました。求職の申込みと、雇用保険の基本手当の手続きをしたいです。離職票を持ってきました。")}
+{say("kaisha", "会社に（離職票が届かないとき）",
+     "〇月〇日に退職した〇〇です。離職票がまだ届いていません。いつ、どこに送っていただけるか教えてください。")}
+{say("jiritsu", "自立相談支援機関に電話で",
+     "〇月に仕事を失い、今月の家賃と生活費が足りなくなりそうです。使える制度と、相談の予約の取り方を教えてください。")}
+
+<h2>家族や友人が仕事を失ったとき</h2>
+<p>このページを一緒に開いて、上の「あなたの場合を選ぶ」を本人と選んでください。調べるのと電話の準備はあなたが手伝い、話すのは本人、という分け方が役に立ちます。<a href="{{up}}sasaeru/shitsugyo-yachin/">家族や友人が仕事を失い、家賃が払えないとき</a>も参考にしてください。</p>
+
+<p class="small">このページは、福祉や法律の専門家の監修を受けたものではありません。厚生労働省・日本年金機構・協会けんぽ・自治体の資料を読んで、運営者がまとめたものです。受けられるかどうかを決めるのは、それぞれの窓口です。</p>
+"""
+
+# ---------------------------------------------------------------- 画面の中だけで動く部分（送らない・保存しない）
+SCRIPT = r"""<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var WEEK = ["日", "月", "火", "水", "木", "金", "土"];
+
+  function parseDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+    if (!m) return null;
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function addDays(d, n) { return new Date(d.getTime() + n * 86400000); }
+  function addYear(d) { return new Date(Date.UTC(d.getUTCFullYear() + 1, d.getUTCMonth(), d.getUTCDate())); }
+  function label(d) { return d.getUTCFullYear() + "年" + (d.getUTCMonth() + 1) + "月" + d.getUTCDate() + "日（" + WEEK[d.getUTCDay()] + "）"; }
+  function todayJst() {
+    var n = new Date(Date.now() + 9 * 3600000);
+    return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()));
+  }
+
+  // 期限の目安。leave は退職日（最後に在籍した日）。
+  function deadlines(a, leave) {
+    var out = [];
+    if (!leave) return out;
+    var switching = a.kenpo !== "kokuho" && a.kenpo !== "family";
+    if (switching) {
+      out.push({ date: addDays(leave, 14), what: "国民健康保険に入る届出（市区町村の役所）", note: "退職日の翌日から14日以内に届け出るよう案内している自治体があります（例：横浜市）" });
+    }
+    if (switching) {
+      out.push({ date: addDays(leave, 14), what: "国民年金の切り替え（市区町村の役所）", note: "厚生年金に入っていた20歳以上60歳未満の人。退職日の翌日から14日以内（日本年金機構）" });
+      out.push({ date: addDays(leave, 20), what: "任意継続を選ぶなら、その申し出", note: "退職日の翌日から20日以内。20日目が土日・祝日なら翌営業日（協会けんぽ）" });
+    }
+    if (a.ins !== "no") {
+      out.push({ date: addYear(leave), what: "失業給付を受け取れる期間の終わり（受給期間）", note: "原則、離職の翌日から1年。手続きはこれよりずっと早く（ハローワーク）" });
+    }
+    return out;
+  }
+
+  // 今日やること（一つ）と、続けてやること。
+  function plan(a, leave, today) {
+    var since = leave && today ? Math.round((today - leave) / 86400000) : null;
+    var t = { today: "", next: [] };
+    var switching = a.kenpo !== "kokuho" && a.kenpo !== "family";
+    var yakusho = "住んでいる市区町村の役所で、国民健康保険と国民年金の切り替えをする（下の「市区町村の役所で」の文が使えます）";
+    var hw = "離職票が届いていれば、住所地のハローワークで求職の申込みをする。まだ届いていなければ、会社にいつ届くか聞く";
+    var kyu = "住所地のハローワークで、求職者支援制度（月10万円の給付金つきの無料の職業訓練）について聞く";
+    var jiritsu = "市区町村の自立相談支援機関に電話して、相談の予約を取る（下の「自立相談支援機関に電話で」の文が使えます）";
+
+    if (a.why === "notyet") {
+      t.today = "会社から渡された書類に、その場で署名しない。言われたことをメモして、総合労働相談コーナー（予約不要・無料）に相談する";
+      t.next = ["辞めることが決まったら、もう一度このページで「辞めた理由」を選び直す"];
+      if (a.money === "short") t.next.unshift(jiritsu);
+      return t;
+    }
+    var list = [];
+    if (a.money === "short") list.push(jiritsu);
+    if (switching) {
+      if (since !== null && since > 14) list.push("14日を過ぎていても、できるだけ早く" + yakusho);
+      else list.push(yakusho);
+    }
+    if (a.ins === "no") list.push(kyu); else list.push(hw);
+    if (a.why === "company" && switching) list.push("国民健康保険の窓口で、会社の都合で辞めた人の保険料の軽減を入れた額を聞き、任意継続と比べる");
+    if (switching && (a.why === "company" || a.money === "short")) list.push("国民年金の保険料の、失業による免除を申請する（離職票か受給資格者証などの写しを添えます）");
+    t.today = list[0];
+    t.next = list.slice(1);
+    return t;
+  }
+
+  function read() {
+    var a = {};
+    ["why", "ins", "kenpo", "money"].forEach(function (n) {
+      var c = document.querySelector('input[name="' + n + '"]:checked');
+      a[n] = c ? c.value : "";
+    });
+    return a;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function render() {
+    var a = read();
+    var leave = parseDate($("leave").value);
+    var today = todayJst();
+    var any = a.why || a.ins || a.kenpo || a.money || leave;
+    $("toolBtns").hidden = !any;
+    if (!any) return;
+    var p = plan(a, leave, today);
+    var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>";
+    if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
+    $("todayOut").innerHTML = h;
+    var ds = deadlines(a, leave);
+    if (!ds.length) { $("datesOut").innerHTML = leave ? "" : "<p class=\"small\">退職日を入れると、期限の日付が出ます。</p>"; return; }
+    $("datesOut").innerHTML = "<h3>期限の目安（退職日 " + esc(label(leave)) + " から）</h3><ul class=\"dates\">" + ds.map(function (d) {
+      var left = Math.round((d.date - today) / 86400000);
+      var tag = left < 0 ? "過ぎています" : (left === 0 ? "今日まで" : "あと" + left + "日");
+      return "<li><span class=\"d\">" + esc(label(d.date)) + "まで</span><span class=\"tag\">" + tag + "</span><br>" + esc(d.what) + "<br><span class=\"small\">" + esc(d.note) + "</span></li>";
+    }).join("") + "</ul><p class=\"small\">日付は目安です。数え方や休日の扱いは窓口で確かめてください。期限を過ぎていても、手続きはできるだけ早く進めてください。</p>";
+  }
+
+  function copy(id, btn) {
+    var text = $(id).textContent;
+    var ok = function () { $("status").textContent = "コピーしました。"; };
+    var ng = function () { $("status").textContent = "コピーできませんでした。文を長押しして選び、コピーしてください。"; };
+    try { navigator.clipboard.writeText(text).then(ok, ng); } catch (err) { ng(); }
+  }
+
+  if (typeof window !== "undefined" && window.__SHITSUGYO_TEST__) {
+    window.__SHITSUGYO_TEST__({ plan: plan, deadlines: deadlines, parseDate: parseDate, label: label });
+    return;
+  }
+  var DEFAULT_TODAY = $("todayOut").innerHTML;
+  document.addEventListener("change", function (ev) {
+    if (ev.target.closest && ev.target.closest("#tool")) render();
+  });
+  $("leave").addEventListener("input", render);
+  Array.prototype.forEach.call(document.querySelectorAll(".copy-row"), function (el) { el.hidden = false; });
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest("[data-copy]");
+    if (b) copy(b.getAttribute("data-copy"), b);
+  });
+  $("printBtn").addEventListener("click", function () { window.print(); });
+  $("resetBtn").addEventListener("click", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("#tool input[type=radio]"), function (r) { r.checked = false; });
+    $("leave").value = "";
+    $("todayOut").innerHTML = DEFAULT_TODAY;
+    $("datesOut").innerHTML = "";
+    $("toolBtns").hidden = true;
+    $("status").textContent = "選んだ内容を消しました。";
+  });
+})();
+</script>"""
+
+
+def render() -> dict[str, str]:
+    up = "../"
+    canon = BASE + PATH
+    src_items = "".join(
+        f'<li><a href="{e(u)}" rel="noopener">{e(n)}</a>（{e(c)} 確認）</li>' for n, u, c in SRC.values())
+    page = f"""<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{e(TITLE)}｜くらしの非常口</title>
+<meta name="description" content="{e(DESC)}">
+<link rel="canonical" href="{e(canon)}">
+<meta property="og:title" content="{e(TITLE)}">
+<meta property="og:description" content="{e(DESC)}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{e(canon)}">
+<meta name="theme-color" content="#fffaf2">
+<link rel="stylesheet" href="{up}assets/fonts.css">
+<link rel="stylesheet" href="{up}assets/tokens.css">
+<link rel="stylesheet" href="{up}assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">本文へ</a>
+<div class="page">
+<header class="hero hero-sub">
+ <div class="brandrow">{LOGO}<a class="brand" href="{up}">くらしの非常口</a><span class="tag">仕事を失ったとき</span></div>
+ <h1>仕事を失った・辞めたとき<br><em>今日から2週間</em>でやること</h1>
+ <p class="lead">健康保険と年金の切り替えには、14日・20日という期限があります。失業給付は、離職票が届いたらハローワークへ。お金が足りないときの相談先も、このページにあります。</p>
+ {SIGN}
+</header>
+{SAFETY}
+<main id="main" class="prose">
+{BODY.replace("{up}", up)}
+<!--survey:shitsugyo-->
+</main>
+<footer class="foot">
+ <p>このページは「くらしの非常口」の案内です（{UPDATED}作成）。制度の内容は、下の出典で確かめたものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
+ <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。ハローワークや役所の手続きに、当サイトの手数料はかかりません。手数料や成功報酬を求める業者には注意してください。困ったときは、消費者ホットライン <a href="tel:188">188</a> に相談できます。</p>
+ <p><a href="{up}unei.html">運営者と連絡先</a> ・ <a href="{up}yachin/">家賃が払えないとき</a> ・ <a href="{up}sasaeru/">支える人へ</a> ・ <a href="{up}">支援の新着</a></p>
+ <details><summary>出典と確認日</summary><ul class="srcs">{src_items}</ul></details>
+</footer>
+</div>
+{SCRIPT}
+</body>
+</html>
+"""
+    return {"index.html": page}
+
+
+def main() -> None:
+    for rel, text in render().items():
+        f = OUT / rel
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(text, encoding="utf-8")
+    print("wrote", OUT)
+
+
+if __name__ == "__main__":
+    main()

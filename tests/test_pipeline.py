@@ -535,3 +535,37 @@ class TestSasaeru(unittest.TestCase):
         for s in self.m.SCENES:
             for k in s["srcs"]:
                 self.assertIn(k, self.m.SRC)
+
+
+class TestShitsugyo(unittest.TestCase):
+    """仕事を失ったときのページ（pages/shitsugyo/）。生成元と一致し、検索向けの項目と出典があり、使わない言葉がない。"""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import make_shitsugyo
+        self.m = make_shitsugyo
+        self.pages = make_shitsugyo.render()
+
+    def test_files_match_generator(self):
+        for rel, text in self.pages.items():
+            f = ROOT / "pages" / "shitsugyo" / rel
+            self.assertEqual(f.read_text(encoding="utf-8"), text, f"{rel} が古い：python scripts/make_shitsugyo.py を実行")
+
+    def test_search_fields_sources_and_words(self):
+        base = json.loads((ROOT / "config" / "site.json").read_text(encoding="utf-8"))["base_url"]
+        text = self.pages["index.html"]
+        self.assertIn(f'<link rel="canonical" href="{base}shitsugyo/">', text)
+        self.assertRegex(text, r"<title>[^<]+</title>")
+        self.assertRegex(text, r'<meta name="description" content="[^"]{40,}">')
+        self.assertIn("出典と確認日", text)
+        self.assertIn("<!--survey:shitsugyo-->", text)
+        for w in ("申請代行", "申請サポート", "受給できます", "noindex"):
+            self.assertNotIn(w, text)
+        self.assertNotRegex(text, r'<(script|img|iframe)[^>]+src=')
+        self.assertNotRegex(text, r'<link rel="stylesheet" href="https?:')
+        # 緊急の案内は本文より前、専門家の監修でないことを書いている
+        self.assertLess(text.index("今夜寝る場所がない"), text.index('<main id="main"'))
+        self.assertIn("専門家の監修を受けたものではありません", text)
+        for _, url, checked in self.m.SRC.values():
+            self.assertTrue(url.startswith("https://"))
+            self.assertRegex(checked, r"^\d{4}-\d{2}-\d{2}$")
