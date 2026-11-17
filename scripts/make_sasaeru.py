@@ -64,7 +64,7 @@ SRC = {
     "tokyoShakyo": ("東京都：生活福祉資金貸付制度（2026年10月9日更新。申し込みは区市町村の社会福祉協議会）",
                     "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi", "2026-11-16"),
     "houterasu": ("法テラス：サポートダイヤル（受付時間・通話料・案内の範囲）",
-                  "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html", "2026-11-16"),
+                  "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html", "2026-11-17"),
     "mlit": ("国土交通省：家賃債務保証業者登録制度（2022年12月12日の最高裁判決を受けた周知）",
              "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr7_000024.html", "2026-11-16"),
     "dv": ("内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋",
