@@ -46,3 +46,14 @@ test('calendar end date crosses year without sending name or notes',()=>{const {
 test('deadline count follows Japanese date near midnight',()=>{const {a}=appAt('2026-11-15T16:00:00Z');a.setState({payday:'2026-11-17'});assert.equal(a.daysLeft(),1);});
 test('failed storage erasure is not reported as success',()=>{const {a,el,mem}=appAt();a.save();mem.delete=()=>{throw Error('blocked')};a.clearAll();assert.match(el('status').textContent,/削除できません/);});
 test('copy failure gives phone number fallback',()=>{const {a,el}=appAt();a.copyText('0570-078374',{textContent:'番号をコピー'});assert.match(el('status').textContent,/コピーできません/);});
+test('prerender fills the first screen for readers without JavaScript and leaves the rest of the page as is',()=>{
+  const {prerender,render,TARGETS}=require('../scripts/prerender_yachin.cjs');
+  const out=prerender(html);
+  for(const id of ['firstOut','planOut','candOut','questions','srcList']) assert.doesNotMatch(out,new RegExp('id="'+id+'"[^>]*></'),id);
+  assert.match(out,/id="say_first_call">家賃のことで相談したくて電話しました/);
+  assert.doesNotMatch(out.slice(out.indexOf('id="firstOut"'),out.indexOf('id="city"')),/閉まっている時間/);
+  // 書き込んだ中身を取り除くと、元の HTML（正本）に戻る＝ほかの場所は変えていない
+  const parts=render(html); let rest=out.replace(/^<!doctype html>\n<!--[^\n]*-->/,'<!doctype html>');
+  for(const id of TARGETS) if(parts[id]) rest=rest.replace(parts[id],'');
+  assert.equal(rest,html);
+});
