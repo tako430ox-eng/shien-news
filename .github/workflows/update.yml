@@ -32,8 +32,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: 家賃編の分岐と保存のテスト
-        run: node --test tests/test_yachin.cjs
+      - name: 家賃編と仕事を失ったときのページのテスト
+        run: node --test tests/test_yachin.cjs tests/test_shitsugyo.cjs
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

@@ -123,3 +123,31 @@ h2 { font-weight: 900; }
 .cards .card a.title { display: inline-flex; align-items: center; min-height: var(--tap); }
 .srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
 .guides .links .tool span { margin-top: var(--s-1); }
+
+/* ---- 仕事を失ったとき（pages/shitsugyo/）：あなたの場合を選ぶ道具（家賃編の選択肢と同じ見た目） ---- */
+.choose { background: var(--c-surface); border: 1.5px solid var(--c-line); border-radius: var(--r-md); padding: var(--s-4); }
+.choose h2 { margin-top: 0; }
+.choose fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: var(--s-2); min-width: 0; }
+.choose legend { font-weight: 700; padding: 0; margin-bottom: var(--s-2); line-height: 1.6; }
+.choose .opts { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.choose .opt { position: relative; display: block; }
+.choose .opt input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+.choose .opt span { display: flex; align-items: center; gap: 8px; min-height: var(--tap); background: var(--c-surface); border: 1.5px solid var(--c-line-strong); border-radius: var(--r-md); padding: 8px 16px; line-height: 1.45; }
+.choose .opt input:checked + span { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-primary-ink); font-weight: 700; }
+.choose .opt input:checked + span::before { content: "✓"; font-weight: 700; }
+.choose .opt input:focus-visible + span { outline: 3px solid var(--c-link); outline-offset: 2px; }
+.choose .field { display: grid; gap: var(--s-1); }
+.choose .field label { font-weight: 700; }
+.choose .field input[type="date"] { font: inherit; width: 100%; max-width: 20em; min-height: var(--tap); padding: 10px 12px; border-radius: var(--r-sm); border: 1.5px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink); }
+.today { background: var(--c-primary-soft); border-left: 6px solid var(--c-primary); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); }
+.today .big { font-weight: 700; font-size: var(--fs-lead); }
+.today ol { margin: 0; padding-left: 1.4em; display: grid; gap: var(--s-2); }
+.dates { list-style: none; padding: 0 !important; display: grid; gap: var(--s-3); }
+.dates li { border: 1.5px solid var(--c-line-strong); border-radius: var(--r-sm); padding: var(--s-3); }
+.dates .d { font-weight: 700; }
+.dates .tag { margin-left: 8px; font-size: var(--fs-small); font-weight: 700; color: var(--c-warn); }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
+.btn { font: inherit; cursor: pointer; min-height: var(--tap); padding: 8px 20px; border-radius: var(--r-pill); border: 1.5px solid var(--c-primary); background: var(--c-surface); color: var(--c-primary); font-weight: 700; }
+.btn.ghost { border-color: var(--c-line-strong); color: var(--c-ink); font-weight: 400; }
+.copy { font: inherit; font-size: var(--fs-small); cursor: pointer; min-height: var(--tap); padding: 6px 14px; border-radius: var(--r-pill); border: 1.5px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink); }
+@media print { .choose fieldset, .choose .field, .btn-row, .copy-row, .survey, footer details { display: none !important; } .choose { border: 0; padding: 0; } }

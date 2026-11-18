@@ -1,6 +1,6 @@
 {
  "_説明": "行動支援の試作（家賃の次の一歩）が出典にしている公式ページ。内容が変わったら、人が試作の文面を見直すために知らせる。公開はしない（変化の検知だけ）。ignore は毎回変わってしまう部分（アクセス数など）を無視する正規表現。 法テラスのトップページ（https://www.houterasu.or.jp/）は、お知らせ・イベントの入れ替わりで毎週のように変わり、サイトはそこから事実を引いていない（運営者ページの案内リンクだけ）ので、2026-11-17 に見張りから外した。電話番号・受付時間などの根拠はサポートダイヤルのページで見張る。",
- "used_by": "pages/yachin/index.html, pages/sasaeru/（scripts/make_sasaeru.py）",
+ "used_by": "pages/yachin/index.html, pages/sasaeru/（scripts/make_sasaeru.py）, pages/shitsugyo/（scripts/make_shitsugyo.py）",
  "pages": [
   {
    "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html",
@@ -129,6 +129,54 @@
   {
    "url": "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/faq.html",
    "what": "住居確保給付金 よくある質問（厚生労働省）"
+  },
+  {
+   "url": "https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html",
+   "what": "ハローワークインターネットサービス：基本手当について（受給要件・受給期間）"
+  },
+  {
+   "url": "https://www.hellowork.mhlw.go.jp/insurance/insurance_procedure.html",
+   "what": "ハローワークインターネットサービス：雇用保険の具体的な手続き（持ち物・待期・離職理由の判定・不正受給）"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyushokusha_shien/index.html",
+   "what": "厚生労働省：求職者支援制度のご案内"
+  },
+  {
+   "url": "https://www.check-roudou.mhlw.go.jp/study/roudousya_taisyoku.html",
+   "what": "厚生労働省 確かめよう労働条件：退職・解雇（解雇予告と解雇予告手当）"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html",
+   "what": "厚生労働省：総合労働相談コーナーのご案内"
+  },
+  {
+   "url": "https://www.mhlw.go.jp/stf/newpage_21517.html",
+   "what": "厚生労働省：国民健康保険の保険料・保険税について（非自発的失業者の軽減、減免）"
+  },
+  {
+   "url": "https://www.kyoukaikenpo.or.jp/benefit/voluntary_continuation/",
+   "what": "全国健康保険協会（協会けんぽ）：任意継続"
+  },
+  {
+   "url": "https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-04.html",
+   "what": "日本年金機構：会社を退職したときの国民年金の手続き"
+  },
+  {
+   "url": "https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html",
+   "what": "日本年金機構：国民年金の種別変更"
+  },
+  {
+   "url": "https://www.nenkin.go.jp/service/kokunen/menjo/20150428.html",
+   "what": "日本年金機構：失業等による保険料免除・納付猶予の特例"
+  },
+  {
+   "url": "https://www.city.saitama.lg.jp/001/153/002/004/p010048.html",
+   "what": "さいたま市：国民健康保険税の軽減"
+  },
+  {
+   "url": "https://www.city.yokohama.lg.jp/faq/kukyoku/kenko/hoken-nenkin/20211014092646834.html",
+   "what": "横浜市：会社を退職して国民健康保険に加入したいのですが"
   }
  ],
  "ignore": [
