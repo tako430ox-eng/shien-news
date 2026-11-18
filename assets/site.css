@@ -122,6 +122,7 @@ h2 { font-weight: 900; }
 .prose ul.cards { padding-left: 0; }
 .cards .card a.title { display: inline-flex; align-items: center; min-height: var(--tap); }
 .srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
+.guides .links .tool span { margin-top: var(--s-1); }
 
 /* ---- 仕事を失ったとき（pages/shitsugyo/）：あなたの場合を選ぶ道具（家賃編の選択肢と同じ見た目） ---- */
 .choose { background: var(--c-surface); border: 1.5px solid var(--c-line); border-radius: var(--r-md); padding: var(--s-4); }

@@ -9,6 +9,7 @@ import argparse
 import html
 import re
 import shutil
+import subprocess
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -26,6 +27,28 @@ VERIFY_FILE = re.compile(r"google[0-9a-f]{8,32}\.html")
 SURVEY_MARK = re.compile(r"<!--survey:([a-z]+)-->")
 SURVEY_URL = re.compile(r"https://[A-Za-z0-9.-]+/[^\s\"'<>]*")
 SURVEY_ENTRY = re.compile(r"entry\.[0-9]{3,20}")
+# 家賃編の「最初に出る画面」を公開する HTML に書き込むスクリプト（node で動かす）。理由はスクリプトの先頭に書いた
+PRERENDER = ROOT / "scripts" / "prerender_yachin.cjs"
+
+
+def prerender_yachin(text: str) -> str:
+    """家賃編の本文（今日やること・手順・制度の候補）を、プログラムなしでも読めるように書き込む。
+
+    node がない、または失敗したときは、元の HTML をそのまま返す（公開は止めない）。
+    """
+    node = shutil.which("node")
+    if not node:
+        print("家賃編の本文の書き込みを飛ばしました：node が見つかりません", file=sys.stderr)
+        return text
+    try:
+        r = subprocess.run([node, str(PRERENDER)], input=text, capture_output=True, text=True, encoding="utf-8", timeout=60)
+    except (OSError, subprocess.TimeoutExpired) as ex:
+        print(f"家賃編の本文の書き込みを飛ばしました：{ex}", file=sys.stderr)
+        return text
+    if r.returncode != 0 or 'id="say_first_call"' not in r.stdout:
+        print("家賃編の本文の書き込みを飛ばしました：" + (r.stderr.strip().splitlines() or ["結果が空です"])[-1], file=sys.stderr)
+        return text
+    return r.stdout
 
 
 def e(s) -> str:
@@ -334,12 +357,30 @@ class Site:
  <ul class="links">{tool_html}{links}</ul>
 </section>"""
 
+    def guides_html(self) -> str:
+        """新着のトップの上のほうに出す、行動を助けるページ（家賃編・支える人へ）への入口。
+
+        相談先の欄はページのいちばん下にあり、新着を60件読んだ先になるので、困って来た人も検索エンジンも
+        見つけやすいよう、上のほうにも置く。
+        """
+        tools = [t for t in self.cfg.get("tools", []) if t.get("guide_title")]
+        if not tools:
+            return ""
+        rows = "".join(f'<li class="tool"><a href="{e(t["url"])}">{e(t["guide_title"])}</a>'
+                       + (f'<span class="small">{e(t["guide_note"])}</span>' if t.get("guide_note") else "") + "</li>" for t in tools)
+        return f"""<section class="box help guides" aria-labelledby="guides-h">
+ <h2 id="guides-h">困っているときは、こちらから</h2>
+ <p class="small">新着の一覧とは別に、今日やることを順番に示すページです。無料で、登録はいりません。</p>
+ <ul class="links">{rows}</ul>
+</section>"""
+
     # ------------------------------------------------------------ ページ
     def page_index(self) -> str:
         desc = "生活・住まい・仕事・障害・子ども・高齢・外国籍の人に関わる国のお知らせの新着を、公式ページから毎日自動で集めて分野ごとに並べています。"
         body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, hero=True)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
+        body.append(self.guides_html())
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
         body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{"制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')
@@ -484,6 +525,8 @@ class Site:
                 depth = len(rel.parts) - 1
                 text = f.read_text(encoding="utf-8")
                 text = SURVEY_MARK.sub(lambda m: self.survey_unei() if m.group(1) == "unei" else self.survey_block(m.group(1), depth), text)
+                if rel.as_posix() == "yachin/index.html":
+                    text = prerender_yachin(text)
                 dst.write_text(text, encoding="utf-8")
             else:
                 shutil.copy2(f, dst)

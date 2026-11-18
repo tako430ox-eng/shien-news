@@ -397,6 +397,45 @@ class TestSearch(unittest.TestCase):
             self.site.build(self.tmp / "site2")
 
 
+    def test_guides_near_top_of_index(self):
+        # 家賃編と支える人へのページは、新着の一覧より前（分野ボタンより上）からもリンクする
+        out = self.tmp / "site"
+        self.site.build(out)
+        index = (out / "index.html").read_text(encoding="utf-8")
+        base = self.site.cfg["base_url"]
+        g = index.index('id="guides-h"')
+        self.assertLess(g, index.index('class="chips"'))
+        for path in ("yachin/", "sasaeru/"):
+            self.assertIn(f'href="{base}{path}"', index[g:index.index("</section>", g)])
+
+    @unittest.skipUnless(shutil.which("node"), "node がない環境では家賃編の本文の書き込みを確かめない")
+    def test_yachin_body_readable_without_script(self):
+        # 家賃編の大事な本文（今日やること・手順・制度の候補）が、プログラムを動かさなくても HTML に入っている
+        out = self.tmp / "site"
+        self.site.build(out)
+        y = (out / "yachin" / "index.html").read_text(encoding="utf-8")
+        src = (ROOT / "pages" / "yachin" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<div id="firstOut" class="stack" aria-live="polite"></div>', src)  # 正本は書き換えない
+        first = y[y.index('id="firstOut"'):y.index('id="city"')]
+        self.assertIn("自立相談支援機関", first)
+        self.assertIn("家賃のことで相談したくて電話しました", first)
+        self.assertNotIn("閉まっている時間", first)  # 開いた時刻で変わる文は固定しない
+        plan = y[y.index('id="planOut"'):y.index('id="candidates"')]
+        self.assertIn("持ち物をそろえる", plan)
+        self.assertIn("住居確保給付金", y[y.index('id="candOut"'):y.index('id="exclOut"')])
+        self.assertIn("<li>", y[y.index('id="srcList"'):])
+
+    def test_yachin_prerender_failure_keeps_page(self):
+        # 書き込みに失敗しても、元の家賃編をそのまま公開する（公開は止めない）
+        old = build.PRERENDER
+        try:
+            build.PRERENDER = self.tmp / "missing.cjs"
+            text = "<html><body><div id=\"firstOut\"></div></body></html>"
+            self.assertEqual(build.prerender_yachin(text), text)
+        finally:
+            build.PRERENDER = old
+
+
 class TestReviewRegression(unittest.TestCase):
     def test_medical_headline_is_findable_in_health(self):
         result = lib.classify('OTC類似薬の保険給付の在り方の見直しについて', RULES)

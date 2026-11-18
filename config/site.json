@@ -45,6 +45,8 @@
   {
    "label": "家賃が払えないとき、電話で何て言う？（くらしの非常口）",
    "url": "https://tako430ox-eng.github.io/shien-news/yachin/",
+   "guide_title": "家賃が払えない・滞納したとき",
+   "guide_note": "今日どこに電話して何と言うか、持ち物、窓口で聞く制度（住居確保給付金・生活保護など）を出します。",
    "topics": [
     "housing",
     "money"
@@ -53,6 +55,8 @@
   {
    "label": "仕事を失った・辞めたとき、今日から2週間でやること（くらしの非常口）",
    "url": "https://tako430ox-eng.github.io/shien-news/shitsugyo/",
+   "guide_title": "仕事を失った・辞めたとき",
+   "guide_note": "健康保険と年金の切り替え（14日以内）、失業給付、雇用保険がない人の職業訓練と給付金。今日やることと期限の日付を出します。",
    "topics": [
     "work",
     "money"
@@ -61,6 +65,8 @@
   {
    "label": "家族や友人が生活に困っているとき、支える人ができること（くらしの非常口）",
    "url": "https://tako430ox-eng.github.io/shien-news/sasaeru/",
+   "guide_title": "家族や友人が生活に困っているとき",
+   "guide_note": "親の家賃、失業、退去を迫られた、生活保護をすすめたい、代わりに電話する。場面ごとに、支える人ができることをまとめました。",
    "topics": [
     "housing",
     "money"
