@@ -62,11 +62,14 @@ config/rules.json の topics（分野）と kinds（種類）の keywords に言
 - 祝日一覧は 2027 年まで。内閣府の翌年分公表後に `HOLIDAYS` を更新して境界日をテストする。未登録年は開庁日の断定を避ける。自治体ごとの時間や臨時開庁は個別確認が必要。
 - 旧版で保存した持ち物・質問のチェック印は、意味の取り違えを防ぐため自動継承されない。回答・メモ・相談記録は引き継ぐ。
 - ページを開いただけで外のサーバーに接続するものを入れない（テスト `TestPages` が確かめる）。
+- 公開するとき、build.py が `scripts/prerender_yachin.cjs`（node）を呼び、何も選んでいない状態の「今日やること」「やること（手順）」「窓口で聞いてみる制度」「質問」「出典」を、公開用の HTML の空の場所に書き込む。プログラムを動かさない検索エンジンや AI の検索、スクリプトが動かないブラウザでも本文が読めるようにするため。正本は書き換えない。ブラウザではプログラムが同じ場所を作り直すので、見た目と動きは変わらない（2026-11-17 に、書き込みの有無で読み込み後の画面が同一なことを確認）。node がない・失敗したときは書き込まずにそのまま公開する。書き込む場所の id を変えたり `renderQuestions();` の起動部分を変えたりしたら、`node --test tests/test_yachin.cjs` が知らせる。
 
 ## 検索エンジン（Google Search Console）
 
 - 登録の種類は「URL プレフィックス」で `https://tako430ox-eng.github.io/shien-news/`。github.io はドメインの持ち主ではないので「ドメイン」の種類は使えない。
 - 所有確認は config/site.json に書く。「HTMLタグ」なら content の中身だけを `google_site_verification` に、「HTMLファイル」ならファイル名（google…….html）を `google_site_verification_file` に。build.py がトップなど生成ページの head にタグを入れる、またはそのファイルを作る。確認後も消さない。形が違う値を書くと build が止まり、前の公開版がそのまま残る。
 - サイトマップは build.py が毎回 `sitemap.xml` を作る。Search Console の「サイトマップ」に `https://tako430ox-eng.github.io/shien-news/sitemap.xml` を送る。pages/ の HTML も自動で載る。lastmod は、お知らせの一覧なら載っている中でいちばん新しい日付、about は生成日、pages/ のページは書かない。
+- 新着のトップには、分野ボタンより上に「困っているときは、こちらから」の欄を出し、家賃編と支える人へにリンクする（config/site.json の tools の guide_title・guide_note）。行動を助けるページを、人にも検索エンジンにも見つけやすくするため。
+- 掲載の確かめ方：Search Console の「URL 検査」に URL を入れる。「公開 URL をテスト」→「テスト済みのページを表示」で、Google が読んだ HTML とスクリーンショットが見られる。新しいページや大きく直したページは、そこで「インデックス登録をリクエスト」を押す。
 - 各ページの題名・説明文・正規URL（canonical）は、生成ページは build.py の head()、pages/ のページは各ファイルに直接書いてある。新しいページを pages/ に足すときは、title・description・canonical（公開URLそのもの）を必ず書く（TestSearch が確かめる）。
 - `robots.txt` も作っているが、プロジェクトサイト（…/shien-news/）ではホスト直下ではないので検索エンジンは読まない。独自ドメインに移したときのために残している。

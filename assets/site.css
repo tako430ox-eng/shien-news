@@ -122,3 +122,4 @@ h2 { font-weight: 900; }
 .prose ul.cards { padding-left: 0; }
 .cards .card a.title { display: inline-flex; align-items: center; min-height: var(--tap); }
 .srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
+.guides .links .tool span { margin-top: var(--s-1); }
