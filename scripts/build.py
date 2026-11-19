@@ -452,7 +452,7 @@ class Site:
             last_t = jdate(last[:10], True) if last else "—"
             rows.append(f'<tr><td><a href="{e(s["url"])}" rel="noopener">{e(s["name"])}</a></td><td>{state}</td><td>{e(last_t)}</td>'
                         f'<td><a href="{e(s["license_url"])}" rel="noopener">{e(s["license"])}</a></td></tr>')
-        kinds = "".join(f'<li><b>{e(k["label"])}</b>：{e(k["hint"])}</li>' for k in list(self.kinds.values()))
+        kinds = "".join(f'<li><b>{e(k["label"])}</b>：{e(k.get("about") or k["hint"])}</li>' for k in list(self.kinds.values()))
         desc = "このページのしくみ、出典、情報源の状態、利用条件について。"
         survey_li = ('<li>感想のアンケート（任意）は、押した人だけが外部のフォームを開きます。くわしくは'
                      '<a href="unei.html#kansou">アンケートについて</a>。</li>') if self.survey() else ""

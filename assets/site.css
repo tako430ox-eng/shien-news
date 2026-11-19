@@ -147,7 +147,7 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .say-h { font-size: var(--fs-small); font-weight: 700; color: var(--c-ink-soft); }
 .cta { justify-self: start; display: inline-flex; align-items: center; min-height: 48px; background: var(--c-primary); color: var(--c-primary-ink); text-decoration: none; font-weight: 700; border-radius: var(--r-sm); padding: 8px 24px; margin-top: var(--s-3); line-height: 1.5; }
 .cta:hover { text-decoration: underline; }
-.prose ul.cards { padding-left: 0; }
+.prose ul.cards, .prose ul.links { padding-left: 0; }
 /* 場面の一覧（支える人へ）：入口の行と同じ見た目。カード全体を押せる */
 .cards .card:has(> a.title:only-child) { position: relative; padding: var(--s-3) 44px var(--s-3) var(--s-4); border-color: var(--c-line-strong); border-radius: var(--r-sm); }
 .cards .card > a.title:only-child { display: block; text-decoration: none; font-weight: 700; line-height: 1.5; }

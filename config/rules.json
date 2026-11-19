@@ -331,7 +331,8 @@
  "default_kind": {
   "id": "notice",
   "label": "お知らせ",
-  "hint": ""
+  "hint": "",
+  "about": "行事・広報・ページ更新など、ほかの種類に当てはまらないお知らせです。"
  },
  "exclude_keywords": [
   "採用選考",
