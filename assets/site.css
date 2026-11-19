@@ -33,7 +33,7 @@ a:hover { text-decoration-thickness: 3px; }
 .promise { display: grid; gap: var(--s-1); }
 .promise li { font-size: var(--fs-small); line-height: 1.6; display: flex; gap: var(--s-2); align-items: baseline; }
 .promise li::before { content: "✓"; font-weight: 700; flex: none; }
-.h1 { font-size: var(--fs-h2); }
+.h1 { font-size: var(--fs-h1); }
 
 /* ---- 注意の帯 ---- */
 /* 緊急の案内：赤い面で全体を塗らず、左の太い線と見出しで示す（GOV.UK の警告文・デジタル庁の通知バナーの考え方。
@@ -97,7 +97,9 @@ a:hover { text-decoration-thickness: 3px; }
 
 /* ---- このページについて ---- */
 .prose { display: grid; gap: var(--s-3); }
-.prose h2 { font-size: var(--fs-h3); margin-top: var(--s-4); }
+/* 本文の見出し：h2（節）22px と h3（小見出し）18px で段を分ける */
+.prose h2 { font-size: var(--fs-h2); margin-top: var(--s-5); }
+.prose h3 { font-size: var(--fs-h3); margin-top: var(--s-2); }
 .prose ul { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); }
 .tablewrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: var(--fs-small); background: var(--c-surface); }
