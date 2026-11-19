@@ -408,6 +408,38 @@ class TestSearch(unittest.TestCase):
         for path in ("yachin/", "sasaeru/"):
             self.assertIn(f'href="{base}{path}"', index[g:index.index("</section>", g)])
 
+    def test_site_menu_on_every_page(self):
+        # 看板の右上の「メニュー」が全ページにあり、行き先がすべて実在し、今のページに印が付く
+        import re
+        out = self.tmp / "site"
+        self.site.build(out)
+        pages = sorted(out.rglob("*.html"))
+        self.assertGreater(len(pages), 15)
+        for f in pages:
+            text = f.read_text(encoding="utf-8")
+            rel = f.relative_to(out).as_posix()
+            self.assertEqual(text.count("data-site-menu"), 1, rel)
+            self.assertNotIn("<!--site-menu-->", text, rel)
+            self.assertIn('assets/menu.css">', text, rel)
+            self.assertIn('assets/menu.js" defer></script>', text, rel)
+            nav = text[text.index('<nav class="site-menu"'):text.index("</nav>", text.index('<nav class="site-menu"'))]
+            hrefs = re.findall(r'href="([^"]+)"', nav)
+            self.assertEqual(len(hrefs), sum(len(items) for _, items in build.SITE_MENU), rel)
+            for h in hrefs:
+                path = h.split("#")[0]
+                target = (f.parent / path) if path else f
+                if target.is_dir():
+                    target = target / "index.html"
+                self.assertTrue(target.exists(), f"{rel} のメニューの {h} が見つからない")
+        y = (out / "yachin" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('aria-current="page">家賃が払えない', y)
+        d = (out / "sasaeru" / "denwa" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('aria-current="true">家族や友人が', d)
+        top = (out / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="#help"', top[top.index('<nav class="site-menu"'):])
+        # 家賃編の本文を書き込むスクリプトが、メニューのスクリプトを取り違えない（本文のプログラムが先に残る）
+        self.assertIn('<script src="../assets/menu.js" defer></script>', y)
+
     @unittest.skipUnless(shutil.which("node"), "node がない環境では家賃編の本文の書き込みを確かめない")
     def test_yachin_body_readable_without_script(self):
         # 家賃編の大事な本文（今日やること・手順・制度の候補）が、プログラムを動かさなくても HTML に入っている

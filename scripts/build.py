@@ -31,6 +31,56 @@ SURVEY_ENTRY = re.compile(r"entry\.[0-9]{3,20}")
 PRERENDER = ROOT / "scripts" / "prerender_yachin.cjs"
 
 
+MENU_MARK = "<!--site-menu-->"
+# サイトのメニュー（看板の右上の「メニュー」ボタンで開く一覧）。全ページで同じ並び。
+# 行き先はサイトの一番上からの道筋（"" はトップ）。新しいページを足したら、ここにも足す。
+SITE_MENU = [
+    ("困っているとき", [
+        ("yachin/", "家賃が払えない・滞納したとき"),
+        ("shitsugyo/", "仕事を失った・辞めたとき"),
+        ("sasaeru/", "家族や友人が生活に困っているとき（支える人へ）"),
+        ("#help", "困ったときの相談先"),
+    ]),
+    ("新着とこのサイト", [
+        ("", "支援の新着（トップ）"),
+        ("talk.html", "国で話し合っていること"),
+        ("about.html", "新着のしくみと出典"),
+        ("unei.html", "運営者と連絡先"),
+    ]),
+]
+MENU_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+             '<path class="i-open" d="M4 6.5h16M4 12h16M4 17.5h16"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg>')
+
+
+def menu_html(depth: int, current: str) -> str:
+    """看板の右上に置くメニューボタンと、開くページの一覧。current は今のページの道筋（例 "sasaeru/denwa/"）。
+
+    ボタンは hidden で出し、assets/menu.js が動いたときだけ見せる。スクリプトがないときは
+    ページの下の案内から移れる（今までどおり）。外部への通信はしない。
+    """
+    up = "../" * depth
+    current = current[: -len("index.html")] if current.endswith("index.html") else current
+    groups = []
+    for title, items in SITE_MENU:
+        rows = []
+        for path, label in items:
+            if path == "#help":
+                href = "#help" if current == "" else up + "index.html#help"
+            else:
+                href = up + path or "./"
+            mark = ""
+            if path == current:
+                mark = ' aria-current="page"'
+            elif path and path.endswith("/") and current.startswith(path):
+                mark = ' aria-current="true"'
+            rows.append(f'<li><a href="{e(href)}"{mark}>{e(label)}</a></li>')
+        groups.append(f'<div><p class="site-menu-h">{e(title)}</p><ul>{"".join(rows)}</ul></div>')
+    return (f'<button type="button" class="menu-btn" data-site-menu aria-expanded="false" aria-controls="site-menu" hidden>'
+            f'{MENU_ICON}<span class="menu-label">メニュー</span></button>'
+            f'<nav class="site-menu" id="site-menu" aria-label="サイトのメニュー" hidden>{"".join(groups)}</nav>'
+            f'<script src="{up}assets/menu.js" defer></script>')
+
+
 def prerender_yachin(text: str) -> str:
     """家賃編の本文（今日やること・手順・制度の候補）を、プログラムなしでも読めるように書き込む。
 
@@ -132,12 +182,13 @@ class Site:
 <link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
 <link rel="stylesheet" href="{up}assets/site.css">
+<link rel="stylesheet" href="{up}assets/menu.css">
 </head>
 <body data-generated="{e(self.fresh)}" data-stale-hours="{e(self.cfg.get('stale_hours', 72))}">
 <a class="skip" href="#main">本文へ</a>
 """
 
-    def header(self, depth: int, hero: bool = False) -> str:
+    def header(self, depth: int, current: str, hero: bool = False) -> str:
         up = "../" * depth
         sample = ""
         if self.sample:
@@ -147,7 +198,7 @@ class Site:
         path = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>'
         if hero:
             top = f"""<header class="hero">
- <div class="brandrow">{logo}<span class="brand">{brand}</span><span class="tag">新着まとめ</span></div>
+ <div class="brandrow">{logo}<span class="brandname"><span class="brand">{brand}</span><span class="tag">新着まとめ</span></span>{menu_html(depth, current)}</div>
  <h1>国の支援の<em>新着</em>を、<br>毎日まとめて。</h1>
  <p class="lead">暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選んでいます。</p>
  <ul class="promise" aria-label="このページの約束">
@@ -158,7 +209,7 @@ class Site:
 </header>"""
         else:
             top = f"""<header class="hero hero-sub">
- <div class="brandrow">{logo}<a class="brand" href="{up}index.html">{brand} 新着</a></div>
+ <div class="brandrow">{logo}<a class="brand" href="{up}index.html">{brand} 新着</a>{menu_html(depth, current)}</div>
  {path}
 </header>"""
         return f"""{sample}<div class="page">
@@ -377,7 +428,7 @@ class Site:
     # ------------------------------------------------------------ ページ
     def page_index(self) -> str:
         desc = "生活・住まい・仕事・障害・子ども・高齢・外国籍の人に関わる国のお知らせの新着を、公式ページから毎日自動で集めて分野ごとに並べています。"
-        body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, hero=True)]
+        body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, "", hero=True)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(self.guides_html())
@@ -400,7 +451,7 @@ class Site:
         talk = [it for it in self.talk if slug in it["topics"]]
         other = [it for it in self.other if slug in it["topics"]]
         desc = f"「{t['label']}」に関わる国の支援やお知らせの新着です。公式ページから毎日自動で集めています。"
-        body = [self.head(f"{t['label']}の支援制度・お知らせ 新着｜{self.cfg.get('brand', self.cfg['name'])}", desc, f"t/{slug}.html", 1), self.header(1)]
+        body = [self.head(f"{t['label']}の支援制度・お知らせ 新着｜{self.cfg.get('brand', self.cfg['name'])}", desc, f"t/{slug}.html", 1), self.header(1, f"t/{slug}.html")]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">{e(t["label"])}の新着</h1><p class="lead">{e(desc)}</p>')
@@ -416,7 +467,7 @@ class Site:
 
     def page_talk(self) -> str:
         desc = "審議会・検討会の開催、意見募集、調査の結果など、国で話し合っていることの一覧です。検討段階の案と、すでに公表された調査結果などを含みます。支援を利用できるかは、公式ページで確かめてください。"
-        body = [self.head(f"国で話し合っていること（審議会・意見募集）｜{self.cfg.get('brand', self.cfg['name'])}", desc, "talk.html", 0), self.header(0)]
+        body = [self.head(f"国で話し合っていること（審議会・意見募集）｜{self.cfg.get('brand', self.cfg['name'])}", desc, "talk.html", 0), self.header(0, "talk.html")]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">国で話し合っていること</h1><p class="lead">{e(desc)}</p>')
@@ -428,7 +479,7 @@ class Site:
 
     def page_other(self) -> str:
         desc = "行事や広報、ページ更新のお知らせなど、制度の変更・申請・相談窓口・注意のどれにも当たらない国のお知らせの一覧です。"
-        body = [self.head(f"そのほかのお知らせ｜{self.cfg.get('brand', self.cfg['name'])}", desc, "other.html", 0), self.header(0)]
+        body = [self.head(f"そのほかのお知らせ｜{self.cfg.get('brand', self.cfg['name'])}", desc, "other.html", 0), self.header(0, "other.html")]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(f'<h1 class="h1">そのほかのお知らせ</h1><p class="lead">{e(desc)}</p><p class="small">見出しの言葉だけで分けているので、役立つお知らせがここにまぎれていることもあります。</p>')
@@ -456,7 +507,7 @@ class Site:
         desc = "このページのしくみ、出典、情報源の状態、利用条件について。"
         survey_li = ('<li>感想のアンケート（任意）は、押した人だけが外部のフォームを開きます。くわしくは'
                      '<a href="unei.html#kansou">アンケートについて</a>。</li>') if self.survey() else ""
-        body = [self.head(f"このページについて｜{self.cfg.get('brand', self.cfg['name'])}", desc, "about.html", 0), self.header(0)]
+        body = [self.head(f"このページについて｜{self.cfg.get('brand', self.cfg['name'])}", desc, "about.html", 0), self.header(0, "about.html")]
         body.append(f"""<main id="main" class="prose">
 <h1 class="h1">このページについて</h1>
 <h2>何をしているページか</h2>
@@ -524,6 +575,8 @@ class Site:
             if f.suffix == ".html":
                 depth = len(rel.parts) - 1
                 text = f.read_text(encoding="utf-8")
+                if MENU_MARK in text:
+                    text = text.replace(MENU_MARK, menu_html(depth, rel.as_posix()), 1)
                 text = SURVEY_MARK.sub(lambda m: self.survey_unei() if m.group(1) == "unei" else self.survey_block(m.group(1), depth), text)
                 if rel.as_posix() == "yachin/index.html":
                     text = prerender_yachin(text)

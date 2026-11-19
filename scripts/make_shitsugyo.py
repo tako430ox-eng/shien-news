@@ -616,12 +616,13 @@ def render() -> dict[str, str]:
 <link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
 <link rel="stylesheet" href="{up}assets/site.css">
+<link rel="stylesheet" href="{up}assets/menu.css">
 </head>
 <body>
 <a class="skip" href="#main">本文へ</a>
 <div class="page">
 <header class="hero hero-sub">
- <div class="brandrow">{LOGO}<a class="brand" href="{up}">くらしの非常口</a><span class="tag">仕事を失ったとき</span></div>
+ <div class="brandrow">{LOGO}<span class="brandname"><a class="brand" href="{up}">くらしの非常口</a><span class="tag">仕事を失ったとき</span></span><!--site-menu--></div>
  <h1>仕事を失った・辞めたとき<br><em>まずやる手続き</em>と期限</h1>
  <p class="lead">健康保険と年金の手続きには、退職日の翌日から14日・20日という期限があります。失業給付は、離職票が届いたらハローワークへ。お金が足りないときの相談先も、このページにあります。</p>
  {SIGN}
