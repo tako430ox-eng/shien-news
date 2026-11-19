@@ -490,7 +490,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
 
   <section class="tip stack small" aria-label="支える人へ">
     <strong>隣で支える人へ</strong>
-    <p>研究では、制度の情報を見せるだけより、手続きを一緒にする方が利用につながりやすいことが示されています。電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことが役に立ちます。お金を個人的に貸すのは避けてください。支える人の役目は、専門の窓口につなぐことです。</p>
+    <p>当サイトでは、本人の了解を得たうえで、電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことを勧めています（当サイトの判断です）。お金を個人的に貸すのは避けてください。支える人の役目は、専門の窓口につなぐことです。</p>
       <p><a href="../sasaeru/">家族や友人が生活に困っているときの、場面ごとの案内（支える人へ）</a></p>
   </section>
 
@@ -811,13 +811,20 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     var dl = daysLeft();
     return any("rent", ["late1", "late2", "evict"]) || (dl !== null && dl < 0);
   }
+  // 大家さんへの文の「理由」は、選んだことだけから作る。年金だけでは足りない人に「収入が減った」と書かない。
+  function landlordReason() {
+    if (has("reason", "pension")) return { why: "年金だけでは、家賃と生活費が足りないためです。", lead: "年金だけでは家賃と生活費が足りず、" };
+    if (any("reason", ["jobloss", "cut", "sick"])) return { why: "収入が減ったためです。", lead: "収入が減り、" };
+    return { why: "生活費が足りなくなったためです。", lead: "生活費が足りなくなり、" };
+  }
   function landlordScript() {
     var who = (state.room.trim() ? state.room.trim() + "号室の" : "") + (state.name.trim() || "");
     var intro = who ? who + "です。" : "";
-    if (has("rent", "evict")) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。役所の窓口と、法律の相談窓口への相談を進めたいと考えています。結果が出るまで、少しお待ちいただけないでしょうか。結果がわかり次第ご連絡します。";
-    if (isLate()) return intro + "家賃のお支払いが遅れていて、申し訳ありません。収入が減ったためです。役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いの方法について、ご相談させてください。";
-    if (has("rent", "soon")) return intro + "収入が減り、来月以降の家賃のお支払いが難しくなりそうです。役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
-    return intro + "収入が減り、次の家賃を期日までにお支払いできない見込みです。役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+    var r = landlordReason();
+    if (has("rent", "evict")) return intro + "家賃のお支払いが遅れていて、申し訳ありません。" + r.why + "役所の窓口と、法律の相談窓口への相談を進めたいと考えています。結果が出るまで、少しお待ちいただけないでしょうか。結果がわかり次第ご連絡します。";
+    if (isLate()) return intro + "家賃のお支払いが遅れていて、申し訳ありません。" + r.why + "役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いの方法について、ご相談させてください。";
+    if (has("rent", "soon")) return intro + r.lead + "来月以降の家賃のお支払いが難しくなりそうです。役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
+    return intro + r.lead + "次の家賃を期日までにお支払いできない見込みです。役所の窓口で、家賃を補助する制度について相談を進めたいと考えています。結果がわかり次第ご連絡します。お支払いについてご相談させてください。";
   }
   function sayBox(id, text, label) {
     return '<div class="say"><span class="small muted">' + esc(label || "言うこと（そのまま読んでかまいません）") + '</span><p class="text" id="say_' + id + '">' + esc(text) + '</p><div class="row"><button class="copy" type="button" data-copy-from="say_' + id + '">この文をコピー</button></div></div>';

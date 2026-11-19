@@ -57,3 +57,10 @@ test('prerender fills the first screen for readers without JavaScript and leaves
   for(const id of TARGETS) if(parts[id]) rest=rest.replace(parts[id],'');
   assert.equal(rest,html);
 });
+test('landlord script states only the chosen reason (pension is not "income decreased")',()=>{const {a}=appAt();
+  for (const rent of ['now','late1','evict','soon']) {
+    a.setState({a:{rent,reason:'pension'}});const s=a.landlordScript();assert.doesNotMatch(s,/収入が減/,rent);assert.match(s,/年金だけでは/,rent);
+    a.setState({a:{rent,reason:'jobloss'}});assert.match(a.landlordScript(),/収入が減/,rent);
+    a.setState({a:{rent}});assert.doesNotMatch(a.landlordScript(),/収入が減|年金/,rent);
+  }});
+test('supporter tip does not present the SNAP study as evidence for family support',()=>{assert.doesNotMatch(html,/研究では、制度の情報を見せるだけより/);assert.match(html,/本人の了解を得たうえで/);});
