@@ -310,6 +310,36 @@ textarea.memo-out:focus { outline: 3px solid var(--c-link); outline-offset: 2px;
   .tiles .opt span { font-size: 0.9375rem; }
 }
 @media print { details.q > summary::after, details.step > summary::after { display: none; } .memo-stale { display: none !important; } }
+
+/* ==== ひだまり v2.0（2026-11-19）：文字・角・選択肢・緊急の囲みを、ほかのページ（assets/site.css）と同じ基準にそろえる。
+   根拠と合否の基準は docs/design-standard.md。v1 の値の上に重ねて書いている（下の値が優先） ==== */
+:root { --fs-small: 1rem; --fs-lead: 1.125rem; --fs-h3: 1.125rem; --fs-h2: 1.375rem; --fs-h1: 1.75rem; --lh-body: 1.7; --lh-tight: 1.5; --r-sm: 8px; --r-md: 12px; }
+@media (min-width: 40.0625rem) { :root { --fs-h1: 2.25rem; --fs-h2: 1.625rem; --fs-h3: 1.25rem; } }
+body { letter-spacing: 0.02em; line-break: strict; }
+h2, h3, .cand-name, .first .lead2 { font-family: var(--f-body); font-weight: 700; font-feature-settings: "palt"; }
+.hero h1 { font-size: var(--fs-h1); }
+p, li { text-wrap: pretty; }
+legend, summary, .opts:not(.tiles) .opt span, .cand-name, .say-h { word-break: auto-phrase; }
+.tiles .opt span { word-break: normal; }
+a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.card, .first, details.cand { box-shadow: none; }
+/* 看板は端から端まで */
+.hero { box-shadow: 0 0 0 100vmax var(--c-sign); clip-path: inset(0 -100vmax); }
+@media (min-width: 44rem) { .hero { border-radius: 0; } .sign-path { width: 100%; margin-left: 0; margin-right: 0; } }
+.promise { display: grid; gap: 2px; }
+.promise li { background: none; border: 0; padding: 0; border-radius: 0; align-items: baseline; }
+.promise li::before { content: "✓"; width: auto; height: auto; border-radius: 0; background: none; color: var(--c-sign-accent); font-weight: 700; }
+.brandrow .tag, .badge, .eyebrow .tag { border-radius: 4px; font-size: 0.875rem; } /* 14px 未満は使わない（デジタル庁） */
+/* 選択肢：3つ以上は縦に並べ、左に丸を出す（GOV.UK：縦積み・丸は左。2つで短いときだけ横） */
+.opts:not(.tiles) .opt span { position: relative; border-radius: var(--r-sm); border-width: 1px; padding: 10px 16px 10px 48px; line-height: 1.6; min-height: 48px; display: block; }
+.opts:not(.tiles) .opt span::before { content: "" !important; position: absolute; left: 13px; top: 12px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--c-ink); background: var(--c-surface); box-sizing: border-box; }
+.opts:not(.tiles) .opt input:checked + span { background: var(--c-primary-soft); color: var(--c-ink); border-color: var(--c-primary); box-shadow: inset 0 0 0 1px var(--c-primary); font-weight: 400; }
+.opts:not(.tiles) .opt input:checked + span::before { border: 7px solid var(--c-primary); }
+.opts:not(.tiles):has(> .opt:nth-child(3)) { display: grid; }
+.supporter span { border-radius: var(--r-sm); }
+.supporter input:checked + span::before { content: "✓ "; }
+/* ボタンは角を入力欄とそろえる（札の形は短い札だけ） */
+.btn, .copy, .find-links a, .find-links span, .closebar button { border-radius: var(--r-sm); }
 </style>
 </head>
 <body>

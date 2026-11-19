@@ -74,3 +74,8 @@ config/rules.json の topics（分野）と kinds（種類）の keywords に言
 - 掲載の確かめ方：Search Console の「URL 検査」に URL を入れる。「公開 URL をテスト」→「テスト済みのページを表示」で、Google が読んだ HTML とスクリーンショットが見られる。新しいページや大きく直したページは、そこで「インデックス登録をリクエスト」を押す。
 - 各ページの題名・説明文・正規URL（canonical）は、生成ページは build.py の head()、pages/ のページは各ファイルに直接書いてある。新しいページを pages/ に足すときは、title・description・canonical（公開URLそのもの）を必ず書く（TestSearch が確かめる）。
 - `robots.txt` も作っているが、プロジェクトサイト（…/shien-news/）ではホスト直下ではないので検索エンジンは読まない。独自ドメインに移したときのために残している。
+
+## ページを作る・直す・見直すとき
+
+- 見た目と文章は **docs/design-standard.md（デザインとページ作りの基準）** の「工程」に沿って進め、「決まり」を満たす。
+- PR を出す前に `python scripts/build.py --out site` と `node scripts/design_audit.cjs site` を実行し、結果と変更前後の画像を PR に付ける。
