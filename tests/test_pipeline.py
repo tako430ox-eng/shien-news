@@ -610,6 +610,24 @@ class TestShitsugyo(unittest.TestCase):
             self.assertRegex(checked, r"^\d{4}-\d{2}-\d{2}$")
 
 
+    def test_folding_keeps_deadlines_and_emergency_visible(self):
+        """畳むのは一部の人向けの補足だけ（docs/design-standard.md の C6）。緊急の案内・期限・条件・してはいけないことは畳まない。"""
+        import re
+        text = self.pages["index.html"]
+        main = text[text.index('<main id="main"'):text.index("</main>")]
+        folded = "".join(re.findall(r'<details class="more"[^>]*>.*?</details>', main, re.S))
+        outside = re.sub(r'<details class="more"[^>]*>.*?</details>', "", main, flags=re.S)
+        self.assertNotIn("<details", "".join(re.findall(r'<details class="more"[^>]*>(.*?)</details>', main, re.S)), "畳んだ中に畳んだ欄")
+        for must in ("退職日の翌日から20日以内", "20日以内に<b>届く</b>", "退職日の翌日から14日以内", "その場で署名しないでください",
+                     "離職した日の翌日から1年", "不正受給", "払えないまま放っておかず"):
+            self.assertIn(must, outside, f"「{must}」を畳んだ中に入れない")
+        self.assertNotIn("今夜寝る場所がない", folded)
+        # 畳んだ見出しには、期限がある補足の要点を書く
+        self.assertIn("<summary>保険料が払えないときは、免除を申請する（期限は14日とは別）</summary>", main)
+        # 質問は、スクリプトが動かないときは全部開いている
+        self.assertEqual(len(re.findall(r'<details class="q" id="qd_\w+" open>', main)), 4)
+
+
 class TestDesignStandard(unittest.TestCase):
     """docs/design-standard.md の決まりのうち、ブラウザなしで確かめられるもの（ブラウザで測る分は scripts/design_audit.cjs）。"""
 

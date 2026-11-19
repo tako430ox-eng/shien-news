@@ -105,9 +105,29 @@ def say(sid: str, label: str, text: str) -> str:
 
 
 def radio(name: str, opts: list[tuple[str, str]], legend: str) -> str:
+    """押すと選択肢が開く質問（家賃編と同じ形）。スクリプトが動かないときは、全部開いたまま選べる（open）。
+    スクリプトが動くときは、まだ答えていない最初の質問だけを開き、答えると閉じて、選んだ答えを見出しの下に出す。"""
     items = "".join(
         f'<label class="opt"><input type="radio" name="{name}" value="{v}"><span>{t}</span></label>' for v, t in opts)
-    return f'<fieldset class="q"><legend>{legend}</legend><div class="opts">{items}</div></fieldset>'
+    return (f'<details class="q" id="qd_{name}" open><summary><span class="q-label">{legend}</span>'
+            f'<span class="q-ans" id="qa_{name}"></span></summary>'
+            f'<fieldset><legend class="sr-only">{legend}</legend><div class="opts">{items}</div></fieldset></details>')
+
+
+SAY_SUMMARY = {"yakusho": "市区町村の役所（国民健康保険・国民年金の窓口）で言う文", "hw": "ハローワークで言う文",
+               "kaisha": "会社に言う文（離職票が届かないとき）", "jiritsu": "自立相談支援機関に電話で言う文"}
+
+
+def say_more(sid: str, label: str, text: str, note: str = "") -> str:
+    """窓口で言う文は、行く先ごとに畳む。使うのは、その日に行く窓口の1つだけのため。"""
+    return more(SAY_SUMMARY[sid], say(sid, label, text) + note, "say_" + sid + "_d")
+
+
+def more(summary: str, body: str, did: str = "") -> str:
+    """一部の人だけが読む補足を畳む（GOV.UK Design System の Details：「一部の利用者だけが必要とする情報」に使い、
+    「大多数が必要とする情報」には使わない）。期限・条件の要点は見出し（summary）に書く。"""
+    idattr = f' id="{did}"' if did else ""
+    return f'<details class="more"{idattr}><summary>{summary}</summary><div class="more-body">{body}</div></details>'
 
 
 # ---------------------------------------------------------------- 本文
@@ -191,7 +211,7 @@ BODY = f"""
 </ul>
 <h3>家族の健康保険の扶養に入る</h3>
 <p>入れるかどうかは収入などで決まります。家族の勤め先に聞いてください。</p>
-<h3>会社の都合で辞めた人は、国民健康保険料が大きく軽くなる場合があります</h3>
+<details class="more" id="keigen"><summary>会社の都合で辞めた人は、国民健康保険料が大きく軽くなる場合があります</summary><div class="more-body">
 <ul>
 <li>対象：倒産・解雇などで辞めた人（雇用保険の「特定受給資格者」）と、契約が更新されなかった人・正当な理由で自分から辞めた人（「特定理由離職者」）です（厚生労働省）。</li>
 <li>軽くなる仕組み：前年の給与所得を<b>100分の30</b>とみなして、国民健康保険料を計算します（厚生労働省）。</li>
@@ -200,6 +220,7 @@ BODY = f"""
 </ul>
 <p>このため、国民健康保険と任意継続のどちらが安いかは、この軽減を入れて比べないと分かりません。<b>役所の国民健康保険の窓口で、軽減を入れた保険料を聞いてから選ぶ</b>のがよいと考えます（当サイトの判断です）。</p>
 <p>国民健康保険料は前年の所得で決まるので、収入がなくなっても高く感じることがあります。払えないときは、市区町村の国民健康保険の窓口に相談してください。特別な事情があるときは、減免や納付猶予を受けられる場合があります（厚生労働省）。</p>
+</div></details>
 
 <h2 id="nenkin">2. 年金の手続きと、保険料の免除（切り替えは14日以内）</h2>
 <p>年金は、健康保険とは別の手続きです。会社の厚生年金に入っていた20歳以上60歳未満の人は、辞めたあとの行き先で手続きが変わります（日本年金機構）。</p>
@@ -209,7 +230,7 @@ BODY = f"""
 <li><b>次の会社の厚生年金に入る人</b>：入るまでに間が空くときは、その間について国民年金の手続きが要ります（日本年金機構）。</li>
 <li>あなたの扶養に入っていた配偶者も、あなたが辞めると、国民年金（第1号）の手続きが必要です（日本年金機構）。</li>
 </ul>
-<h3>保険料が払えないときは、免除を申請する（期限は14日とは別）</h3>
+<details class="more" id="menjo"><summary>保険料が払えないときは、免除を申請する（期限は14日とは別）</summary><div class="more-body">
 <ul>
 <li>失業・倒産などが確認できると、<b>失業した人の前年の所得を除いて</b>審査する特例があります（日本年金機構）。</li>
 <li>ただし、免除では世帯主と配偶者の所得も審査されます。そのため、本人の所得が少なくても認められない場合があります（日本年金機構）。</li>
@@ -218,7 +239,9 @@ BODY = f"""
 <li>添える書類：離職票の写しか、雇用保険受給資格者証・受給資格通知の写しなど。</li>
 <li>免除の申請は、退職から14日を過ぎてもできます。さかのぼれるのは、申請の時点から2年1か月前までの分です（日本年金機構）。</li>
 </ul>
-<p><b>払えないまま放っておかず、早めに申請してください。</b>免除の手続きをせずに未納にすると、その期間は、年金の受給に必要な期間にも数えられません。申請が遅れると、障害を負ったときなどに障害年金や遺族年金を受けられないおそれがあります。事故や病気が起きてから後で申請しても、障害基礎年金の保険料の条件には数えられません（日本年金機構）。</p>
+<p>免除の手続きをせずに未納にすると、その期間は、年金の受給に必要な期間にも数えられません。申請が遅れると、障害を負ったときなどに障害年金や遺族年金を受けられないおそれがあります。事故や病気が起きてから後で申請しても、障害基礎年金の保険料の条件には数えられません（日本年金機構）。</p>
+</div></details>
+<p><b>払えないまま放っておかず、早めに申請してください。</b>未納のままにすると、障害年金などを受けられないおそれがあります（日本年金機構）。</p>
 
 <h2 id="hellowork">3. ハローワークで失業給付（雇用保険の基本手当）の手続きをする</h2>
 <p>雇用保険に入っていた人は、仕事を探している間の生活費として、基本手当を受けられる場合があります。主な条件は次のとおりです（ハローワーク）。</p>
@@ -244,8 +267,9 @@ BODY = f"""
 <li>本人名義の通帳かキャッシュカード</li>
 </ul>
 <p class="small">持ち物はハローワークの案内によります。</p>
-<h3>辞めた理由に納得できないとき</h3>
+<details class="more"><summary>辞めた理由（自己都合・会社都合）に納得できないとき</summary><div class="more-body">
 <p>たとえば、会社に辞めるよう勧められたのに「自己都合」とされているときは、ハローワークに相談してください。ハローワークが事実を調べて、離職理由を判定します（ハローワーク）。離職理由によって、受け取れる日数や、支給が始まる時期が変わります。</p>
+</div></details>
 <h3>気をつけること</h3>
 <ul>
 <li><b>早めに行ってください。</b>
@@ -258,7 +282,7 @@ BODY = f"""
 <li>受け取っている間に、アルバイト・パート・試用期間などで働いたり、内職や手伝いをしたりしたときは、必ず失業認定申告書で申告してください。申告しないと不正受給になり、支給が止まり、厳しい処分があります（ハローワーク）。</li>
 </ul>
 
-<h3 id="kyushoku">雇用保険に入っていなかった人・受け取りが終わった人：求職者支援制度</h3>
+<details class="more" id="kyushoku"><summary>雇用保険に入っていなかった人・受け取りが終わった人：求職者支援制度（受講料が無料の職業訓練）</summary><div class="more-body">
 <p>雇用保険の失業給付を受けられない人は、<b>受講料が無料の職業訓練</b>（求職者支援訓練）を受けられる場合があります。<b>テキスト代は自己負担</b>です（厚生労働省）。</p>
 <ul>
 <li>対象の例：雇用保険に入っていなかった人、自営業・フリーランスをやめた人、受け取りが終わった人など（厚生労働省）。</li>
@@ -277,6 +301,7 @@ BODY = f"""
 <li>給付金の条件に当たらなくても、受講料が無料の訓練は受けられます（厚生労働省）。</li>
 <li>窓口は、住所地のハローワークです。</li>
 </ul>
+</div></details>
 
 <h2 id="notyet">4. まだ辞めていない・「辞めてほしい」と言われたとき</h2>
 <ul>
@@ -287,40 +312,44 @@ BODY = f"""
 
 <h2 id="money">5. お金が足りないとき</h2>
 <p>困りごとに合わせて、次の4つがあります。どれに当たるか分からないときは、まず自立相談支援機関に相談してください。</p>
-<h3>どこに相談すればよいか分からないとき：自立相談支援機関</h3>
+<details class="more"><summary>どこに相談すればよいか分からないとき：自立相談支援機関</summary><div class="more-body">
 <ul>
 <li>仕事や家賃、生活費の困りごとを聞き、一緒に支援の計画を作る窓口です（厚生労働省）。</li>
 <li>名前は地域で違います（「くらしの相談窓口」など）。</li>
 <li>探し方：<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関の一覧</a>か、「（市区町村名） 自立相談支援」で検索します。</li>
 </ul>
-<h3>家賃が払えない・払えなくなりそうなとき：住居確保給付金</h3>
+</div></details>
+<details class="more"><summary>家賃が払えない・払えなくなりそうなとき：住居確保給付金</summary><div class="more-body">
 <ul>
 <li>仕事を失ってから2年以内なら、家賃の補助の対象になる場合があります（厚生労働省）。</li>
 <li>収入・預貯金・求職活動の条件があります。</li>
 <li><a href="{{up}}yachin/">家賃が払えないときの道具</a>で、電話で言う文と順番を出せます。</li>
 </ul>
-<h3>給付が出るまでの急ぎのお金：緊急小口資金</h3>
+</div></details>
+<details class="more"><summary>給付が出るまでの急ぎのお金：緊急小口資金</summary><div class="more-body">
 <ul>
 <li>社会福祉協議会の、急にお金が足りなくなったときの無利子の小口の貸付です。</li>
 <li>返す必要があり、審査があります。</li>
 <li>愛知県の案内では、10万円以内で、申し込みから最短でも5営業日かかります。条件は都道府県で違う場合があります。</li>
 </ul>
-<h3>手持ちのお金がほとんどないとき：生活保護</h3>
+</div></details>
+<details class="more"><summary>手持ちのお金がほとんどないとき：生活保護</summary><div class="more-body">
 <ul>
 <li>相談できます。窓口は、市区町村の福祉事務所です。</li>
 <li>失業給付などほかの収入があっても、国が決める最低限の生活費に足りなければ、足りない分が支給される仕組みです（厚生労働省）。</li>
 </ul>
+</div></details>
 
 <h2 id="say">窓口でそのまま言える文</h2>
-<p>〇〇のところを書き換えて、読み上げるか、画面を見せてください。</p>
-{say("yakusho", "市区町村の役所（国民健康保険・国民年金の窓口）で",
+<p>行く先を開いて、〇〇のところを書き換え、読み上げるか、画面を見せてください。</p>
+{say_more("yakusho", "市区町村の役所（国民健康保険・国民年金の窓口）で",
      "〇月〇日に会社を退職しました。国民健康保険と国民年金の手続きについて相談したいです。会社の都合で辞めた人の国民健康保険料の軽減と、国民年金保険料の失業による免除についても教えてください。今日そろっていない書類があれば、何を、いつまでに持ってくればよいか教えてください。")}
-{say("hw", "ハローワークで",
-     "〇月〇日に退職しました。求職の申込みと、雇用保険で受けられる給付の手続きをしたいです。離職票を持ってきました。")}
-<p class="small">離職票がまだ届いていないときは、最後の文を「離職票がまだ届いていません。どうすればよいか教えてください。」に替えてください。</p>
-{say("kaisha", "会社に（離職票が届かないとき）",
+{say_more("hw", "ハローワークで",
+     "〇月〇日に退職しました。求職の申込みと、雇用保険で受けられる給付の手続きをしたいです。離職票を持ってきました。",
+     '<p class="small">離職票がまだ届いていないときは、最後の文を「離職票がまだ届いていません。どうすればよいか教えてください。」に替えてください。</p>')}
+{say_more("kaisha", "会社に（離職票が届かないとき）",
      "〇月〇日に退職した〇〇です。離職票がまだ届いていません。いつ、どこに送っていただけるか教えてください。")}
-{say("jiritsu", "自立相談支援機関に電話で",
+{say_more("jiritsu", "自立相談支援機関に電話で",
      "〇月に仕事を失い、今月の家賃と生活費が足りなくなりそうです。使える制度と、相談の予約の取り方を教えてください。")}
 
 <h2>家族や友人が仕事を失ったとき</h2>
@@ -471,8 +500,78 @@ SCRIPT = r"""<script>
     return;
   }
   var DEFAULT_TODAY = $("todayOut").innerHTML;
+
+  // ---- 押すと選択肢が開く質問（家賃編と同じ形）----
+  // スクリプトが動かないときは、HTML の open のまま全部開いている。動くときは、まだ答えていない最初の質問だけを開く。
+  var QS = ["why", "ins", "kenpo", "money"];
+  function answerText(n) {
+    var c = document.querySelector('input[name="' + n + '"]:checked');
+    return c ? c.parentNode.textContent : "";
+  }
+  function updateSummaries() {
+    QS.forEach(function (n) {
+      var el = $("qa_" + n), t = answerText(n);
+      el.textContent = t || "まだ選んでいません";
+      el.classList.toggle("set", !!t);
+    });
+  }
+  function openFirstUnanswered(after) {
+    var start = after ? QS.indexOf(after) + 1 : 0;
+    for (var i = start; i < QS.length; i++) if (!answerText(QS[i])) { $("qd_" + QS[i]).open = true; return; }
+  }
+  QS.forEach(function (n) { $("qd_" + n).open = false; });
+  updateSummaries();
+  openFirstUnanswered();
+
+  // 矢印キーで選び直している間は閉じない（キーボードで選ぶ人が、選んでいる途中で閉じられないように）
+  var byKey = false;
+  document.addEventListener("keydown", function (ev) { byKey = /^Arrow/.test(ev.key) || ev.key === " "; });
+  document.addEventListener("pointerdown", function () { byKey = false; });
+
+  // 選んだ答えに合わせて、下の補足（畳んだ欄）を開いておく
+  function openRelated(a) {
+    var ids = [];
+    if (a.why === "company") ids.push("keigen");
+    if (a.ins === "no") ids.push("kyushoku");
+    if (a.money === "short") ids.push("menjo");
+    ids.forEach(function (id) { var d = $(id); if (d) d.open = true; });
+  }
+
   document.addEventListener("change", function (ev) {
-    if (ev.target.closest && ev.target.closest("#tool")) render();
+    if (!(ev.target.closest && ev.target.closest("#tool"))) return;
+    updateSummaries();
+    var qd = ev.target.closest("details.q");
+    if (qd && ev.target.type === "radio" && !byKey) {
+      qd.open = false;
+      qd.querySelector("summary").focus();
+      openFirstUnanswered(qd.id.slice(3));
+    }
+    openRelated(read());
+    render();
+  });
+
+  // ページ内のリンク（目次など）の行き先が畳んだ欄の中にあるときは、開いてから移る
+  function openTarget() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var t = id && document.getElementById(id);
+    if (!t) return;
+    var d = t.closest("details");
+    while (d) { d.open = true; d = d.parentNode.closest && d.parentNode.closest("details"); }
+    t.scrollIntoView();
+  }
+  window.addEventListener("hashchange", openTarget);
+  document.addEventListener("click", function (ev) {
+    var l = ev.target.closest && ev.target.closest('a[href^="#"]');
+    if (l && l.getAttribute("href") === location.hash) openTarget();
+  });
+  if (location.hash) openTarget();
+
+  // 印刷するときは、畳んだ欄を全部開いて出し、終わったら元に戻す
+  window.addEventListener("beforeprint", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("main details.more"), function (d) { d.setAttribute("data-was", d.open ? "1" : ""); d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("main details[data-was]"), function (d) { d.open = d.getAttribute("data-was") === "1"; d.removeAttribute("data-was"); });
   });
   $("leave").addEventListener("input", render);
   Array.prototype.forEach.call(document.querySelectorAll(".copy-row"), function (el) { el.hidden = false; });
@@ -484,6 +583,9 @@ SCRIPT = r"""<script>
   $("resetBtn").addEventListener("click", function () {
     Array.prototype.forEach.call(document.querySelectorAll("#tool input[type=radio]"), function (r) { r.checked = false; });
     $("leave").value = "";
+    QS.forEach(function (n) { $("qd_" + n).open = false; });
+    updateSummaries();
+    openFirstUnanswered();
     $("todayOut").innerHTML = DEFAULT_TODAY;
     $("datesOut").innerHTML = "";
     $("toolBtns").hidden = true;

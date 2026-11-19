@@ -192,7 +192,35 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .btn.ghost { border: 1px solid var(--c-line-strong); color: var(--c-ink); font-weight: 400; }
 .btn:hover, .copy:hover { text-decoration: underline; }
 .copy { font: inherit; font-size: var(--fs-small); cursor: pointer; min-height: var(--tap); padding: 6px 16px; border-radius: var(--r-sm); border: 1px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink); }
-@media print { .choose fieldset, .choose .field, .btn-row, .copy-row, .survey, footer details { display: none !important; } .choose { border: 0; padding: 0; } }
+/* 押すと選択肢が開く質問（家賃編の details.q と同じ形）。答えると閉じ、選んだ答えを ✓ つきで見出しの下に出す。
+   スクリプトが動かないときは HTML の open のまま全部開いている */
+.choose details.q { background: var(--c-surface); border: 1px solid var(--c-line-strong); border-radius: var(--r-sm); }
+.choose details.q[open] { border-color: var(--c-primary); box-shadow: inset 0 0 0 1px var(--c-primary); }
+.choose details.q > summary { list-style: none; cursor: pointer; display: grid; gap: 2px; position: relative; min-height: 56px; align-content: center; padding: 8px 48px 8px 16px; }
+.choose details.q > summary::-webkit-details-marker { display: none; }
+.choose details.q > summary::after, details.more > summary::before { content: ""; position: absolute; width: 10px; height: 10px; border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(45deg); }
+.choose details.q > summary::after { right: 20px; top: 50%; margin-top: -8px; color: var(--c-ink-soft); }
+.choose details.q[open] > summary::after { transform: rotate(225deg); margin-top: -3px; }
+.choose details.q > fieldset { padding: 0 16px 16px; }
+.q-label { font-weight: 700; line-height: 1.5; }
+.q-ans { font-size: var(--fs-small); line-height: 1.6; color: var(--c-ink-soft); }
+.q-ans.set { color: var(--c-ink); font-weight: 700; }
+.q-ans.set::before { content: "✓ "; color: var(--c-primary); }
+.q-ans:empty { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* 一部の人だけが読む補足を畳む（GOV.UK Design System の Details）。押せる見出しは下線つきの文字と、左の向きの印。
+   中身は左の線で、どこまでが畳んだ中身かを示す。期限・条件の要点は、見出しの文に書く（畳んだ中に隠さない） */
+details.more > summary { list-style: none; cursor: pointer; position: relative; display: block; min-height: var(--tap); padding: 10px 0 10px 28px; color: var(--c-link); font-weight: 700; line-height: 1.5; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { left: 4px; top: 17px; transform: rotate(-45deg); }
+details.more[open] > summary::before { transform: rotate(45deg); top: 15px; }
+details.more > summary:hover { text-decoration-thickness: 3px; }
+.more-body { border-left: 4px solid var(--c-line-strong); padding: 0 0 var(--s-2) var(--s-4); margin-left: 6px; display: grid; gap: var(--s-3); }
+.prose .more-body ul { margin: 0; }
+details.more + details.more { margin-top: calc(-1 * var(--s-2)); }
+@media print { .choose details.q, .choose fieldset, .choose .field, .btn-row, .copy-row, .survey, footer details { display: none !important; } .choose { border: 0; padding: 0; } }
+@media print { details.more > summary { color: var(--c-ink); text-decoration: none; padding-left: 0; } details.more > summary::before { display: none; } .more-body { border-left: 0; padding-left: 0; margin-left: 0; } }
 
 /* ---- 強制カラーモード（Windows のハイコントラスト）でも、選んだ丸と枠が見えるように ---- */
 @media (forced-colors: active) {
