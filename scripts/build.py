@@ -197,8 +197,8 @@ class Site:
         logo = '<svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>'
         path = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>'
         if hero:
-            top = f"""<header class="hero">
- <div class="brandrow">{logo}<span class="brandname"><span class="brand">{brand}</span><span class="tag">新着まとめ</span></span>{menu_html(depth, current)}</div>
+            top = f"""<div class="brandrow topbar">{logo}<span class="brandname"><span class="brand">{brand}</span><span class="tag">新着まとめ</span></span>{menu_html(depth, current)}</div>
+<header class="hero">
  <h1>国の支援の<em>新着</em>を、<br>毎日まとめて。</h1>
  <p class="lead">暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選んでいます。</p>
  <ul class="promise" aria-label="このページの約束">
@@ -208,8 +208,8 @@ class Site:
  {path}
 </header>"""
         else:
-            top = f"""<header class="hero hero-sub">
- <div class="brandrow">{logo}<a class="brand" href="{up}index.html">{brand} 新着</a>{menu_html(depth, current)}</div>
+            top = f"""<div class="brandrow topbar">{logo}<a class="brand" href="{up}index.html">{brand} 新着</a>{menu_html(depth, current)}</div>
+<header class="hero hero-sub">
  {path}
 </header>"""
         return f"""{sample}<div class="page">
