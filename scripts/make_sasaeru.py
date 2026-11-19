@@ -126,8 +126,8 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
 <body>
 <a class="skip" href="#main">本文へ</a>
 <div class="page">
+<div class="brandrow topbar">{LOGO}<span class="brandname"><a class="brand" href="{up}">くらしの非常口</a><span class="tag">支える人へ</span></span><!--site-menu--></div>
 <header class="hero hero-sub">
- <div class="brandrow">{LOGO}<span class="brandname"><a class="brand" href="{up}">くらしの非常口</a><span class="tag">支える人へ</span></span><!--site-menu--></div>
  <h1>{h1}</h1>
  <p class="lead">{lead}</p>
  {PATH}

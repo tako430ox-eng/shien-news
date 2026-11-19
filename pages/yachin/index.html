@@ -51,7 +51,7 @@ body { margin: 0; background: var(--c-bg); color: var(--c-ink); font-family: var
 .page {
   max-width: 44rem; margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: var(--s-5) 112px; display: grid; gap: var(--s-6);
+  padding-block: var(--s-5) 112px; display: grid; --page-gap: var(--s-6); gap: var(--page-gap);
 }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: var(--lh-tight); text-wrap: balance; margin: 0; }
 h2 { font-size: var(--fs-h2); }
@@ -329,7 +329,7 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 /* スマホ（640px以下）：緊急タイル4つを「すぐ閉じる」の帯より上に収める（v1.2 の決まり3）。
    v2.0 で文字の大きさを決まった段にそろえたため、文字を縮めずに、間隔とタイルの高さで詰める */
 @media (max-width: 40rem) {
-  .page { gap: var(--s-5); }
+  .page { --page-gap: var(--s-5); }
   .hero { gap: var(--s-2); }
   .hero h1 { letter-spacing: 0; font-feature-settings: "palt"; }
   .hero .lead { font-size: var(--fs-body); line-height: 1.6; }
@@ -340,7 +340,7 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   .tiles .opt span { min-height: 0; padding: 8px 12px; line-height: 1.45; }
 }
 @media (max-width: 380px) {
-  .page { gap: var(--s-4); }
+  .page { --page-gap: var(--s-4); }
   .hero h1 { font-size: 1.625rem; }  /* 26px（決まった段の一つ下）。28px だと2行目が折り返して3行になる */
   .tiles { gap: 6px; }
   .tiles .opt span { padding: 6px 10px; font-size: var(--fs-small); }
@@ -361,11 +361,11 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
 <div class="cover" id="cover" hidden><p>天気予報</p><p class="small">読み込んでいます…</p></div>
 <div class="page" id="pageMain" lang="ja">
 
-  <header class="hero">
-    <div class="brandrow">
+  <div class="brandrow topbar">
       <svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>
       <span class="brandname"><span class="brand">くらしの非常口</span><span class="tag">試作版</span></span><!--site-menu-->
-    </div>
+  </div>
+  <header class="hero">
     <h1>家賃が払えない。<br><em>今日やること</em>は、ひとつ。</h1>
     <p class="lead">どこに電話して、何と言えばいいかを示します。</p>
     <ul class="promise" aria-label="このページの約束">

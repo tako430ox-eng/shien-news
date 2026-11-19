@@ -420,6 +420,9 @@ class TestSearch(unittest.TestCase):
             rel = f.relative_to(out).as_posix()
             self.assertEqual(text.count("data-site-menu"), 1, rel)
             self.assertNotIn("<!--site-menu-->", text, rel)
+            # 名前とメニューの行は看板の外（ページ全体の中）に置く。看板の中にあると、上に出たままにできない
+            bar = text.index('<div class="brandrow topbar">')
+            self.assertLess(bar, text.index('<header class="hero'), rel)
             self.assertIn('assets/menu.css">', text, rel)
             self.assertIn('assets/menu.js" defer></script>', text, rel)
             nav = text[text.index('<nav class="site-menu"'):text.index("</nav>", text.index('<nav class="site-menu"'))]

@@ -16,7 +16,7 @@ a { color: var(--c-link); text-underline-offset: 0.2em; text-decoration-thicknes
 a:hover { text-decoration-thickness: 3px; }
 :focus-visible { outline: 3px solid var(--c-link); outline-offset: 2px; border-radius: 6px; }
 .small { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--c-ink-soft); }
-.page { max-width: 44rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: var(--s-5) var(--s-7); display: grid; gap: var(--s-5); }
+.page { max-width: 44rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: var(--s-5) var(--s-7); display: grid; --page-gap: var(--s-5); gap: var(--page-gap); }
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: var(--s-2); top: var(--s-2); background: var(--c-surface); padding: var(--s-2); z-index: 10; }
 .lines { background-color: var(--c-path); background-image: repeating-linear-gradient(90deg, transparent 0 4px, var(--c-path-groove) 4px 6px); }
@@ -229,3 +229,7 @@ details.more + details.more { margin-top: calc(-1 * var(--s-2)); }
 }
 /* ---- 動きを減らす設定 ---- */
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* 上に出たままの行（.topbar、assets/menu.css）を低く保つ：幅の狭いスマホでは、看板の札（「支える人へ」など）を出さない。
+   札と同じことは大見出し（h1）に書いてある。家賃編の「試作版」は家賃編の中で決める */
+@media (max-width: 26.5rem) { .topbar .brandname .tag { display: none; } }
