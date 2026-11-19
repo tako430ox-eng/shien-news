@@ -294,21 +294,6 @@ details.loglist { padding: 0 14px; }
 textarea.memo-out { width: 100%; font: inherit; line-height: 1.75; color: var(--c-ink); resize: vertical; min-height: 10rem; white-space: pre-wrap; }
 textarea.memo-out:focus { outline: 3px solid var(--c-link); outline-offset: 2px; border-style: solid; }
 .memo-stale { background: var(--c-info-bg); border-radius: var(--r-sm); padding: var(--s-3); display: grid; gap: var(--s-2); justify-items: start; }
-/* 幅の狭いスマホ（380px以下）：緊急タイルを「すぐ閉じる」の帯より上に収める */
-@media (max-width: 380px) {
-  .page { gap: var(--s-5); }
-  .hero { gap: var(--s-2); }
-  .hero .lead { font-size: 1rem; line-height: 1.5; }
-  .promise li { font-size: 0.875rem; padding: 2px 10px 2px 8px; }
-  #safety { gap: var(--s-3); }
-  #safety h2 { font-size: 1.3125rem; }
-  #safety .section-head > p { font-size: var(--fs-small); line-height: 1.6; }
-  .tiles .opt span { min-height: 0; padding: 8px 10px; line-height: 1.4; }
-}
-@media (max-width: 340px) {
-  #safety h2 { font-size: 1.1875rem; }
-  .tiles .opt span { font-size: 0.9375rem; }
-}
 @media print { details.q > summary::after, details.step > summary::after { display: none; } .memo-stale { display: none !important; } }
 
 /* ==== ひだまり v2.0（2026-11-19）：文字・角・選択肢・緊急の囲みを、ほかのページ（assets/site.css）と同じ基準にそろえる。
@@ -340,6 +325,25 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .supporter input:checked + span::before { content: "✓ "; }
 /* ボタンは角を入力欄とそろえる（札の形は短い札だけ） */
 .btn, .copy, .find-links a, .find-links span, .closebar button { border-radius: var(--r-sm); }
+/* スマホ（640px以下）：緊急タイル4つを「すぐ閉じる」の帯より上に収める（v1.2 の決まり3）。
+   v2.0 で文字の大きさを決まった段にそろえたため、文字を縮めずに、間隔とタイルの高さで詰める */
+@media (max-width: 40rem) {
+  .page { gap: var(--s-5); }
+  .hero { gap: var(--s-2); }
+  .hero h1 { letter-spacing: 0; font-feature-settings: "palt"; }
+  .hero .lead { font-size: var(--fs-body); line-height: 1.6; }
+  .promise li { font-size: 0.875rem; line-height: 1.5; }
+  #safety { gap: var(--s-3); }
+  #safety .section-head { gap: var(--s-1); }
+  #safety .section-head > p { font-size: var(--fs-small); }
+  .tiles .opt span { min-height: 0; padding: 8px 12px; line-height: 1.45; }
+}
+@media (max-width: 380px) {
+  .page { gap: var(--s-4); }
+  .hero h1 { font-size: 1.625rem; }  /* 26px（決まった段の一つ下）。28px だと2行目が折り返して3行になる */
+  .tiles { gap: 6px; }
+  .tiles .opt span { padding: 6px 10px; font-size: var(--fs-small); }
+}
 </style>
 </head>
 <body>
@@ -364,7 +368,7 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   <section id="safety" class="stack-lg" aria-labelledby="safety-h">
     <div class="section-head">
       <h2 id="safety-h">いま、こんなことはありますか</h2>
-      <p>当てはまるものを押してください。すぐ下に相談先が出ます。なければ、そのまま下へ進んでください。</p>
+      <p>当てはまるものを押すと、相談先が出ます。</p>
     </div>
     <div class="opts tiles" role="group" aria-label="今すぐの危険">
       <label class="opt"><input type="checkbox" id="s_night" data-safety="night"><span>今夜、寝る場所がない</span></label>
