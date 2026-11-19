@@ -22,6 +22,8 @@
 | 同「Warning text」 https://design-system.service.gov.uk/components/warning-text | 大事な注意は、目立つ印と短い文で示す専用の部品にする | 2026-11-19 |
 | 同「Type scale」「Paragraphs」 https://design-system.service.gov.uk/styles/type-scale | 文字の大きさは決まった段だけ。小さい画面と大きい画面で見出しの段だけを変え、本文の大きさは変えない。導入文（リード）は1ページに1回 | 2026-11-19 |
 | GOV.UK Service Manual「Writing for user interfaces」 https://www.gov.uk/service-manual/design/writing-for-user-interfaces | 大事な言葉を先に。1文に1つのこと。人は読むより拾い読みする。見出しで区切る。リンクの文字だけで行き先が分かるように。「緑のボタン」のように色や位置で指示しない | 2026-11-19 |
+| GOV.UK Design System「Details」 https://design-system.service.gov.uk/components/details と「Accordion」 https://design-system.service.gov.uk/components/accordion | Details は「一部の利用者だけが必要とする情報」があるページを拾い読みしやすくするために使い、「大多数が必要とする情報」を隠すのには使わない。開かない人がいるという調査がある。アコーディオンは中身を隠すので、まず畳まずに試し、全員が見る中身には使わない。入れ子にしない | 2026-11-19 |
+| Nielsen Norman Group「Accordions on Desktop」（2023-07-30） https://www.nngroup.com/articles/accordions-on-desktop/ 、スコットランド政府デザインシステム「Accordion」（2026-06-19 更新） https://designsystem.gov.scot/components/accordion | 畳むのは、内容が長く画面が小さいときに、利用者がその一部だけを必要とする場合。大事な情報は畳んだ中に置かない。複数を同時に開けるようにする | 2026-11-19 |
 | W3C「WCAG 2.2 の新しい項目」 https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/ と「2.5.8 Target Size (Minimum)」解説 | 押せる部品は 24×24px 以上（文中のリンクは除く）。当サイトは 44px を目安に、主な部品は 48px | 2026-11-19 |
 | Chrome「CSS に 4 つの新しい国際化機能を導入」 https://developer.chrome.com/blog/css-i18n-features?hl=ja （2023-12-04更新） | `word-break: auto-phrase` で日本語を文節で折り返す（Chrome 119以降、`lang="ja"` が必要。対応しないブラウザは今までどおりの改行になる） | 2026-11-19 |
 | ProMo Cymru「Trauma-informed Design: An Introduction for Non-profits」（Chayn の8原則、CC BY-SA 4.0） https://promo.cymru/resource/trauma-informed-design-an-introduction-for-non-profits | 困っている人を驚かせない。きつい言葉や不安をあおる見た目を避ける。本人が選べるようにする | 2026-11-19 |
@@ -61,6 +63,7 @@
 | C3 | 次のページへの入口（.links .tool、場面の一覧） | 1行ずつ枠で囲み、右に「›」。行のどこを押しても進める。説明は2行程度まで |
 | C4 | ボタン | 主（緑の塗り）と副（枠）の2種類。高さ 48px、角 8px。1つの画面に主ボタンは1つを目安 |
 | C5 | 札（タグ・種類） | 角 4px、14px。押せない札は押せるもの（分野ボタン）と形を変える |
+| C6 | 畳む（details.more：補足、details.q：押すと開く質問） | 畳むのは「一部の人だけが読む補足」だけ。大多数が読む中身、緊急の案内、期限・条件・してはいけないことは畳まない。期限や条件がある補足は、その要点を押せる見出しの文に書く。畳んだ中に畳んだ欄を入れない。スクリプトがなくても開ける `<details>` を使い、印刷のときは全部開く。目次などのリンクの行き先が畳んだ中にあるときは開いてから移る。質問は、スクリプトが動かないときは全部開いたまま選べるようにする |
 
 ### 文章（ページを作るとき）
 
