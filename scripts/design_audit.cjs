@@ -16,7 +16,8 @@
  *  3. 押せる部品：高さ 24px 未満がないか（WCAG 2.2 の 2.5.8。文中のリンクは除く）
  *  4. 見出し・選択肢の改行：word-break: auto-phrase が効いているか
  *  5. 最後の行が2字以下で終わる段落（泣き別れ）の数（参考値。0 を目指すが、合否にはしない）
- *  6. 横にはみ出していないか（WCAG 1.4.10 リフロー。320px でも測る）
+ *  6. 横にはみ出していないか（WCAG 1.4.10 リフロー。320px でも測る。320px で文字を1.25倍にしたときも測る：
+ *     html の文字の大きさを 20px にして、ブラウザの文字の拡大を模す）
  */
 const { chromium } = require('playwright');
 const http = require('http');
@@ -25,7 +26,8 @@ const path = require('path');
 
 const root = path.resolve(process.argv[2] || 'site');
 let pages = process.argv.slice(3);
-if (!pages.length) pages = ['', 'shitsugyo/', 'yachin/', 'sasaeru/', 'sasaeru/denwa/', 'unei.html', 'about.html'];
+if (!pages.length) pages = ['', 'shitsugyo/', 'yachin/', 'sasaeru/', 'sasaeru/oya-yachin/', 'sasaeru/shitsugyo-yachin/',
+  'sasaeru/taikyo/', 'sasaeru/denwa/', 'sasaeru/seikatsuhogo/', 'unei.html', 'about.html'];
 
 const SIZES = new Set([14, 16, 17, 18, 20, 22, 26, 28, 36]);
 const RADII = new Set(['0px', '4px', '8px', '12px', '50%', '999px']);
@@ -50,9 +52,10 @@ srv.listen(0, async () => {
   for (const p of pages) {
     const problems = [];
     let info = {};
-    for (const width of [390, 320]) {
+    for (const [width, zoom] of [[390, 0], [320, 0], [320, 20]]) {
       const page = await browser.newPage({ viewport: { width, height: 844 } });
       await page.goto(`http://localhost:${port}/${p}`);
+      if (zoom) await page.addStyleTag({ content: `html { font-size: ${zoom}px !important; }` });
       await page.waitForTimeout(150);
       const r = await page.evaluate(([sizes, radii]) => {
         const out = { badSize: new Set(), badRadius: new Set(), smallTargets: [], noPhrase: [], orphans: 0, overflow: 0 };
@@ -92,7 +95,7 @@ srv.listen(0, async () => {
         if (r.smallTargets.length) problems.push(`高さ24px未満の押せる部品：${r.smallTargets.slice(0, 6).join('、')}`);
         if (r.noPhrase.length) problems.push(`文節で改行しない見出し：${r.noPhrase.slice(0, 6).join('、')}`);
       }
-      if (r.overflow) problems.push(`${width}px 幅で横にはみ出す要素：${r.overflow}個`);
+      if (r.overflow) problems.push(`${width}px 幅${zoom ? '（文字1.25倍）' : ''}で横にはみ出す要素：${r.overflow}個`);
     }
     const name = p || '（トップ）';
     if (problems.length) { failed++; console.log(`✗ ${name}`); problems.forEach(x => console.log(`   - ${x}`)); }
