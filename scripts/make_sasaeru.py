@@ -121,12 +121,13 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
 <link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
 <link rel="stylesheet" href="{up}assets/site.css">
+<link rel="stylesheet" href="{up}assets/menu.css">
 </head>
 <body>
 <a class="skip" href="#main">本文へ</a>
 <div class="page">
 <header class="hero hero-sub">
- <div class="brandrow">{LOGO}<a class="brand" href="{up}">くらしの非常口</a><span class="tag">支える人へ</span></div>
+ <div class="brandrow">{LOGO}<span class="brandname"><a class="brand" href="{up}">くらしの非常口</a><span class="tag">支える人へ</span></span><!--site-menu--></div>
  <h1>{h1}</h1>
  <p class="lead">{lead}</p>
  {PATH}

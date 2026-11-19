@@ -1,0 +1,47 @@
+/* ---- サイトのメニュー（全ページ共通、2026-11-19） ----
+   看板の右上の「メニュー」ボタンを押すと、看板の中にページの一覧が開く（下の中身は押し下げる。重ねない）。
+   ボタンとメニューは scripts/build.py の menu_html() が作る。家賃編も同じこのファイルを読む。
+   スクリプトが動かないときはボタンを出さない（ページの下の案内から移れる）。 */
+/* 看板の行：ロゴ・名前・札は左にまとめ、ボタンは右端。幅が足りないときは、札が名前の下に回る（ボタンは押し出さない） */
+.brandrow .brandname { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 0; flex: 1 1 0; min-width: 0; }
+.brandrow .brandname .tag { margin-left: 0; }
+.brandrow { flex-wrap: wrap; }
+.brandrow .menu-btn { margin-left: auto; }
+/* ボタン：枠のない「≡＋メニュー」。押せる範囲は 44px 四方以上。上下に 7px はみ出させて、看板の行の高さを変えない
+   （家賃編のスマホの最初の画面に、緊急タイル4つを収めるため） */
+.menu-btn {
+  flex: none; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 44px; min-height: 44px; padding: 0 4px; margin: -7px -4px -7px 0;
+  font: inherit; font-size: 0.875rem; font-weight: 700; line-height: 1.15; letter-spacing: 0;
+  color: var(--c-sign-ink); background: transparent; border: 0; border-radius: 8px; cursor: pointer;
+}
+.menu-btn[hidden] { display: none; }
+.menu-btn:hover { background: rgba(255,255,255,0.12); }
+.menu-btn:focus-visible { outline: 3px solid var(--c-sign-accent); outline-offset: 2px; }  /* 緑の看板の上でも見える黄色の輪 */
+.menu-btn svg { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.menu-btn path { stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; fill: none; }
+.menu-btn .i-close, .menu-btn[aria-expanded="true"] .i-open { display: none; }
+.menu-btn[aria-expanded="true"] .i-close { display: inline; }
+
+.site-menu {
+  background: var(--c-surface); color: var(--c-ink); border: 1px solid var(--c-line); border-radius: 12px;
+  padding: 8px 16px 16px; display: grid; gap: 16px; text-align: left;
+  flex: 1 0 100%; margin: 8px 0 0;  /* 看板の行の下に、行の幅いっぱいで開く */
+}
+.site-menu[hidden] { display: none; }
+.site-menu-h { margin: 8px 0 0; font-size: 0.875rem; font-weight: 700; line-height: 1.5; letter-spacing: 0.02em; color: var(--c-ink-soft); }
+.site-menu ul { list-style: none; margin: 0; padding: 0; }
+.site-menu li { margin: 0; padding: 0; background: none; }
+.site-menu li::before { content: none; }
+.site-menu li + li { border-top: 1px solid var(--c-line); }
+.site-menu a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 0;
+  font-size: 1.0625rem; font-weight: 700; line-height: 1.5; letter-spacing: 0.02em;
+  color: var(--c-ink); text-decoration: none; word-break: auto-phrase; overflow-wrap: anywhere;
+}
+.site-menu a::after { content: "›"; flex: none; font-size: 1.375rem; line-height: 1; color: var(--c-ink-soft); }
+.site-menu a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.site-menu a[aria-current] { color: var(--c-primary); box-shadow: inset 4px 0 0 var(--c-primary); padding-left: 12px; }
+@media (min-width: 41rem) { .site-menu { grid-template-columns: 1fr 1fr; column-gap: 32px; } }
+@media print { .menu-btn, .site-menu { display: none !important; } }
+@media (forced-colors: active) { .menu-btn { border: 1px solid ButtonText; } .site-menu a[aria-current] { border-left: 4px solid; } }

@@ -18,6 +18,7 @@
  *  5. 最後の行が2字以下で終わる段落（泣き別れ）の数（参考値。0 を目指すが、合否にはしない）
  *  6. 横にはみ出していないか（WCAG 1.4.10 リフロー。320px でも測る。320px で文字を1.25倍にしたときも測る：
  *     html の文字の大きさを 20px にして、ブラウザの文字の拡大を模す）
+ *  7. 看板の「メニュー」を開いたときの 1〜3 と 6（390px、320px・文字1.25倍）
  */
 const { chromium } = require('playwright');
 const http = require('http');
@@ -52,11 +53,12 @@ srv.listen(0, async () => {
   for (const p of pages) {
     const problems = [];
     let info = {};
-    for (const [width, zoom] of [[390, 0], [320, 0], [320, 20]]) {
+    for (const [width, zoom, open] of [[390, 0], [320, 0], [320, 20], [390, 0, true], [320, 20, true]]) {
       const page = await browser.newPage({ viewport: { width, height: 844 } });
       await page.goto(`http://localhost:${port}/${p}`);
       if (zoom) await page.addStyleTag({ content: `html { font-size: ${zoom}px !important; }` });
       await page.waitForTimeout(150);
+      if (open) { const b = await page.$('[data-site-menu]'); if (!b) { await page.close(); continue; } await b.click(); await page.waitForTimeout(100); }
       const r = await page.evaluate(([sizes, radii]) => {
         const out = { badSize: new Set(), badRadius: new Set(), smallTargets: [], noPhrase: [], orphans: 0, overflow: 0 };
         for (const el of document.querySelectorAll('body *')) {
@@ -88,14 +90,18 @@ srv.listen(0, async () => {
         return { badSize: [...out.badSize], badRadius: [...out.badRadius], smallTargets: out.smallTargets, noPhrase: out.noPhrase, orphans: out.orphans, overflow: out.overflow };
       }, [[...SIZES], [...RADII]]);
       await page.close();
-      if (width === 390) {
+      if (width === 390 && open) {
+        if (r.badSize.length) problems.push(`メニューを開いたとき、決まった段以外の文字の大きさ：${r.badSize.slice(0, 8).join('、')}`);
+        if (r.badRadius.length) problems.push(`メニューを開いたとき、決まり以外の角の丸み：${r.badRadius.slice(0, 6).join('、')}`);
+        if (r.smallTargets.length) problems.push(`メニューを開いたとき、高さ24px未満の押せる部品：${r.smallTargets.slice(0, 6).join('、')}`);
+      } else if (width === 390) {
         info = r;
         if (r.badSize.length) problems.push(`決まった段以外の文字の大きさ：${r.badSize.slice(0, 8).join('、')}`);
         if (r.badRadius.length) problems.push(`決まり以外の角の丸み：${r.badRadius.slice(0, 6).join('、')}`);
         if (r.smallTargets.length) problems.push(`高さ24px未満の押せる部品：${r.smallTargets.slice(0, 6).join('、')}`);
         if (r.noPhrase.length) problems.push(`文節で改行しない見出し：${r.noPhrase.slice(0, 6).join('、')}`);
       }
-      if (r.overflow) problems.push(`${width}px 幅${zoom ? '（文字1.25倍）' : ''}で横にはみ出す要素：${r.overflow}個`);
+      if (r.overflow) problems.push(`${width}px 幅${zoom ? '（文字1.25倍）' : ''}${open ? '・メニューを開いたとき' : ''}で横にはみ出す要素：${r.overflow}個`);
     }
     const name = p || '（トップ）';
     if (problems.length) { failed++; console.log(`✗ ${name}`); problems.forEach(x => console.log(`   - ${x}`)); }
