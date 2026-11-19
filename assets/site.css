@@ -9,8 +9,8 @@ h1, h2, h3 { font-family: var(--f-body); font-weight: 700; line-height: var(--lh
 h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); }
 /* 日本語の改行：見出しや短い文は文節で折り返す（Chrome 119 以降。lang="ja" が必要。対応しないブラウザは今までどおり） */
-h1, h2, h3, legend, summary, .lead, .title, .links a, .opt span, .say-h, .promise li, .notice-h, .navlist a, .chip, .cta, .btn { word-break: auto-phrase; }
-p, li { text-wrap: pretty; }
+h1, h2, h3, legend, summary, .lead, .title, .links a, .opt span, .say-h, .promise li, .notice-h, .navlist a, .chip, .cta, .btn { word-break: auto-phrase; overflow-wrap: anywhere; } /* 文節が欄より長いとき（文字拡大＋狭い幅）だけ文節の中で折り返す（WCAG 1.4.10） */
+p, li, dd { text-wrap: pretty; overflow-wrap: anywhere; }
 p { margin: 0; }
 a { color: var(--c-link); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { text-decoration-thickness: 3px; }

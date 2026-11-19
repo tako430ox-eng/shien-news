@@ -248,7 +248,7 @@ footer { display: grid; gap: var(--s-3); border-top: 1px solid var(--c-line); pa
 .hero h1 em { font-style: normal; color: var(--c-sign-accent); }
 .hero .lead { color: var(--c-sign-ink); font-size: 1.0625rem; line-height: 1.6; text-wrap: pretty; }
 .promise li { text-wrap: pretty; }
-h1, h2, h3, .hero .lead, .promise li { word-break: auto-phrase; }
+h1, h2, h3, .hero .lead, .promise li { word-break: auto-phrase; overflow-wrap: anywhere; }
 .promise li { padding: 4px 12px 4px 10px; background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); color: var(--c-sign-ink); }
 .promise li::before { background: var(--c-sign-accent); }
 .sign-path { display: block; width: calc(100% + 32px); height: 20px; margin: -6px -16px 0; }
@@ -304,7 +304,7 @@ body { letter-spacing: 0.02em; line-break: strict; }
 h2, h3, .cand-name, .first .lead2 { font-family: var(--f-body); font-weight: 700; font-feature-settings: "palt"; }
 .hero h1 { font-size: var(--fs-h1); }
 p, li { text-wrap: pretty; }
-legend, summary, .opts:not(.tiles) .opt span, .cand-name, .say-h { word-break: auto-phrase; }
+legend, summary, .opts:not(.tiles) .opt span, .cand-name, .say-h { word-break: auto-phrase; overflow-wrap: anywhere; }
 .tiles .opt span { word-break: normal; }
 a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .card, .first, details.cand { box-shadow: none; }
@@ -344,6 +344,15 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   .tiles { gap: 6px; }
   .tiles .opt span { padding: 6px 10px; font-size: var(--fs-small); }
 }
+
+/* 幅320px・文字拡大のとき（2026-11-19）：「すぐ閉じる」を1行に保って帯を低くし、フォーカスが帯に隠れないよう余白を文字の大きさに合わせる（WCAG 2.4.11） */
+html { scroll-padding-bottom: calc(5.5rem + 16px); }
+.exit-bar > span { min-width: 0; word-break: auto-phrase; }
+.quick-exit { flex: none; white-space: nowrap; }
+/* 文字拡大＋幅320pxで横にはみ出さないように（WCAG 1.4.10）：文節が欄より長いときだけ文節の中で折り返す */
+.plan > li { grid-template-columns: minmax(0, 1fr); }
+.plan > li > *, fieldset, legend { min-width: 0; max-width: 100%; }
+legend, summary, .step-body { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
