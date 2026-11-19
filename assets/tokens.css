@@ -1,5 +1,7 @@
 /* ==========================================================================
-   ひだまり デザイントークン v1.2（2026-11-13。v1.2 は「道しるべ（大胆）」：緑の看板・強い枠の緊急タイル。v1.1 の付箋・蛍光ペン・方眼・手書き風は不採用で削除）
+   ひだまり デザイントークン v2.0（2026-11-19。文字・余白・角丸を、デジタル庁デザインシステムの基準に合わせて決め直した。
+   v1.2 は「道しるべ（大胆）」：緑の看板・強い枠の緊急タイル。v1.1 の付箋・蛍光ペン・方眼・手書き風は不採用で削除。
+   根拠と合否の基準は docs/design-standard.md）
    プロジェクト「社会的弱者の救済」の共通デザインの決まり。
    行動支援の試作（くらしの非常口）と、支援情報の自動更新サイトで共有する。
    値を直接書かず、必ずこの変数を使うこと。説明は README.md。
@@ -35,26 +37,34 @@
   --f-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
   --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic", "Meiryo", sans-serif;
   --f-num: "BIZ UDGothic", "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
-  --fs-small: 0.9375rem;   /* 15px 補足（これより小さくしない） */
-  --fs-body: 1.0625rem;    /* 17px 本文 */
-  --fs-lead: 1.1875rem;    /* 19px 導入・大事な一文 */
-  --fs-h3: 1.25rem;        /* 20px */
-  --fs-h2: 1.5rem;         /* 24px */
-  --fs-h1: clamp(1.875rem, 7vw, 2.5rem); /* 30〜40px */
-  --lh-body: 1.8;
-  --lh-tight: 1.45;
+  /* 文字の大きさは決まった段だけを使う（デジタル庁デザインシステムの Std-17N-170 などに対応。clamp で中間の値を作らない） */
+  --fs-small: 1rem;        /* 16px 補足（デジタル庁：基本は16px以上） */
+  --fs-body: 1.0625rem;    /* 17px 本文（Std-17N-170） */
+  --fs-lead: 1.125rem;     /* 18px 導入・大事な一文（Std-18B-160） */
+  --fs-h3: 1.125rem;       /* 18px（スマホ）→ 20px（広い画面） */
+  --fs-h2: 1.375rem;       /* 22px（スマホ）→ 26px（広い画面） */
+  --fs-h1: 1.75rem;        /* 28px（スマホ）→ 36px（広い画面） */
+  --lh-body: 1.7;          /* 本文の行間（Std-17N-170） */
+  --lh-small: 1.7;
+  --lh-tight: 1.5;         /* 見出しの行間（Std-xxB-150） */
+  --ls-body: 0.02em;       /* 字間（16〜26px は 2%） */
   --measure: 40rem;        /* 1行の長さの上限（約35〜40字） */
 
-  /* ---- 余白（4の倍数） ---- */
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px;
+  /* ---- 余白（8の倍数を基本に。4 は部品の内側の微調整だけ） ---- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
 
   /* ---- 形 ---- */
-  --r-sm: 10px;   /* 入力欄・小さなボタン */
-  --r-md: 16px;   /* カード */
-  --r-pill: 999px;/* 選択肢・電話ボタン */
+  --r-sm: 8px;    /* 入力欄・ボタン・選択肢 */
+  --r-md: 12px;   /* カード・囲み */
+  --r-pill: 999px;/* 札（タグ・分野ボタン）だけ。文字が折り返す部品には使わない */
   --shadow-1: 0 1px 2px rgba(30, 36, 51, 0.06), 0 6px 20px rgba(30, 36, 51, 0.06);
   --tap: 44px;    /* 押せる部品の最小の高さ */
   --focus: 0 0 0 3px var(--c-bg), 0 0 0 6px var(--c-link);
+}
+
+/* ---- 広い画面（641px以上）では見出しだけ一段大きく。本文は変えない（GOV.UK の段の考え方と同じ） ---- */
+@media (min-width: 40.0625rem) {
+  :root { --fs-h1: 2.25rem; --fs-h2: 1.625rem; --fs-h3: 1.25rem; }
 }
 
 /* ---- 暗い画面設定のとき ---- */

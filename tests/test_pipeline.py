@@ -608,3 +608,39 @@ class TestShitsugyo(unittest.TestCase):
         for _, url, checked in self.m.SRC.values():
             self.assertTrue(url.startswith("https://"))
             self.assertRegex(checked, r"^\d{4}-\d{2}-\d{2}$")
+
+
+class TestDesignStandard(unittest.TestCase):
+    """docs/design-standard.md の決まりのうち、ブラウザなしで確かめられるもの（ブラウザで測る分は scripts/design_audit.cjs）。"""
+
+    def setUp(self):
+        self.tokens = (ROOT / "assets" / "tokens.css").read_text(encoding="utf-8")
+        self.site = (ROOT / "assets" / "site.css").read_text(encoding="utf-8")
+        self.yachin = (ROOT / "pages" / "yachin" / "index.html").read_text(encoding="utf-8")
+
+    def test_type_scale_is_fixed_steps(self):
+        import re
+        allowed = {"0.875rem", "1rem", "1.0625rem", "1.125rem", "1.25rem", "1.375rem", "1.625rem", "1.75rem", "2.25rem"}
+        for name, val in re.findall(r"--fs-(\w+):\s*([^;]+);", self.tokens):
+            self.assertIn(val.strip(), allowed, f"--fs-{name} が決まった段ではない")
+        self.assertNotRegex(self.site, r"font-size:\s*clamp")
+
+    def test_radii_and_small_text(self):
+        import re
+        self.assertIn("--r-sm: 8px", self.tokens)
+        self.assertIn("--r-md: 12px", self.tokens)
+        for css in (self.site,):
+            for v in re.findall(r"font-size:\s*([0-9.]+)rem", css):
+                self.assertGreaterEqual(float(v), 0.875, "14px 未満の文字")
+
+    def test_phrase_breaking_and_v2_layer(self):
+        self.assertIn("word-break: auto-phrase", self.site)
+        self.assertIn("ひだまり v2.0", self.yachin)
+        self.assertIn("word-break: auto-phrase", self.yachin)
+
+    def test_choices_are_not_pills(self):
+        # 選択肢は丸い札にしない（折り返すと形が崩れる）。縦に並ぶ行と左の丸
+        block = self.site[self.site.index(".choose .opt span {"):]
+        block = block[:block.index("}")]
+        self.assertIn("var(--r-sm)", block)
+        self.assertNotIn("r-pill", block)
