@@ -197,14 +197,10 @@ class Site:
         logo = '<svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg>'
         path = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>'
         if hero:
-            top = f"""<div class="brandrow topbar">{logo}<span class="brandname"><span class="brand">{brand}</span><span class="tag">新着まとめ</span></span>{menu_html(depth, current)}</div>
+            top = f"""<div class="brandrow topbar">{logo}<span class="brandname"><span class="brand">{brand}</span><span class="tag">困ったときの入口</span></span>{menu_html(depth, current)}</div>
 <header class="hero">
- <h1>国の支援の<em>新着</em>を、<br>毎日まとめて。</h1>
- <p class="lead">暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選んでいます。</p>
- <ul class="promise" aria-label="このページの約束">
-  <li>国の公式ページの見出しを、そのまま載せています</li><li>無料です。登録はいらず、個人の情報も集めません</li>
- </ul>
- <a class="jump" href="#help">いま困っていることがある人は、相談先へ ↓</a>
+ <h1>困っていることから、<br><em>今日やること</em>を探す。</h1>
+ <p class="lead">家賃、仕事、家族や友人のこと。選ぶと、どこに連絡して何と言うかが分かります。</p>
  {path}
 </header>"""
         else:
@@ -420,18 +416,20 @@ class Site:
         rows = "".join(f'<li class="tool"><a href="{e(t["url"])}">{e(t["guide_title"])}</a>'
                        + (f'<span class="small">{e(t["guide_note"])}</span>' if t.get("guide_note") else "") + "</li>" for t in tools)
         return f"""<section class="box help guides" aria-labelledby="guides-h">
- <h2 id="guides-h">困っているときは、こちらから</h2>
- <p class="small">新着の一覧とは別に、今日やることを順番に示すページです。無料で、登録はいりません。</p>
+ <h2 id="guides-h">困りごとを選ぶ</h2>
  <ul class="links">{rows}</ul>
+ <ul class="promise-plain small" aria-label="このサイトの約束"><li>無料です。登録はいらず、個人の情報も集めません。</li><li>制度の説明は、国などの公式資料で確かめ、出典を付けています。</li></ul>
 </section>"""
 
     # ------------------------------------------------------------ ページ
     def page_index(self) -> str:
-        desc = "生活・住まい・仕事・障害・子ども・高齢・外国籍の人に関わる国のお知らせの新着を、公式ページから毎日自動で集めて分野ごとに並べています。"
-        body = [self.head("生活・住まい・仕事の支援制度 新着まとめ｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, "", hero=True)]
+        desc = "家賃が払えない、仕事を失った、家族や友人を支えたいときに、今日やることと相談先、窓口で言える文を案内します。あわせて、生活・住まい・仕事・障害・子ども・高齢・外国籍の人に関わる国のお知らせの新着を、公式ページから毎日自動で集めて並べています。"
+        body = [self.head("家賃・失業・支える人の今日やることと、支援制度の新着｜" + self.cfg.get("brand", self.cfg["name"]), desc, "index.html", 0), self.header(0, "", hero=True)]
         body.append('<main id="main" class="stack">')
         body.append(self.source_warnings())
         body.append(self.guides_html())
+        # 2026-11-21 コタローさんの判断：トップの主役は3つの入口。新着はその下に続ける
+        body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページに出た新着を、1日2回自動で集めています。暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選び、見出しは公式のまま載せています。分野で絞り込めます。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
         body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{"制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')

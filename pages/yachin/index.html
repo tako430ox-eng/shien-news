@@ -491,7 +491,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
 
   <section class="tip stack small" aria-label="支える人へ">
     <strong>隣で支える人へ</strong>
-    <p>当サイトでは、本人の了解を得たうえで、電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことを勧めています（当サイトの判断です）。お金を個人的に貸すのは避けてください。支える人の役目は、専門の窓口につなぐことです。</p>
+    <p>当サイトでは、本人の了解を得たうえで、電話をかけるときに隣にいること、持ち物を一緒にそろえること、窓口に付き添うことを勧めています（当サイトの判断です）。お金を援助するときも、あなた自身の生活を損なわない範囲にして、窓口への相談を並行して進めてください。支える人の大きな役目は、専門の窓口につなぐことです。</p>
       <p><a href="../sasaeru/">家族や友人が生活に困っているときの、場面ごとの案内（支える人へ）</a></p>
   </section>
 
@@ -599,7 +599,11 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     mlitLaw: { t: "国土交通省：家賃債務保証業者登録制度（最高裁判決を受けた周知）", u: "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr7_000024.html", c: "2026-11-14" },
     hellowork: { t: "厚生労働省：ハローワークの所在地", u: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html", c: "2026-10" },
     dvNavi: { t: "内閣府男女共同参画局：配偶者からの暴力被害者支援情報（DV相談ナビ #8008）", u: "https://www.gender.go.jp/policy/no_violence/e-vaw/index.html", c: CHECKED },
-    setagayaDv: { t: "世田谷区：DVの相談（DV相談＋ 0120-279-889、2025年6月27日更新）", u: "https://www.city.setagaya.lg.jp/02409/1025.html", c: CHECKED }
+    setagayaDv: { t: "世田谷区：DVの相談（DV相談＋ 0120-279-889、2025年6月27日更新）", u: "https://www.city.setagaya.lg.jp/02409/1025.html", c: CHECKED },
+    dvPlus: { t: "内閣府男女共同参画局：配偶者等からの暴力の被害者への支援（DV相談＋の電話・チャットの受付時間、外国語のチャットは24時間）", u: "https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/", c: "2026-11-21" },
+    soudanplus: { t: "DV相談＋（運営元）：電話・チャット・プラス相談箱（返信は1週間をめど）", u: "https://soudanplus.jp/", c: "2026-11-21" },
+    yorisoiForeign: { t: "よりそいホットライン（運営元）：外国語の相談（毎日10時〜22時、ガイダンスで2、10言語）", u: "https://www.since2011.net/yorisoi/n2/", c: "2026-11-21" },
+    houterasuFaq: { t: "法テラス よくある相談：家賃不払を理由に、賃貸人から部屋の明渡しを求められました", u: "https://www.houterasu.or.jp/site/faq/sumai-kaiyakukoushin-001.html", c: "2026-11-21" }
   };
 
   // ---- data: things to bring (shared, so the same item is listed once) ----
@@ -664,7 +668,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     houterasu: {
       name: "法テラス（制度・法律相談窓口の案内）", where: "法テラス（電話）",
       plain: "収入などの条件によっては、弁護士や司法書士に無料で相談できます。借金の整理や、大家さん・保証会社とのトラブルを相談できます。",
-      ask: ["家賃を滞納していて、出ていくように言われています。どうすればいいですか", "借金があり、返せなくなっています。無料で相談できますか"],
+      ask: ["大家さん（管理会社・保証会社）から、出ていくように言われています。どうすればいいですか", "借金があり、返せなくなっています。無料で相談できますか"],
       bring: ["guarantee", "debts", "contract"],
       caution: "家賃保証会社の契約にあった「追い出し条項」を、最高裁が2022年12月に無効と判断した例があります。一方的に鍵を替えられた、荷物を出されたなどのときは、一人で判断せず相談してください。",
       local: false, src: ["houterasu", "mlitLaw"],
@@ -733,7 +737,18 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   function contact(who, num, note) {
     return '<div class="contact">' + (who ? '<span class="who">' + esc(who) + '</span>' : '') + '<span class="phone-row">' + telBtn(num, "に電話する") + '<button class="copy" type="button" data-copy="' + esc(num) + '">番号をコピー</button></span>' + (note ? '<span class="small muted">' + esc(note) + '</span>' : '') + '</div>';
   }
-  var YORISOI = ["0120-279-338", "よりそいホットライン。24時間・無料。どんな悩みでも話を聞いてもらえます。ガイダンスで外国語も選べます（厚生労働省のページで2026年11月13日確認）"];
+  var YORISOI = "0120-279-338";
+  var YORISOI_HOURS = "一般の電話相談は24時間・無料（厚生労働省のページで2026年11月21日確認）。外国語の電話相談は毎日10時〜22時で、ガイダンスが流れたら2を押します。対応する言語と日程は、運営元のページで確かめてください（2026年11月21日確認）。";
+  var YORISOI_LINK = '<a href="https://www.since2011.net/yorisoi/n2/" rel="noreferrer">外国語相談の対応言語と時間（運営元）</a>';
+  function yorisoiContact(who) {
+    return contact("よりそいホットライン" + (who ? "：" + who : ""), YORISOI, YORISOI_HOURS) +
+      '<p class="small">' + YORISOI_LINK + '</p>';
+  }
+  function dvContact() {
+    return contact("DV相談＋（プラス）", "0120-279-889", "電話相談は24時間・無料。チャット相談は12時〜22時で、外国語（10言語）のチャット相談は24時間受付です（内閣府）。文字で送る「プラス相談箱」は24時間受付で、相談員から1週間をめどに返信があります（運営元。どちらも2026年11月21日確認）。急ぐときは電話へ。") +
+      '<p class="small"><a href="https://soudanplus.jp/" rel="noreferrer">チャット・プラス相談箱の公式案内</a></p>';
+  }
+  var LAW_CLOSED = '<p>受付時間外は、言われたことや届いた書類を整理して、<a href="https://www.houterasu.or.jp/site/faq/sumai-kaiyakukoushin-001.html" rel="noreferrer">法テラスのよくある相談「家賃不払を理由に、部屋の明渡しを求められた」</a>を確認できます。裁判所から書類が届いている場合は、書類に書かれた期限や期日を先に確認してください。</p>';
 
   // ---- render questions ----
   // 選択肢が横1行に収まる質問は、そのまま並べる。ほかは押すと選択肢が開く
@@ -786,11 +801,11 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   }
   function situationSentence() {
     var s = [];
-    var r = { soon: "今月は払えますが、来月以降の家賃が払えなくなりそうです", now: "次の家賃が払えません", late1: "家賃を1か月分滞納しています", late2: "家賃を2か月分以上滞納しています", evict: "家賃を滞納していて、出ていくよう言われています" }[state.a.rent];
+    var r = { soon: "今月は払えますが、来月以降の家賃が払えなくなりそうです", now: "次の家賃が払えません", late1: "家賃を1か月分滞納しています", late2: "家賃を2か月分以上滞納しています", evict: "大家さん（管理会社・保証会社）から、出ていくよう言われています" }[state.a.rent];
     var why = { jobloss: "仕事を失った（辞めた）ため、収入が減りました", cut: "仕事やシフトが減ったため、収入が減りました", sick: "病気やけがで働けなくなり、収入が減りました", pension: "年金だけでは生活費と家賃が足りません", other: "" }[state.a.reason];
     if (why) s.push(why);
     if (r) s.push(r);
-    return s.length ? s.join("。") + "。" : "収入が減って、家賃が払えなくなりそうです。";
+    return s.length ? s.join("。") + "。" : "家賃の支払いのことで困っています。"; // 選んでいない事情を、事実のように足さない
   }
   function callerIsSupporter() { return state.supporter; }
   function supIntro() {
@@ -806,7 +821,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     var me = state.name.trim() ? state.name.trim() + "と申します。" : "";
     return me + "家賃のことで相談したくて電話しました。" + situationSentence() + foreign + "住居確保給付金など、使える制度について相談したいです。相談の予約はできますか。持っていくものも教えてください。";
   }
-  var EVICT_SCRIPT = "家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少ないので、無料で相談できる方法を教えてください。";
+  var EVICT_SCRIPT = "大家さん（管理会社・保証会社）から出ていくように言われています。無料で相談できる方法があれば教えてください。"; // 「出ていくよう言われた」の選択肢は滞納を確かめていないので、滞納とは書かない
   var DAIHYO = "生活のことで困っています。家賃が払えないので、相談できる窓口につないでいただけますか。（「自立相談支援機関」や「生活困窮者の相談窓口」と呼ばれる窓口です）";
   function isLate() {
     var dl = daysLeft();
@@ -832,36 +847,35 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   }
 
   // ---- urgent ----
-  function nightBlock() {
+  function nightBlock(yorisoiShown) {
     // Shown when town hall is likely closed and the person has no place / no money tonight.
     return '<div class="notice"><strong>いまは役所が閉まっている時間かもしれません</strong>' +
       '<span>多くの役所は平日の昼間だけ開いています（祝日は休み）。今夜できることは次のとおりです。</span>' +
       '<ol style="margin:0;padding-left:1.2em;display:grid;gap:6px">' +
       '<li>住んでいる市区町村（または今いる場所の市区町村）の<strong>代表番号</strong>に電話して「今夜寝る場所がありません。緊急の生活の相談をしたいです」と伝える。国は、役所が閉まる年末年始などに、当番の職員が連絡を受けられる体制をつくるよう自治体に依頼しています（厚生労働省）。夜間・土曜の専用の電話窓口がある自治体もあります（例：名古屋市）。<strong>すべての自治体・時間で対応しているわけではありません。</strong></li>' +
-      '<li>つながらないとき、一人でいるのがつらいときは、24時間の電話相談で話を聞いてもらう。' + contact("", YORISOI[0], YORISOI[1]) + '</li>' +
+      '<li>つながらないとき、一人でいるのがつらいときは、電話相談で話を聞いてもらう。' + (yorisoiShown ? "上のよりそいホットラインを利用できます。" : yorisoiContact("")) + '</li>' +
       '<li>危険が迫っているときは 110。体の具合が悪いときは 119。</li>' +
       '<li>' + esc(nextWeekdayLabel()) + 'いちばんに、福祉事務所へ行く（上の文を言う）。</li>' +
       '</ol></div>';
   }
   function renderUrgent() {
-    var s = state.safety, parts = [], yShown = false;
+    var s = state.safety, parts = [];
     if (s.life) {
       parts.push(contact("命の危険があるとき", "119", "救急"));
-      if (!yShown) parts.push(contact("死にたいほどつらいとき・話を聞いてほしいとき", YORISOI[0], YORISOI[1]));
-      else parts.push('<span class="small">死にたいほどつらいときは、上のよりそいホットライン（24時間）にも電話できます。</span>');
+      parts.push(yorisoiContact("死にたいほどつらいとき・話を聞いてほしいとき"));
       parts.push(contact("", "0120-783-556", "いのちの電話。毎日16時〜21時、無料。毎月10日は朝8時から翌朝8時まで（厚生労働省のページで2026年11月13日確認）"));
     }
     if (s.dv) {
       parts.push(contact("暴力から逃げたいとき（危険が迫っているときは 110）", "#8008", "DV相談ナビ。近くの相談窓口につながります（内閣府）。受付時間は窓口ごとに違います"));
-      parts.push(contact("", "0120-279-889", "DV相談＋（プラス）。24時間。チャットやメールの相談もあります"));
+      parts.push(dvContact());
       parts.push('<span class="small">相手にこのページを見られそうなときは、画面の下の「すぐ閉じる」を押してください。画面と選んだ内容を消して、別のページに切り替えます。ブラウザの閲覧履歴には残るので、必要なら履歴も消してください。「この端末に保存」は押さないでください。</span>');
       parts.push('<span class="small">逃げた先でも、生活保護や住まいの相談はできます。家族に居場所を知られたくない事情は、窓口で伝えてください（親族への連絡を控えてもらえる場合があります）。下の「窓口や支援者に見せるメモ」に、その一文を入れることもできます。</span>');
     }
     if (s.night || s.food) {
       parts.push('<div class="contact"><span class="who">住んでいる市区町村（または今いる場所の市区町村）の福祉事務所（役所の生活保護の担当）へ</span><span>住まいのない人に、一時的な宿泊場所と食事を用意する事業がある地域もあります。福祉事務所がない町村に住んでいる人は、町村役場でも申請できます。</span></div>');
       parts.push(sayBox("urgent", urgentScript(), "福祉事務所で言うこと"));
-      if (!officeOpen()) { parts.push(nightBlock()); yShown = true; }
-      else if (!s.life) { parts.push(contact("つらいとき・話を聞いてほしいとき", YORISOI[0], YORISOI[1])); yShown = true; }
+      if (!officeOpen()) parts.push(nightBlock(s.life));
+      else if (!s.life) parts.push(yorisoiContact("つらいとき・話を聞いてほしいとき"));
     }
     if (!parts.length) { $("urgentOut").innerHTML = ""; return; }
     var html = parts.join("");
@@ -970,7 +984,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       html += '<p class="lead2">まず命と体の安全を確保する</p><p>今すぐ命に危険があるときは119、暴力などの危険が迫っているときは110へ。つらい気持ちの相談先は、<a href="#safety">上の「今すぐの相談先」</a>にあります。家賃の手続きは、安全が確保できてからで大丈夫です。</p>';
     } else if (dvFirst) {
       html += '<p class="lead2">DVの相談窓口に電話して、家を出ることと、住まい・お金のことを相談する</p>' +
-        contact("DV相談ナビ（近くの相談窓口につながります）", "#8008", "受付時間は窓口ごとに違います（内閣府）") + contact("DV相談＋（プラス）", "0120-279-889", "24時間。チャットやメールの相談もあります") +
+        contact("DV相談ナビ（近くの相談窓口につながります）", "#8008", "受付時間は窓口ごとに違います（内閣府）") + dvContact() +
         '<p class="small">家賃や生活費のことは、そのあと総合窓口でも相談できます（下の手順）。相手に見られそうなときは「すぐ閉じる」を押してください。</p>';
     } else if (urgent) {
       html += '<p class="lead2">' + (open ? "福祉事務所（役所の生活保護の担当）に行く" : "今夜できることをする。役所が開いたら福祉事務所に行く") + '</p><p>言うことと相談先は、<a href="#safety">上の「今すぐの相談先」</a>にあります。</p>';
@@ -978,7 +992,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       html += '<p class="lead2">法テラスに電話して、退去の問題を相談できる法律相談窓口を聞く</p>' +
         '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '</p><p class="small muted">' + esc(LAW_NOTE) + '大家さんなどから書類を出されても、その場ではサインしないでください。</p>' +
         sayBox("first_law", EVICT_SCRIPT) + '<p class="small">鍵を替えられた・荷物を出されたときは、そのことも伝えてください。</p>' +
-        '<p>同じ日に、総合窓口にも電話してください（下の手順）。</p>';
+        LAW_CLOSED + '<p>市区町村の総合窓口にも、その窓口の受付時間内に早めに連絡してください（下の手順）。法テラスの受付を待つ必要はありません。</p>';
     } else if (has("welfare", "yes")) {
       html += '<p class="lead2">担当のケースワーカー（福祉事務所）に家賃のことを伝える</p>' + sayBox("first_case", "生活保護を受けています。" + situationSentence() + "担当の方に、家賃と住まいのことを相談したいです。");
     } else {
@@ -986,8 +1000,8 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
         sayBox("first_call", callScript());
     }
     if (!open && !urgent && !state.safety.life) {
-      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスと役所では受付時間が異なります。上の法テラスの受付時間を確認してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。</p>') +
-        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI[0], "よりそいホットライン（24時間）") + '</p>';
+      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）の電話相談は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスと役所では受付時間が異なります。上の案内で受付時間を確認してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。</p>') +
+        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI, "よりそいホットライン") + '</p><p class="small">' + esc(YORISOI_HOURS) + ' ' + YORISOI_LINK + '</p>';
     }
     $("firstOut").innerHTML = html;
   }
@@ -1016,7 +1030,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     var rentTrouble = any("rent", ["now", "late1", "late2", "evict"]) || isLate();
     var lawScript = evict ? EVICT_SCRIPT : "借金があって返せなくなっています。収入が少なく、無料で相談できる方法を教えてください。";
     var lawBody = '<p class="phone-row">' + telBtn("0570-078374", "に電話する") + '<button class="copy" type="button" data-copy="0570-078374">番号をコピー</button></p><p class="small muted">' + esc(LAW_NOTE) + '</p>' + sayBox("law", lawScript) +
-      (evict ? '<p class="small"><strong>出ていくよう言われた・鍵を替えられたとき：</strong>その場で書類にサインせず、言われたことと日時をメモしておきます。</p>' : "");
+      (evict ? '<p class="small"><strong>出ていくよう言われた・鍵を替えられたとき：</strong>その場で書類にサインせず、言われたことと日時をメモしておきます。</p>' + LAW_CLOSED : "");
 
     if (state.safety.life) steps.push({ id: "safety", when: "今すぐ", title: "命と体の安全を確保する", body: '<p><a href="#safety">上の「今すぐの相談先」</a>を確認してください。このあとの家賃の手続きは、安全が確保できてからで大丈夫です。</p>' });
     if (state.supporter) {
@@ -1032,10 +1046,10 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       steps.push({ id: "fukushi", when: officeOpen() ? "今日" : nextWeekdayLabel(), title: "福祉事務所に行く", body:
         '<p>今日・明日の寝る場所やお金がないときは、まず役所の福祉事務所（生活保護の担当）へ行ってください。言うことは、上の「今すぐの相談先」にあります。</p>' + searchLinks(["福祉事務所 生活保護"]) });
     }
-    if (evict) steps.push({ id: "law", when: "すぐに（今日か明日）", title: "法テラスに電話する", body: lawBody });
+    if (evict) steps.push({ id: "law", when: "受付時間内にできるだけ早く", title: "法テラスに電話する", body: lawBody });
 
     if (has("welfare", "yes")) steps.push({ id: "case", when: "早めに", title: "担当のケースワーカーに相談する", body: '<p>家賃の不足、滞納、転居の必要があることを担当者へ伝えてください。急に食べ物や寝る場所がなくなったときは、そのことも先に伝えてください。</p>' });
-    else steps.push({ id: "call", when: urgent ? "福祉事務所のあと" : (evict ? "法テラスと同じ日に" : "今日か明日（平日の昼間）"), title: "総合窓口（自立相談支援機関）に電話して、相談の予約をする", body:
+    else steps.push({ id: "call", when: urgent ? "福祉事務所のあと" : (evict ? "総合窓口の受付時間内に早めに" : "今日か明日（平日の昼間）"), title: "総合窓口（自立相談支援機関）に電話して、相談の予約をする", body:
       '<p>家賃の給付金も、生活保護以外の多くの制度も、ここが入口です。' + (firstIsCall ? '言うことと、番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。' : '番号の探し方は、<a href="#first">いちばん上の「今日やること」</a>にあります。') + '電話がこわいときは、支える人に隣にいてもらうか、直接窓口に行ってもかまいません。</p>' + (firstIsCall ? '' : sayBox("call", callScript())) +
       checkList("call", ["相談の日時をメモした", "担当の人の名前をメモした", "持っていくものを聞いた"]) });
 
@@ -1113,7 +1127,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     next: ["次の日時と持ち物を、メモ欄に書いておきます。", "そろえにくい書類（離職票など）は、どこで手に入るかを窓口で聞いておきます。", "支払日が近いときは、大家さん・管理会社に「相談中」であることを伝えます。"],
     other: ["案内された窓口の名前と電話番号をメモします。", "電話では「〇〇（最初の窓口）の〇〇さんから案内されて電話しました」と伝えると話が早くなります。", "たらい回しのように感じたら、最初の窓口に「どこに、何を頼めばいいか」をもう一度確認してかまいません。"],
     refused: ["「どの条件に当てはまらなかったのか」を聞いて、メモしておきます。条件が変わったら、もう一度相談できます。", "ほかの制度がないか、同じ窓口で聞きます（緊急小口資金、生活保護、家計の相談など）。", "生活保護は、申請したいとはっきり伝えれば申請できます。申請書を出すのが原則ですが、出せない特別な事情があれば申請書がなくても申請できると、厚生労働省は説明しています。", "一人で行くのがつらいときは、家族や友人、支援団体の人に付き添ってもらってかまいません。"],
-    notyet: ["電話だけでも一歩です。総合窓口に電話するときの文（「今日やること」か、手順の中にあります）を、そのまま読み上げてください。", "番号が見つからないときは、役所の代表番号に電話して、つないでもらう方法もあります（「今日やること」の「番号が見つからないとき」）。", "電話がこわいときは、支える人に隣にいてもらうか、代わりにかけてもらう方法もあります。", "気持ちがつらいときは、よりそいホットライン（0120-279-338、24時間・無料）でも話を聞いてもらえます。", "支払日が近いときは、大家さん・管理会社への連絡だけでも先にしておきます。"]
+    notyet: ["電話だけでも一歩です。総合窓口に電話するときの文（「今日やること」か、手順の中にあります）を、そのまま読み上げてください。", "番号が見つからないときは、役所の代表番号に電話して、つないでもらう方法もあります（「今日やること」の「番号が見つからないとき」）。", "電話がこわいときは、支える人に隣にいてもらうか、代わりにかけてもらう方法もあります。", "支払日が近いときは、大家さん・管理会社への連絡だけでも先にしておきます。"]
   };
   function renderAfterOpts() {
     $("afterOpts").innerHTML = AFTER.map(function (o) {
@@ -1132,6 +1146,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       extra = '<p class="small"><strong>生活保護を申請したいときに見せるメモ（下書き）</strong>　空いているところは自分で書きます。正式な申請書は窓口でもらえます（<a href="https://top.com-pass.site/" target="_blank" rel="noopener">もやいの PASS</a> で前もって作ることもできます）。このメモは、申請したい気持ちをはっきり伝えるためのものです。' + (has("nat", "foreign") ? "外国籍の人は、在留資格によって対象にならない場合があります。" : "") + '</p>' +
         '<div class="say"><p class="text" id="say_intent">' + esc(INTENT + situationSentence()) + '</p><div class="row"><button class="copy" type="button" data-copy-from="say_intent">この文をコピー</button></div></div>';
     }
+    if (k === "notyet") extra = yorisoiContact("気持ちがつらいとき");
     $("afterOut").innerHTML = '<div class="after-out"><strong>「' + esc(label) + '」のときの次の一歩</strong><ul>' + AFTER_TEXT[k].map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>' + extra + '</div>';
   }
 
@@ -1283,11 +1298,16 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   }
 
   // ---- events ----
+  // キーボード（矢印・スペース）で選んでいるかどうか。仕事を失ったときのページと同じ考え方
+  var byKey = false;
+  document.addEventListener("keydown", function (ev) { byKey = /^Arrow/.test(ev.key) || ev.key === " "; });
+  document.addEventListener("pointerdown", function () { byKey = false; });
   document.addEventListener("change", function (e) {
     var t = e.target;
     if (t.hasAttribute("data-q")) {
       var qid = t.getAttribute("data-q"); state.a[qid] = t.value; renderAll();
-      var qd = $("qd_" + qid); if (qd && qd.open) { qd.open = false; openFirstUnanswered(qid); }
+      // 矢印キーで選び直している間は閉じない。押して選んだときは閉じて、閉じた質問の見出しにフォーカスを移す
+      var qd = $("qd_" + qid); if (qd && qd.open && !byKey) { qd.open = false; qd.querySelector("summary").focus(); openFirstUnanswered(qid); }
     }
     else if (t.hasAttribute("data-safety")) { state.safety[t.getAttribute("data-safety")] = t.checked; renderAll(); }
     else if (t.hasAttribute("data-done")) {
@@ -1299,7 +1319,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       }
     }
     else if (t.hasAttribute("data-chk")) { state.checks[t.getAttribute("data-chk")] = t.checked; }
-    else if (t.hasAttribute("data-after")) { state.after = t.value; renderAfter(); $("afterQ").open = false; }
+    else if (t.hasAttribute("data-after")) { state.after = t.value; renderAfter(); if (!byKey) { $("afterQ").open = false; $("afterQ").querySelector("summary").focus(); } }
     else if (t.id === "payday") { state.payday = t.value; renderAll(); }
     else if (t.id === "nextDate") { state.nextDate = t.value; }
     else if (t.id === "supporter") { state.supporter = t.checked; renderAll(); }

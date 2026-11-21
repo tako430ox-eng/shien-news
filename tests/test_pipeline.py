@@ -603,8 +603,10 @@ class TestSasaeru(unittest.TestCase):
             self.assertIn("出典と確認日", text)
             for w in ("申請代行", "申請サポート", "受給できます", "noindex"):
                 self.assertNotIn(w, text, rel)
-            # 外のサーバーから読み込むもの（script・画像・外部CSS）を入れない
-            self.assertNotRegex(text, r'<(script|img|iframe)\b')
+            # 外のサーバーから読み込むもの（script・画像・外部CSS）を入れない。
+            # ページの中のスクリプトはコピーのボタンだけ（2026-11-21）。送る・保存する仕組みは持たない
+            self.assertNotRegex(text, r'<script[^>]*\bsrc=|<(img|iframe)\b')
+            self.assertNotRegex(text, r'fetch\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|document\.cookie')
             self.assertNotRegex(text, r'<link rel="stylesheet" href="https?:')
         for s in self.m.SCENES:
             for k in s["srcs"]:
@@ -654,7 +656,7 @@ class TestShitsugyo(unittest.TestCase):
         outside = re.sub(r'<details class="more"[^>]*>.*?</details>', "", main, flags=re.S)
         self.assertNotIn("<details", "".join(re.findall(r'<details class="more"[^>]*>(.*?)</details>', main, re.S)), "畳んだ中に畳んだ欄")
         for must in ("退職日の翌日から20日以内", "20日以内に<b>届く</b>", "退職日の翌日から14日以内", "その場で署名しないでください",
-                     "離職した日の翌日から1年", "不正受給", "払えないまま放っておかず"):
+                     "離職した日の翌日から1年", "不正受給", "払うのが難しいときは、早めに免除を申請できます"):
             self.assertIn(must, outside, f"「{must}」を畳んだ中に入れない")
         self.assertNotIn("今夜寝る場所がない", folded)
         # 畳んだ見出しには、期限がある補足の要点を書く

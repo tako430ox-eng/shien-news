@@ -163,3 +163,47 @@ test('本文：外部点検（2026-11-19）で直した文が残っている', (
   assert.doesNotMatch(html, /やむを得ない欠席を含めて/);
   assert.doesNotMatch(html, /訓練は無料で受けられます/);
 });
+// ---- 公開版レビュー（2026-11-19）の指摘 1・3・4・5・6・7 ----
+test('任意継続：確かでない期限（年末年始）は、一覧で「確かめて」と言い、今日やることでも任意継続を外さない', () => {
+  // レビューの再現例：2026-12-09 退職、評価日 2026-12-30。20日目 12-29 は年末年始
+  const d = nini('2026-12-09');
+  assert.equal(d.sure, false);
+  const p = api.plan({kenpo: 'company'}, D('2026-12-09'), D('2026-12-30'));
+  assert.match(p.today, /国民健康保険・任意継続・家族の扶養から選ぶ/);
+  assert.match(p.today, /確かめる/);
+  assert.doesNotMatch(p.today, /20日は過ぎています/);
+  // 祝日の表がない年（2028年）も同じ
+  const q = api.plan({kenpo: 'company'}, D('2028-03-01'), D('2028-04-01'));
+  assert.doesNotMatch(q.today, /20日は過ぎています/);
+  // 一覧と今日やることは同じ判定を使う
+  assert.equal(api.niniDeadline(D('2026-12-09')).sure, d.sure);
+});
+test('国保の軽減：自分から辞めた・分からない人にも、やむを得ない事情の軽減の確認を残す', () => {
+  for (const why of ['self', 'unknown', '']) {
+    const p = api.plan({why, kenpo: 'company', ins: 'yes', money: 'ok'}, D('2026-11-10'), D('2026-11-18'));
+    assert.ok(all(p).some(x => /軽くなる場合/.test(x) && /病気/.test(x)), why);
+  }
+  assert.match(html, /<summary>解雇・雇止め・病気などで辞めた人は、国民健康保険料が大きく軽くなる場合があります<\/summary>/);
+});
+test('今日やることの各行から、相談先を探すページと言う文へ直接進める', () => {
+  const p = api.plan({why: 'self', money: 'short', kenpo: 'company', ins: 'yes'}, D('2026-11-10'), D('2026-11-18'));
+  assert.equal(p.keys.length, 1 + p.next.length);
+  assert.match(api.links(p.keys[0], true), /minna-tunagaru\.jp\/ichiran/);
+  assert.match(api.links(p.keys[0], true), /href="#say_jiritsu_d"/);
+  const hw = p.keys[[p.today, ...p.next].findIndex(x => /ハローワークで求職の申込み/.test(x))];
+  assert.match(api.links(hw), /koyou\/hellowork\.html/);
+  assert.match(api.links(hw), /#say_hw_d/);
+  for (const id of ['say_jiritsu_d', 'say_hw_d', 'say_kaisha_d', 'say_yakusho_d', 'kyushoku', 'hatarakenai']) assert.match(html, new RegExp(`id="${id}"`), id);
+});
+test('離職票が届かないときは会社だけで止めずハローワークへ。受付時間に16時前を添える', () => {
+  const p = api.plan({why: 'self', kenpo: 'kokuho', ins: 'yes'}, D('2026-11-10'), D('2026-11-18'));
+  assert.ok(all(p).some(x => /会社にいつ届くか聞き/.test(x) && /ハローワークに相談する/.test(x) && /16時前/.test(x)));
+  assert.match(html, /祝日・年末年始を除く）の8時30分〜17時15分で、16時前/);
+});
+test('職業訓練の出席：育児・介護中や基礎コースの人の例外を書く。すぐ働けないときの延長と傷病手当金も書く', () => {
+  assert.match(html, /育児・介護をしている人と、基礎コースを受ける人は、証明できないときも8割以上/);
+  assert.match(html, /受給期間の延長/);
+  assert.match(html, /傷病手当金/);
+  assert.match(html, /2年を過ぎていても相談してください/);
+  assert.doesNotMatch(html, /払えないまま放っておかず/);
+});
