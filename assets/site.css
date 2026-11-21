@@ -159,6 +159,7 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .cards .card:has(> a.title:only-child:focus-visible) { outline: 3px solid var(--c-link); outline-offset: 2px; }
 .srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
 .guides .links .tool span { margin-top: var(--s-1); }
+.guides .promise-plain { margin: var(--s-4) 0 0; padding-left: 1.2em; display: grid; gap: var(--s-1); color: var(--c-ink-soft); } /* トップの約束：入口の下に、ふつうの箇条で */
 
 /* ---- 仕事を失ったとき（pages/shitsugyo/）：あなたの場合を選ぶ道具（家賃編の選択肢と同じ見た目） ---- */
 .choose { background: var(--c-surface); border: 1px solid var(--c-line-strong); border-radius: var(--r-md); padding: var(--s-5) var(--s-4); display: grid; gap: var(--s-5); }
@@ -182,6 +183,7 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .today { background: var(--c-primary-soft); border-left: 6px solid var(--c-primary); border-radius: var(--r-sm); padding: var(--s-4); }
 .today .big { font-weight: 700; font-size: var(--fs-lead); }
 .today ol { margin: 0; padding-left: 1.4em; display: grid; gap: var(--s-2); }
+.today .act-links { display: block; margin-top: var(--s-1); } /* 今日やることの行から、相談先と言う文へ直接進むリンク */
 .dates { list-style: none; padding: 0 !important; display: grid; gap: var(--s-3); }
 .dates li { border: 1px solid var(--c-line-strong); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); background: var(--c-surface); }
 .dates .d { font-weight: 700; }

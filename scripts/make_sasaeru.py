@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "pages" / "sasaeru"
 BASE = "https://tako430ox-eng.github.io/shien-news/"
 UPDATED = "2026年11月16日"
-REVISED = "2026年11月19日"
+REVISED = "2026年11月21日"
 
 # ---------------------------------------------------------------- 出典
 # c：その資料を読んで確かめた日。
@@ -39,6 +39,12 @@ SRC = {
                     "https://www.mhlw.go.jp/content/000801479.xlsx", "2026-11-16"),
     "jukyo": ("厚生労働省：住居確保給付金（家賃補助）の制度概要",
               "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html", "2026-11-16"),
+    "jukyoKisoku": ("厚生労働省：生活困窮者自立支援法施行規則 第10条（離職・廃業から2年。病気・けが・育児などで30日以上求職活動ができなかった日数を足す。最長4年）",
+                    "https://www.mhlw.go.jp/web/t_doc?dataId=82ab4498&dataType=0&pageNo=1", "2026-11-21"),
+    "houterasuFaq": ("法テラス よくある相談：家賃不払を理由に、賃貸人から部屋の明渡しを求められました",
+                     "https://www.houterasu.or.jp/site/faq/sumai-kaiyakukoushin-001.html", "2026-11-21"),
+    "soudanplus": ("DV相談＋（運営元）：電話・チャット・プラス相談箱",
+                   "https://soudanplus.jp/", "2026-11-21"),
     "jukyoFaq": ("厚生労働省：住居確保給付金 よくある質問（別居の家族の収入など）",
                  "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/faq.html", "2026-11-16"),
     "tenkyo": ("厚生労働省：住居確保給付金における転居費用の支給",
@@ -67,8 +73,8 @@ SRC = {
                   "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html", "2026-11-17"),
     "mlit": ("国土交通省：家賃債務保証業者登録制度（2022年12月12日の最高裁判決を受けた周知）",
              "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr7_000024.html", "2026-11-16"),
-    "dv": ("内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋",
-           "https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/", "2026-11-14"),
+    "dv": ("内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋（電話は24時間、外国語のチャットは24時間）",
+           "https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/", "2026-11-21"),
     "takeupSnap": ("Finkelstein & Notowidigdo「Take-Up and Targeting: Experimental Evidence from SNAP」Quarterly Journal of Economics 134(3), 2019（米国の60歳以上の人への実験。英語）",
                    "https://doi.org/10.1093/qje/qjz013", "2026-11-17"),
     "mhlwTel": ("厚生労働省「まもろうよ こころ」電話相談",
@@ -104,6 +110,7 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
     canon = BASE + path
     src_items = "".join(
         f'<li><a href="{e(SRC[k][1])}" rel="noopener">{e(SRC[k][0])}</a>（{e(SRC[k][2])} 確認）</li>' for k in srcs)
+    body, jump = jumps(body)
     back = "" if path == "sasaeru/" else f'<p><a class="more-link" href="{up}sasaeru/">← 家族や友人が生活に困っているとき（場面の一覧）</a></p>'
     return f"""<!doctype html>
 <html lang="ja">
@@ -134,8 +141,10 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
 </header>
 {SAFETY.replace("{up}", up)}
 <main id="main" class="prose">
+{jump}
 {body.replace("{up}", up)}
 {back}
+<p class="status small" id="copyStatus" role="status"></p>
 <!--survey:sasaeru-->
 </main>
 <footer class="foot">
@@ -145,14 +154,52 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
  <details><summary>出典と確認日</summary><ul class="srcs">{src_items}</ul></details>
 </footer>
 </div>
+{COPY_JS if 'class="copy"' in body else ""}
 </body>
 </html>
 """
 
 
+_SAY_N = [0]
+
+
 def say(label: str, text: str) -> str:
-    """電話や窓口でそのまま読める文。"""
-    return f'<div class="say"><p class="say-h">{label}</p><p>{text}</p></div>'
+    """電話や窓口でそのまま読める文。コピーのボタンは、スクリプトが動くときだけ出す（家賃編・仕事を失ったときと同じ形）。
+    1つ目の文に id="iu" を付け、ページの上の「電話の文」のリンクの行き先にする。"""
+    _SAY_N[0] += 1
+    n = _SAY_N[0]
+    return (f'<div class="say"><p class="say-h">{label}</p><p id="say_{n}">{text}</p>'
+            f'<p class="copy-row" hidden><button type="button" class="copy" data-copy="say_{n}">この文をコピー</button></p></div>')
+
+
+# ページの中だけで動く小さなスクリプト：コピーのボタン。外のサーバーには接続せず、何も保存しない。
+COPY_JS = """<script>
+(function () {
+  var rows = document.querySelectorAll(".copy-row");
+  if (!rows.length || !navigator.clipboard) return;
+  Array.prototype.forEach.call(rows, function (el) { el.hidden = false; });
+  var st = document.getElementById("copyStatus");
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest("[data-copy]");
+    if (!b) return;
+    var t = document.getElementById(b.getAttribute("data-copy")).textContent;
+    navigator.clipboard.writeText(t).then(function () { st.textContent = "コピーしました。"; },
+      function () { st.textContent = "コピーできませんでした。文を長押しして選び、コピーしてください。"; });
+  });
+})();
+</script>"""
+
+
+def jumps(body: str) -> tuple[str, str]:
+    """長いページの上に「今日やること」「電話の文」へのリンクを出す。1つ目の言える文に id="iu" を付ける。"""
+    if 'class="say"' not in body:
+        return body, ""
+    body = body.replace('<div class="say">', '<div class="say" id="iu">', 1)
+    items = []
+    if 'id="kyou"' in body:
+        items.append('<a href="#kyou">今日やること</a>')
+    items.append('<a href="#iu">そのまま言える文</a>')
+    return body, f'<p class="small jumps">すぐ動きたいときは：{" ・ ".join(items)}</p>'
 
 
 # ---------------------------------------------------------------- 場面
@@ -166,7 +213,7 @@ SCENES.append(dict(
     h1="親が「家賃が払えない」と<br>言ってきたら",
     lead="責めずに、まず状況を一緒に書き出します。そのうえで、市区町村の相談窓口に、本人と一緒に電話します。",
     desc="年金暮らしの親や離れて住む親が「家賃が払えない」と言ってきたときに、子どもや家族が今日できること。聞いておくこと、相談先、電話でそのまま言える文、使えるかもしれない制度を、公式資料で確かめてまとめました。",
-    srcs=["konkyu", "ichiran", "yokohama", "higashiosaka", "chuo", "houkatsu", "jukyo", "tenkyo", "tenkyoNational", "kumamoto", "hogoApply", "hogoSeido", "aichiShakyo"],
+    srcs=["konkyu", "ichiran", "yokohama", "higashiosaka", "chuo", "houkatsu", "jukyo", "jukyoKisoku", "tenkyo", "tenkyoNational", "kumamoto", "hogoApply", "hogoSeido", "aichiShakyo"],
     body=f"""
 <h2>まず、本人に聞いておくこと</h2>
 <p>話してくれたこと自体が、大事な一歩です。理由を責めるより先に、次のことを紙に書き出してください。窓口で聞かれることとほぼ同じです。</p>
@@ -178,7 +225,7 @@ SCENES.append(dict(
 <li>体の具合や、介護が必要になってきていないか。</li>
 </ul>
 
-<h2>今日やること：市区町村の総合窓口に電話する</h2>
+<h2 id="kyou">今日やること：市区町村の総合窓口に電話する</h2>
 <p>暮らしのお金の相談は、市区町村の<b>自立相談支援機関</b>が受けています。</p>
 <ul>
 <li>家賃が払えない、仕事が見つからないといった困りごとを聞き、本人と一緒に支援の計画を作る窓口です。</li>
@@ -199,7 +246,7 @@ SCENES.append(dict(
 <p>使えるかどうかは窓口が決めます。ここに書いたのは、聞いてみる価値がある制度の名前です。</p>
 <h3>住居確保給付金（家賃の補助）</h3>
 <ul>
-<li>主な対象：仕事を失った・店を閉めた（2年以内）人、または本人の責任によらず働く機会が同じくらい減った人。</li>
+<li>主な対象：仕事を失った・店を閉めた（原則2年以内）人、または本人の責任によらず働く機会が同じくらい減った人。病気・けが・育児などで30日以上続けて仕事を探せなかった期間がある人は、その日数を足せる（最長4年）ので、2年を過ぎていても相談してください（厚生労働省）。</li>
 <li>収入・預貯金の条件と、求職活動などの条件があります。</li>
 <li><b>年金だけで暮らしていて、仕事を失ったわけではない場合は、毎月の家賃の補助の条件には当たらないことが多い</b>と考えられます（条件から見た当サイトの判断です。窓口で確かめてください）。</li>
 </ul>
@@ -242,17 +289,27 @@ SCENES.append(dict(
     h1="家族や友人が仕事を失い、<br>家賃が払えないとき",
     lead="家賃の補助（住居確保給付金）と、急ぎの貸付があります。どちらも窓口は市区町村や社会福祉協議会です。",
     desc="子ども・きょうだい・友人が仕事を失って家賃が払えないときに、支える人ができること。家賃の補助（住居確保給付金）の主な条件、離れて暮らす家族の収入の扱い、急ぎの貸付、電話でそのまま言える文を、厚生労働省などの資料で確かめてまとめました。",
-    srcs=["jukyo", "jukyoFaq", "konkyu", "ichiran", "yokohama", "higashiosaka", "chuo", "aichiShakyo", "tokyoShakyo", "hogoApply"],
+    srcs=["jukyo", "jukyoKisoku", "jukyoFaq", "konkyu", "ichiran", "yokohama", "higashiosaka", "chuo", "aichiShakyo", "tokyoShakyo", "hogoApply"],
     body=f"""
 <h2>最初に伝えたいこと</h2>
-<p>「家賃が払えない」と言えるのは、あなたを信頼しているからです。仕事を失った直後は、手続きを調べる気力がない人も多くいます。調べるのと電話の準備はあなたが手伝い、話すのは本人、という分け方が役に立ちます。</p>
+<p>話してくれたことを受け止め、本人が何を手伝ってほしいかを聞いてみてください。仕事を失った直後は、手続きを調べる気力がない人も多くいます。調べるのと電話の準備はあなたが手伝い、本人が話せるときは本人から話します。話すのが難しいときは、本人の了解を得て代わりに事情を伝え、どう確認すればよいかを窓口に聞きます。</p>
+
+<h2 id="kyou">今日やること</h2>
+<ol>
+<li>家賃の額、たまっている月数、仕事を失った日、今の収入と手持ちのお金を、本人と一緒に書き出す。</li>
+<li>本人の住む市区町村の総合窓口（<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関の一覧</a>）に電話して、相談の予約を取る。</li>
+<li>予約の日と持ち物をメモし、できれば窓口に付き添う。</li>
+</ol>
+{say("電話でそのまま言える文（本人の了解を得て、隣でかけるとき）",
+     "「〇〇の家族（友人）です。本人の了解を得て、隣にいる本人に代わってお電話しています。本人が〇月に仕事を失い、家賃が払えなくなっています。住居確保給付金のことと、相談の予約の取り方を教えてください。」")}
+<p class="small">本人が隣にいない、了解をまだ取れていないときは、この文は使わず、<a href="{{up}}sasaeru/denwa/">「本人がその場にいないとき」の文</a>で、家族として相談してください。</p>
 
 <h2>家賃の補助：住居確保給付金</h2>
 <p>厚生労働省の説明で確かめた、主な条件です。細かい金額は市区町村で違います。</p>
 <ul>
 <li><b>誰が</b>：世帯の生活を主に支えている人で、次のどちらかに当たること。
   <ul>
-  <li>仕事を辞めた・失った・店を閉めてから2年以内。</li>
+  <li>仕事を辞めた・失った・店を閉めてから原則2年以内。病気・けが・育児などで30日以上続けて仕事を探せなかった期間がある人は、その日数を足せる（最長4年）ので、2年を過ぎていても相談してください（厚生労働省）。</li>
   <li>本人の責任や都合によらず、働いてお金を得る機会が、仕事を失ったのと同じくらいまで減っている。</li>
   </ul>
 </li>
@@ -262,16 +319,6 @@ SCENES.append(dict(
 <li><b>離れて暮らす家族の収入</b>：別に暮らすあなたの収入は、本人の世帯の収入に<b>含めません</b>（厚生労働省のよくある質問）。仕送りをしているかどうかなど、細かい扱いは窓口で確かめてください。</li>
 </ul>
 <p>相談と申し込みは、市区町村の<b>自立相談支援機関</b>です。家族や周りの人からの相談も受け付けると書いている自治体があります（例：横浜市、東大阪市、東京都中央区）。</p>
-
-<h2>今日やること</h2>
-<ol>
-<li>家賃の額、たまっている月数、仕事を失った日、今の収入と手持ちのお金を、本人と一緒に書き出す。</li>
-<li>本人の住む市区町村の総合窓口（<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関の一覧</a>）に電話して、相談の予約を取る。</li>
-<li>予約の日と持ち物をメモし、できれば窓口に付き添う。</li>
-</ol>
-{say("電話でそのまま言える文（本人の了解を得て、隣でかけるとき）",
-     "「〇〇の家族（友人）です。本人の了解を得て、隣にいる本人に代わってお電話しています。本人が〇月に仕事を失い、家賃が払えなくなっています。住居確保給付金のことと、相談の予約の取り方を教えてください。」")}
-<p class="small">本人が隣にいない、了解をまだ取れていないときは、この文は使わず、<a href="{{up}}sasaeru/denwa/">「本人がその場にいないとき」の文</a>で、家族として相談してください。</p>
 
 <h2>家賃の補助が出るまでのお金が足りないとき</h2>
 <p>社会福祉協議会の<b>緊急小口資金</b>は、急にお金が足りなくなったときの小口の貸付です。愛知県の案内では、次のとおりです。条件は都道府県で違う場合があります。</p>
@@ -285,7 +332,7 @@ SCENES.append(dict(
 
 <h2>支える人が気をつけたいこと</h2>
 <ul>
-<li>まとまったお金を個人的に貸すのは、なるべく避けてください。返す・返さないが関係を壊すことがあり、制度の相談も遅れがちです。</li>
+<li>お金を援助するときも、あなた自身の生活を損なわない範囲にして、窓口への相談を並行して進めてください。まとまったお金の貸し借りは、返す・返さないが関係を壊すことがあり、制度の相談も遅れがちです。</li>
 <li>「手数料を払えば給付金を確実に受け取れる」という業者の広告に注意してください。公的な相談は無料です。</li>
 <li>求職活動は、本人がハローワークなどで行う必要があります。代わりにやってあげるより、隣で一緒に進めてください。</li>
 </ul>
@@ -299,9 +346,9 @@ SCENES.append(dict(
     card="「部屋を出ていくように言われた」と聞いた",
     title="家族や友人が「部屋を出ていくように言われた」とき｜支える人が今日できること",
     h1="「部屋を出ていくように<br>言われた」と聞いたら",
-    lead="その場で書類にサインせず、言われたことを記録して、法律の相談先と市区町村の窓口に、同じ日に連絡します。",
+    lead="その場で書類にサインせず、言われたことを記録して、法律の相談先と市区町村の窓口に、それぞれの受付時間内に早めに連絡します。",
     desc="家族や友人が、家賃の滞納などで大家さん・管理会社・保証会社から「出ていくように」と言われたときに、支える人ができること。記録の取り方、法テラスの電話、家賃の補助、今夜寝る場所がないときの相談先を、公式資料で確かめてまとめました。",
-    srcs=["houterasu", "mlit", "konkyu", "ichiran", "jukyo", "hogoApply", "fukushiList", "dv"],
+    srcs=["houterasu", "houterasuFaq", "mlit", "konkyu", "ichiran", "jukyo", "hogoApply", "fukushiList", "dv", "soudanplus"],
     body=f"""
 <h2>まず、本人に伝えること</h2>
 <ul>
@@ -316,19 +363,20 @@ SCENES.append(dict(
 </li>
 </ul>
 
-<h2>今日やること（1）：法律の相談先に電話する</h2>
+<h2 id="kyou">法律の相談先に、受付時間内に早めに電話する</h2>
 <p><b>法テラスのサポートダイヤル</b>は、困りごとに合った法律の制度や相談窓口を案内する電話です（ここで個別の法律判断はしません）。収入などの条件によっては、弁護士や司法書士に無料で相談できる制度も案内してもらえます。</p>
 <ul>
 <li>電話：<a href="tel:0570078374">0570-078374</a>（IP電話からは <a href="tel:0367455600">03-6745-5600</a>）</li>
 <li>受付：平日9時〜21時、土曜9時〜17時（祝日・年末年始を除く）</li>
 <li>利用は無料ですが、通話料がかかります。</li>
 </ul>
+<p>受付時間外は、言われたことや届いた書類を整理して、<a href="https://www.houterasu.or.jp/site/faq/sumai-kaiyakukoushin-001.html" rel="noreferrer">法テラスのよくある相談「家賃不払を理由に、部屋の明渡しを求められた」</a>を確認できます。裁判所から書類が届いている場合は、書類に書かれた期限や期日を先に確認してください。</p>
 {say("法テラスでそのまま言える文",
      "「家族（友人）のことで電話しています。家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少ないので、無料で相談できる方法を教えてください。」")}
 
-<h2>今日やること（2）：市区町村の総合窓口に電話する</h2>
+<h2>市区町村の総合窓口にも早めに電話する</h2>
 <p>住み続けるにも、引っ越すにも、お金の手当てが要ります。</p>
-<p>市区町村の<b>自立相談支援機関</b>（<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">一覧</a>）は、家賃の補助（住居確保給付金）などの相談を受けています。法律の相談と並行して、同じ日に連絡してください。</p>
+<p>市区町村の<b>自立相談支援機関</b>（<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">一覧</a>）は、家賃の補助（住居確保給付金）などの相談を受けています。総合窓口の受付時間内に連絡してください。法テラスの受付を待つ必要はありません。</p>
 {say("総合窓口でそのまま言える文（本人の了解を得ているとき）",
      "「〇〇の家族（友人）です。本人の了解を得てお電話しています。家賃を滞納していて、出ていくように言われています。使える制度と、相談の予約の取り方を教えてください。」")}
 <p class="small">本人の了解をまだ取れていないときは、「本人の了解を得て」は言わずに、<a href="{{up}}sasaeru/denwa/">「本人がその場にいないとき」の文</a>で、家族として相談してください。</p>
@@ -340,7 +388,7 @@ SCENES.append(dict(
 <li>夜間や休日に電話がつながる窓口がある地域もありますが、全国どこでもではありません。</li>
 <li>夜間に危険があるときは110番へ。</li>
 </ul>
-<p>暴力から逃げるために家を出たいときは、<a href="tel:0120279889">DV相談＋（0120-279-889、電話は24時間）</a>や <a href="tel:%238008">#8008（DV相談ナビ）</a>に相談できます。</p>
+<p>暴力から逃げるために家を出たいときは、<a href="tel:0120279889">DV相談＋（0120-279-889、電話は24時間）</a>や <a href="tel:%238008">#8008（DV相談ナビ）</a>に相談できます。<a href="https://soudanplus.jp/" rel="noreferrer">チャット（外国語は24時間）など、DV相談＋の公式案内</a>も確認できます。</p>
 
 <h2>支える人が気をつけたいこと</h2>
 <ul>
@@ -432,7 +480,7 @@ SCENES.append(dict(
 <p class="small">最後の判断は福祉事務所がします。夫婦や、中学生以下の子どもとの関係などは扱いが違うことがあります。</p>
 <p class="small">ただ、その場合でも、暴力や虐待などで、問い合わせると本人の自立のさまたげになるときは、問い合わせを控える取り扱いです。相手に本人の居場所や、その手がかりが知られないよう、特に慎重に調べることも求められています。</p>
 
-<h2>支える人ができること</h2>
+<h2 id="kyou">支える人ができること</h2>
 <ol>
 <li><b>嫌がる理由を聞く</b>：「恥ずかしい」「親族に知られたくない」「車や家を手放したくない」など。理由によって、窓口で聞くことが変わります。</li>
 <li><b>窓口で伝える事情をメモにする</b>：連絡されたくない親族がいるなら、誰か、なぜか（何年連絡していないか、暴力があったか、など）を書いておきます。</li>

@@ -64,3 +64,43 @@ test('landlord script states only the chosen reason (pension is not "income decr
     a.setState({a:{rent}});assert.doesNotMatch(a.landlordScript(),/収入が減|年金/,rent);
   }});
 test('supporter tip does not present the SNAP study as evidence for family support',()=>{assert.doesNotMatch(html,/研究では、制度の情報を見せるだけより/);assert.match(html,/本人の了解を得たうえで/);});
+test('Yorisoi distinguishes main and foreign-language hours wherever offered',()=>{
+  const cases=[
+    ['2026-11-23T01:00:00Z',{safety:{life:true,night:true}},'renderUrgent','urgentOut'],
+    ['2026-11-23T01:00:00Z',{safety:{night:true}},'renderUrgent','urgentOut'],
+    ['2026-11-24T01:00:00Z',{safety:{food:true}},'renderUrgent','urgentOut'],
+    ['2026-11-23T01:00:00Z',{},'renderFirst','firstOut'],
+    ['2026-11-23T01:00:00Z',{after:'notyet'},'renderAfter','afterOut'],
+  ];
+  for(const [time,state,method,id] of cases){
+    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML;
+    assert.match(out,/一般の電話相談は24時間.*外国語の電話相談は毎日10時〜22時.*対応する言語/);
+    assert.match(out,/href="https:\/\/www\.since2011\.net\/yorisoi\/n2\//);
+    assert.equal((out.match(/href="tel:0120279338"/g)||[]).length,1);
+  }
+});
+test('DV Plus shows current channels and no discontinued email in all DV paths',()=>{
+  const {a,el}=appAt('2026-11-23T01:00:00Z');
+  a.setState({safety:{dv:true,night:true}});a.renderUrgent();
+  a.setState({safety:{dv:true}});a.renderFirst();
+  const check=out=>{
+    assert.match(out,/電話相談は24時間.*チャット相談は12時〜22時.*外国語.*24時間.*プラス相談箱.*1週間をめどに返信/);
+    assert.match(out,/href="https:\/\/soudanplus\.jp\//);
+    assert.doesNotMatch(out,/メールの相談|soudanplus\.jp\/mail/);
+  };
+  check(el('urgentOut').innerHTML);check(el('firstOut').innerHTML);
+  a.setState({a:{move:'flee'}});a.renderFirst();check(el('firstOut').innerHTML);
+});
+test('eviction keeps two independent opening windows and an official closed-hours fallback',()=>{
+  for(const time of ['2026-11-21T01:00:00Z','2026-11-22T01:00:00Z','2026-11-23T01:00:00Z','2026-11-24T01:00:00Z']){
+    const {a,el}=appAt(time);a.setState({a:{rent:'evict'}});a.renderFirst();a.renderPlan(a.decide());
+    for(const id of ['firstOut','planOut']){
+      const out=el(id).innerHTML;
+      assert.match(out,/平日9時〜21時、土曜9時〜17時.*祝日・年末年始を除く/);
+      assert.match(out,/sumai-kaiyakukoushin-001\.html/);
+      assert.match(out,/裁判所.*期限や期日/);
+      assert.doesNotMatch(out,/今日か明日|同じ日に/);
+    }
+    assert.match(el('planOut').innerHTML,/総合窓口の受付時間内に早めに/);
+  }
+});
