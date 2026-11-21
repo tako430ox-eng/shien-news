@@ -179,7 +179,7 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .choose .opt input:focus-visible + span { outline: 3px solid var(--c-link); outline-offset: 2px; }
 .choose .field { display: grid; gap: var(--s-1); }
 .choose .field label { font-weight: 700; }
-.choose .field input[type="date"] { font: inherit; width: 100%; max-width: 20em; min-height: 48px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--c-ink); background: var(--c-surface); color: var(--c-ink); }
+.choose .field input[type="date"], .choose .field input[type="text"] { font: inherit; width: 100%; max-width: 20em; min-height: 48px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--c-ink); background: var(--c-surface); color: var(--c-ink); }
 .today { background: var(--c-primary-soft); border-left: 6px solid var(--c-primary); border-radius: var(--r-sm); padding: var(--s-4); }
 .today .big { font-weight: 700; font-size: var(--fs-lead); }
 .today ol { margin: 0; padding-left: 1.4em; display: grid; gap: var(--s-2); }
@@ -192,6 +192,7 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 /* ボタン：塗り（主）・枠（副）の2種類（デジタル庁のボタンの考え方）。角は入力欄と同じ */
 .btn { font: inherit; cursor: pointer; min-height: 48px; padding: 8px 20px; border-radius: var(--r-sm); border: 2px solid var(--c-primary); background: var(--c-surface); color: var(--c-primary); font-weight: 700; }
 .btn.ghost { border: 1px solid var(--c-line-strong); color: var(--c-ink); font-weight: 400; }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; } /* ページ内の近道など、リンクをボタンの形で出すとき */
 .btn:hover, .copy:hover { text-decoration: underline; }
 .copy { font: inherit; font-size: var(--fs-small); cursor: pointer; min-height: var(--tap); padding: 6px 16px; border-radius: var(--r-sm); border: 1px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink); }
 /* 押すと選択肢が開く質問（家賃編の details.q と同じ形）。答えると閉じ、選んだ答えを ✓ つきで見出しの下に出す。

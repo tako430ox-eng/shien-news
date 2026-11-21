@@ -104,3 +104,10 @@ test('eviction keeps two independent opening windows and an official closed-hour
     assert.match(el('planOut').innerHTML,/総合窓口の受付時間内に早めに/);
   }
 });
+test('Yorisoi shows the Fukushima and IP-phone numbers wherever offered (recheck 2026-11-21)',()=>{
+  for(const [time,state,method,id] of [['2026-11-23T01:00:00Z',{safety:{life:true}},'renderUrgent','urgentOut'],['2026-11-23T01:00:00Z',{},'renderFirst','firstOut'],['2026-11-23T01:00:00Z',{after:'notyet'},'renderAfter','afterOut']]){
+    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML;
+    assert.match(out,/福島県からは 0120-279-226/);assert.match(out,/IP電話からは 050-3655-0279/);
+  }
+  assert.match(html,/第6\.2版、2026年11月2\d日更新/);
+});
