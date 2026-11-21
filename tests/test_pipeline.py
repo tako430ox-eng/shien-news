@@ -195,7 +195,7 @@ class TestEndToEnd(unittest.TestCase):
         # 関係のあるものは出す。公式へのリンクと出典つき
         self.assertIn("住居確保給付金の支給要件の見直し", index)
         self.assertIn("出典：厚生労働省ホームページ", index)
-        # useful_kinds を書かない今の設定では、話し合い以外はすべて役立つ欄に出し、「そのほか」は作らない
+        # useful_kinds を書かない今の設定では、話し合いと行事（group: other）以外はすべて役立つ欄に出す。見本に行事はないので「そのほか」は作らない
         self.assertIn("生活オリエンテーション動画", index.split("class=\"box talk\"")[0])
         self.assertFalse((out / "other.html").exists())
         self.assertNotIn("other.html", (out / "sitemap.xml").read_text(encoding="utf-8"))
@@ -579,6 +579,21 @@ class TestSurvey(unittest.TestCase):
             self.site.build(self.tmp / "bad2")
 
 
+class TestEventKind(unittest.TestCase):
+    """行事・広報（コンクール・表彰式・イベントなど）は「そのほかのお知らせ」に分ける（2026-11-21 コタローさんの判断）。支援の案内は分けない。"""
+
+    def test_event_titles(self):
+        rules = json.loads((ROOT / "config" / "rules.json").read_text(encoding="utf-8"))
+        for t in ("「第８回 ハローワーク業務改善コンクール」を開催します", "「第1回 保育の魅力フォトコンテスト」を開催します",
+                  "世界エイズデーに向けた普及啓発イベントを実施します"):
+            self.assertEqual(lib.classify(t, rules)["kind"], "event", t)
+        for t in ("住居確保給付金の支給要件の見直しについて", "生活困窮者の相談窓口のご案内", "求職者支援訓練の受講者を募集します"):
+            self.assertNotEqual(lib.classify(t, rules)["kind"], "event", t)
+        self.assertEqual({k["id"]: k.get("group") for k in rules["kinds"]}["event"], "other")
+        # サポステは仕事の分野にも出す
+        self.assertIn("work", lib.classify("「地域若者サポートステーション（サポステ）」 特設サイトをリニューアルしました", rules)["topics"])
+
+
 class TestSasaeru(unittest.TestCase):
     """支える人向けの場面別ページ（pages/sasaeru/）。生成元と一致し、検索向けの項目と出典があり、使わない言葉がない。"""
 
@@ -611,6 +626,20 @@ class TestSasaeru(unittest.TestCase):
         for s in self.m.SCENES:
             for k in s["srcs"]:
                 self.assertIn(k, self.m.SRC)
+
+    def test_recheck_20261121(self):
+        """再確認（2026-11-21）：退去の文に確かめていない滞納・低収入を書かない。近道は緊急の案内より前。生活保護のページは自分自身を指さない。"""
+        t = self.pages["taikyo/index.html"]
+        for say in re.findall(r'<div class="say"[^>]*>.*?</div>', t, re.S):
+            self.assertNotIn("家賃を滞納していて", say)
+            self.assertNotIn("収入が少ない", say)
+        for rel, text in self.pages.items():
+            if 'class="btn-row jumps"' in text:
+                self.assertLess(text.index('class="btn-row jumps"'), text.index('<div class="notice">'), rel)
+        h = self.pages["seikatsuhogo/index.html"]
+        self.assertNotIn('href="../../sasaeru/seikatsuhogo/"', h)
+        self.assertIn('href="#kyou"', h)
+        self.assertIn("000801479.xlsx", t)
 
 
 class TestShitsugyo(unittest.TestCase):

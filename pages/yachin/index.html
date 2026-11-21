@@ -498,7 +498,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   <!--survey:yachin-->
 
   <footer>
-    <p>このページは「くらしの非常口」の試作版です（第6.1版、2026年11月14日更新）。制度の内容は、下の出典で確認したものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
+    <p>このページは「くらしの非常口」の試作版です（第6.2版、2026年11月21日更新。第6.1版は2026年11月14日）。制度の内容は、下の出典で確認したものです。確認した日は制度ごとに違い、出典ごとに書いています。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
     <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。ご本人が自分で書類をそろえ、窓口で話すための手伝いです。</p>
     <p>入力した内容を運営者へ送信する機能はありません。検索ボタンを押すと市区町村名などの検索語、カレンダーのリンクを押すと予定名と日付が Google に送られます。外部リンクと電話は押したときに開きます。</p>
     <p><strong>お金を求める人に注意してください。</strong>このサイトから紹介する公的な相談・申請の案内に、当サイトの手数料はかかりません。電話の通話料や、専門家への個別相談・依頼には費用がかかる場合があります。手数料や成功報酬を求める業者、決まった住まいや病院を使うことを条件にする人には注意してください。困ったときは、消費者ホットライン <a href="tel:188">188</a> に相談できます。</p>
@@ -594,7 +594,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     gaikoku: { t: "昭和29年5月8日 社発第382号「生活に困窮する外国人に対する生活保護の措置について」（鳥取県の掲載資料）", u: "https://www.pref.tottori.lg.jp/secure/1073822/konkyo_1_1.pdf", c: CHECKED3 },
     kyujitsu: { t: "厚生労働省 事務連絡（2020年11月24日）：年末年始における生活困窮者支援等に関する協力依頼等について", u: "https://www.mhlw.go.jp/content/000697946.pdf", c: CHECKED3 },
     nagoya: { t: "名古屋市：住居のない方の生活相談（閉庁中の電話相談、2025年10月17日更新）", u: "https://www.city.nagoya.jp/kenkofukushi/fukushi/1016735/1016740.html", c: CHECKED3 },
-    mhlwTel: { t: "厚生労働省「まもろうよ こころ」電話相談（よりそいホットライン、いのちの電話）", u: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel", c: CHECKED3 },
+    mhlwTel: { t: "厚生労働省「まもろうよ こころ」電話相談（よりそいホットライン。福島県から・IP電話からの番号、いのちの電話）", u: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel", c: "2026-11-21" },
     houterasu: { t: "法テラス：サポートダイヤル（受付時間・通話料・案内の範囲）", u: "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html", c: "2026-11-17" },
     mlitLaw: { t: "国土交通省：家賃債務保証業者登録制度（最高裁判決を受けた周知）", u: "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_fr7_000024.html", c: "2026-11-14" },
     hellowork: { t: "厚生労働省：ハローワークの所在地", u: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html", c: "2026-10" },
@@ -739,10 +739,12 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   }
   var YORISOI = "0120-279-338";
   var YORISOI_HOURS = "一般の電話相談は24時間・無料（厚生労働省のページで2026年11月21日確認）。外国語の電話相談は毎日10時〜22時で、ガイダンスが流れたら2を押します。対応する言語と日程は、運営元のページで確かめてください（2026年11月21日確認）。";
+  // 福島県から・IP電話からは番号が違う（厚生労働省「まもろうよ こころ」電話相談、2026-11-21 確認）
+  var YORISOI_OTHER = "福島県からは 0120-279-226、IP電話からは 050-3655-0279（どちらも24時間）。";
   var YORISOI_LINK = '<a href="https://www.since2011.net/yorisoi/n2/" rel="noreferrer">外国語相談の対応言語と時間（運営元）</a>';
   function yorisoiContact(who) {
     return contact("よりそいホットライン" + (who ? "：" + who : ""), YORISOI, YORISOI_HOURS) +
-      '<p class="small">' + YORISOI_LINK + '</p>';
+      '<p class="small">' + esc(YORISOI_OTHER) + ' ' + YORISOI_LINK + '</p>';
   }
   function dvContact() {
     return contact("DV相談＋（プラス）", "0120-279-889", "電話相談は24時間・無料。チャット相談は12時〜22時で、外国語（10言語）のチャット相談は24時間受付です（内閣府）。文字で送る「プラス相談箱」は24時間受付で、相談員から1週間をめどに返信があります（運営元。どちらも2026年11月21日確認）。急ぐときは電話へ。") +
@@ -1001,7 +1003,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     }
     if (!open && !urgent && !state.safety.life) {
       html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）の電話相談は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスと役所では受付時間が異なります。上の案内で受付時間を確認してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。</p>') +
-        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI, "よりそいホットライン") + '</p><p class="small">' + esc(YORISOI_HOURS) + ' ' + YORISOI_LINK + '</p>';
+        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI, "よりそいホットライン") + '</p><p class="small">' + esc(YORISOI_HOURS) + ' ' + esc(YORISOI_OTHER) + ' ' + YORISOI_LINK + '</p>';
     }
     $("firstOut").innerHTML = html;
   }

@@ -136,7 +136,9 @@ class Site:
         # 3つに分ける。暮らしに役立つお知らせ（制度の変更・募集/申請・相談窓口・注意）、
         # 国で話し合っていること（会議・意見募集・調査）、そのほかのお知らせ（行事・広報など）
         # useful_kinds を書かないときは、話し合い以外をすべて役立つ欄に出す（そのほかは空）
-        useful_kinds = set(self.rules.get("useful_kinds") or {it["kind"] for it in self.items} - talk_kinds)
+        # group が other の種類（行事・広報。2026-11-21 コタローさんの判断）は、いつも「そのほかのお知らせ」に出す
+        other_kinds = {k["id"] for k in self.rules["kinds"] if k.get("group") == "other"}
+        useful_kinds = set(self.rules.get("useful_kinds") or {it["kind"] for it in self.items} - talk_kinds - other_kinds)
         self.useful = [it for it in self.items if it["kind"] in useful_kinds]
         self.talk = [it for it in self.items if it["kind"] in talk_kinds]
         self.other = [it for it in self.items if it["kind"] not in useful_kinds and it["kind"] not in talk_kinds]
@@ -432,7 +434,7 @@ class Site:
         body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページに出た新着を、1日2回自動で集めています。暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選び、見出しは公式のまま載せています。分野で絞り込めます。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
-        body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{"制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')
+        body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{("制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.rules.get("useful_kinds") else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。コンクール・表彰式・イベントなどの行事は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。") if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')
         body.append(self.list_by_day(self.useful, 0, limit=60))
         if len(self.useful) > 60:
             body.append('<p class="more">もっと前のお知らせは、上の分野ボタンから見られます。</p>')

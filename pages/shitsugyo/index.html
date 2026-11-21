@@ -28,7 +28,7 @@
 <div class="notice">
 <p class="notice-h">今夜寝る場所がない、今日食べるものやお金がないとき</p>
 <p>この先の手続きより先に、いま居る場所の市区町村の<b>福祉事務所</b>（役所の生活保護の窓口）に、そのことを伝えてください。住むところがなくても、生活保護は申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
-<p>探し方：「（市区町村名） 福祉事務所」で検索するか、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
+<p>探し方：<a href="#city">下の欄に市区町村名を入れる</a>と、福祉事務所を探す検索のボタンが出ます。<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>もあります。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
 <p class="notice-h">命の危険があるとき</p>
 <ul>
 <li>命の危険があるとき：<a href="tel:119">119番</a>・<a href="tel:110">110番</a></li>
@@ -58,6 +58,7 @@
 <h2 id="tool-h">あなたの場合を選ぶ（どれも任意）</h2>
 <p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。選んだ内容はこの画面の中だけで使い、どこにも送らず、保存もしません。</p>
 <details class="q" id="qd_why" open><summary><span class="q-label">1. 辞めた理由</span><span class="q-ans" id="qa_why"></span></summary><fieldset><legend class="sr-only">1. 辞めた理由</legend><div class="opts"><label class="opt"><input type="radio" name="why" value="company"><span>会社の都合（解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた）</span></label><label class="opt"><input type="radio" name="why" value="self"><span>自分から辞めた</span></label><label class="opt"><input type="radio" name="why" value="notyet"><span>まだ辞めていない（辞めるように言われている）</span></label><label class="opt"><input type="radio" name="why" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_ins" open><summary><span class="q-label">2. 雇用保険</span><span class="q-ans" id="qa_ins"></span></summary><fieldset><legend class="sr-only">2. 雇用保険</legend><div class="opts"><label class="opt"><input type="radio" name="ins" value="yes"><span>入っていた（給与明細で「雇用保険」が引かれていた）</span></label><label class="opt"><input type="radio" name="ins" value="no"><span>入っていなかった・自営業やフリーランスだった</span></label><label class="opt"><input type="radio" name="ins" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_kenpo" open><summary><span class="q-label">3. 辞める前の健康保険</span><span class="q-ans" id="qa_kenpo"></span></summary><fieldset><legend class="sr-only">3. 辞める前の健康保険</legend><div class="opts"><label class="opt"><input type="radio" name="kenpo" value="company"><span>会社の健康保険（保険証に協会けんぽや健康保険組合の名前）</span></label><label class="opt"><input type="radio" name="kenpo" value="kokuho"><span>もともと国民健康保険</span></label><label class="opt"><input type="radio" name="kenpo" value="family"><span>家族の健康保険の扶養に入っている</span></label><label class="opt"><input type="radio" name="kenpo" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_money" open><summary><span class="q-label">4. お金</span><span class="q-ans" id="qa_money"></span></summary><fieldset><legend class="sr-only">4. お金</legend><div class="opts"><label class="opt"><input type="radio" name="money" value="short"><span>家賃や今月の生活費が足りない・足りなくなりそう</span></label><label class="opt"><input type="radio" name="money" value="ok"><span>しばらくは暮らせる</span></label></div></fieldset></details><div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>
+<div class="field"><label for="city">6. 住んでいる市区町村（窓口を探す検索のボタンを出すときだけ）</label><input type="text" id="city" autocomplete="address-level2" placeholder="例：横浜市"></div>
 <div id="todayOut" class="today stack" aria-live="polite"><h3>今日やること</h3><p>会社の健康保険に入っていた人は、退職後の健康保険を、国民健康保険・任意継続・家族の扶養から選びます。期限は<b>退職日の翌日から14日・20日</b>です。年金の手続きは別にあり、次の勤め先や配偶者の扶養に入るかで手続き先が変わります。雇用保険に入っていた人は、離職票が届いたら住所地のハローワークへ。お金が足りないときは、<a href="#money">5. お金が足りないとき</a>を先に読んでください。</p></div>
 <div id="datesOut" aria-live="polite"></div>
 <p class="btn-row" hidden id="toolBtns"><button type="button" class="btn" id="printBtn">このページを印刷する</button> <button type="button" class="btn ghost" id="resetBtn">選んだ内容を消す</button></p>
@@ -381,9 +382,18 @@
     kyu: [FIND.hw, ["#kyushoku", "求職者支援制度の説明"]],
     corner: [FIND.corner]
   };
+  // 市区町村名を入れたときだけ出す検索のボタン（押すと Google の検索が開く。入れた名前はこのページからは送らない）
+  var SEARCH = { jiritsu: ["自立相談支援機関", "福祉事務所 生活保護"], yakusho: ["国民健康保険 窓口", "国民年金 窓口"], hw: [], kyu: [], corner: [] };
+  var city = "", searched = {};
   function links(k, big) {
     var l = LINKS[k];
     if (!l) return "";
+    // 検索のボタンは、同じ窓口について最初の1回だけ出す
+    var add = city && SEARCH[k] && !searched[k] ? SEARCH[k] : [];
+    if (add.length) searched[k] = true;
+    l = l.concat(add.map(function (t) {
+      return ["https://www.google.com/search?q=" + encodeURIComponent(city + " " + t), "検索：" + city + " " + t];
+    }));
     return "<span class=\"" + (big ? "act-links" : "act-links small") + "\">" + l.map(function (x) {
       var ext = x[0].charAt(0) !== "#";
       return "<a href=\"" + esc(x[0]) + "\"" + (ext ? " rel=\"noopener\"" : "") + ">" + esc(x[1]) + "</a>";
@@ -392,15 +402,18 @@
 
   function render() {
     var a = read();
+    city = $("city").value.trim().slice(0, 30);
+    searched = {};
     var leave = parseDate($("leave").value);
     var today = todayJst();
-    var any = a.why || a.ins || a.kenpo || a.money || leave;
+    var any = a.why || a.ins || a.kenpo || a.money || leave || city;
     $("toolBtns").hidden = !any;
     if (!any) return;
     var p = plan(a, leave, today);
     var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>" + links(p.keys[0], true);
     if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x, i) { return "<li>" + esc(x) + links(p.keys[i + 1], false) + "</li>"; }).join("") + "</ol>";
-    if (a.ins !== "no") h += "<p class=\"small\">病気・けが・出産・育児などで、すぐ働けないときは：<a href=\"#hatarakenai\">受け取れる期間の延長と、傷病手当金</a></p>";
+    h += "<p class=\"small\">病気・けが・出産・育児などで、すぐ働けないときは：<a href=\"#hatarakenai\">" + (a.ins === "no" ? "傷病手当金など" : "受け取れる期間の延長と、傷病手当金") + "</a></p>";
+    if (!city && (p.keys.indexOf("jiritsu") >= 0 || p.keys.indexOf("yakusho") >= 0)) h += "<p class=\"small\">6 の欄に市区町村名を入れると、窓口を探す検索のボタンが出ます。</p>";
     $("todayOut").innerHTML = h;
     var ds = deadlines(a, leave);
     if (!ds.length) { $("datesOut").innerHTML = leave ? "" : "<p class=\"small\">退職日を入れると、期限の日付が出ます。</p>"; return; }
@@ -498,6 +511,7 @@
     Array.prototype.forEach.call(document.querySelectorAll("main details[data-was]"), function (d) { d.open = d.getAttribute("data-was") === "1"; d.removeAttribute("data-was"); });
   });
   $("leave").addEventListener("input", render);
+  $("city").addEventListener("input", render);
   Array.prototype.forEach.call(document.querySelectorAll(".copy-row"), function (el) { el.hidden = false; });
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest && ev.target.closest("[data-copy]");
@@ -507,6 +521,7 @@
   $("resetBtn").addEventListener("click", function () {
     Array.prototype.forEach.call(document.querySelectorAll("#tool input[type=radio]"), function (r) { r.checked = false; });
     $("leave").value = "";
+    $("city").value = "";
     QS.forEach(function (n) { $("qd_" + n).open = false; });
     updateSummaries();
     openFirstUnanswered();

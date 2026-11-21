@@ -98,7 +98,9 @@ SAFETY = ('<div class="notice">'
           '<p>相談の予約の日を待たずに、'
           '本人がいま居る場所の近くの<b>福祉事務所</b>（市区町村の生活保護の窓口）に、そのことを最初に伝えてください。'
           '住むところがなくても、生活保護は申請できます（厚生労働省）。'
-          '夜間や休日に電話がつながる窓口は、地域によって違います。'
+          '夜間や休日に電話がつながる窓口は、地域によって違います。</p>'
+          '<p>探し方：「（市区町村名） 福祉事務所」で検索するか、<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>を見ます。'
+          '見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。'
           '<a href="{up}sasaeru/seikatsuhogo/">生活保護の相談のしかた</a></p></div>')
 
 YACHIN = '<a class="cta" href="{up}yachin/">家賃が払えないときの道具を、本人と一緒に開く</a>'
@@ -111,6 +113,10 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
     src_items = "".join(
         f'<li><a href="{e(SRC[k][1])}" rel="noopener">{e(SRC[k][0])}</a>（{e(SRC[k][2])} 確認）</li>' for k in srcs)
     body, jump = jumps(body)
+    # 緊急の案内の「生活保護の相談のしかた」は、生活保護のページ自身では、そのページの行動の欄へ
+    safety = SAFETY.replace("{up}", up)
+    if path == "sasaeru/seikatsuhogo/":
+        safety = safety.replace(f'href="{up}sasaeru/seikatsuhogo/"', 'href="#kyou"').replace("生活保護の相談のしかた</a>", "このページの「支える人ができること」</a>")
     back = "" if path == "sasaeru/" else f'<p><a class="more-link" href="{up}sasaeru/">← 家族や友人が生活に困っているとき（場面の一覧）</a></p>'
     return f"""<!doctype html>
 <html lang="ja">
@@ -139,9 +145,9 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
  <p class="lead">{lead}</p>
  {PATH}
 </header>
-{SAFETY.replace("{up}", up)}
-<main id="main" class="prose">
 {jump}
+{safety}
+<main id="main" class="prose">
 {body.replace("{up}", up)}
 {back}
 <p class="status small" id="copyStatus" role="status"></p>
@@ -197,9 +203,9 @@ def jumps(body: str) -> tuple[str, str]:
     body = body.replace('<div class="say">', '<div class="say" id="iu">', 1)
     items = []
     if 'id="kyou"' in body:
-        items.append('<a href="#kyou">今日やること</a>')
-    items.append('<a href="#iu">そのまま言える文</a>')
-    return body, f'<p class="small jumps">すぐ動きたいときは：{" ・ ".join(items)}</p>'
+        items.append('<a class="btn" href="#kyou">今日やることへ ↓</a>')
+    items.append('<a class="btn" href="#iu">そのまま言える文へ ↓</a>')
+    return body, f'<nav class="btn-row jumps" aria-label="このページの近道">{"".join(items)}</nav>'
 
 
 # ---------------------------------------------------------------- 場面
@@ -372,13 +378,14 @@ SCENES.append(dict(
 </ul>
 <p>受付時間外は、言われたことや届いた書類を整理して、<a href="https://www.houterasu.or.jp/site/faq/sumai-kaiyakukoushin-001.html" rel="noreferrer">法テラスのよくある相談「家賃不払を理由に、部屋の明渡しを求められた」</a>を確認できます。裁判所から書類が届いている場合は、書類に書かれた期限や期日を先に確認してください。</p>
 {say("法テラスでそのまま言える文",
-     "「家族（友人）のことで電話しています。家賃を滞納していて、大家さん（管理会社・保証会社）から出ていくように言われています。収入が少ないので、無料で相談できる方法を教えてください。」")}
+     "「家族（友人）のことで電話しています。本人が、大家さん（管理会社・保証会社）から出ていくように言われています。状況に合う相談先と、無料で相談できる制度があるか教えてください。」")}
+<p class="small">家賃を滞納しているときは「家賃を滞納していて」、収入が少ないときは「収入が少なく」と、当てはまることだけを足してください。</p>
 
 <h2>市区町村の総合窓口にも早めに電話する</h2>
 <p>住み続けるにも、引っ越すにも、お金の手当てが要ります。</p>
 <p>市区町村の<b>自立相談支援機関</b>（<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">一覧</a>）は、家賃の補助（住居確保給付金）などの相談を受けています。総合窓口の受付時間内に連絡してください。法テラスの受付を待つ必要はありません。</p>
 {say("総合窓口でそのまま言える文（本人の了解を得ているとき）",
-     "「〇〇の家族（友人）です。本人の了解を得てお電話しています。家賃を滞納していて、出ていくように言われています。使える制度と、相談の予約の取り方を教えてください。」")}
+     "「〇〇の家族（友人）です。本人の了解を得てお電話しています。本人が、大家さん（管理会社・保証会社）から出ていくように言われています。使える制度と、相談の予約の取り方を教えてください。」")}
 <p class="small">本人の了解をまだ取れていないときは、「本人の了解を得て」は言わずに、<a href="{{up}}sasaeru/denwa/">「本人がその場にいないとき」の文</a>で、家族として相談してください。</p>
 
 <h2>今夜寝る場所がないとき</h2>
@@ -522,7 +529,7 @@ def hub() -> str:
   <li>ただ、手伝ったのは行政や専門の担当者です。家族が隣にいることや、このページの効果を確かめた研究ではありません。</li>
   </ul>
 </li>
-<li><b>一人で抱え込まない</b>：まとまったお金を個人的に貸すのは、なるべく避けてください。市区町村の自立相談支援機関には、家族や周りの人からの相談も受け付けると書いている自治体があります。支える人自身がつらいときも、相談してかまいません。</li>
+<li><b>一人で抱え込まない</b>：お金を援助するときも、あなた自身の生活を損なわない範囲にして、窓口への相談を並行して進めてください。市区町村の自立相談支援機関には、家族や周りの人からの相談も受け付けると書いている自治体があります。支える人自身がつらいときも、相談してかまいません。</li>
 </ol>
 {YACHIN}
 """
