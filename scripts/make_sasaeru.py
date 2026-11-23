@@ -68,7 +68,7 @@ SRC = {
     "aichiShakyo": ("愛知県社会福祉協議会：緊急小口資金のご案内（2025年7月版。条件は都道府県で違う場合があります）",
                     "https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf", "2026-11-16"),
     "tokyoShakyo": ("東京都：生活福祉資金貸付制度（2026年10月9日更新。申し込みは区市町村の社会福祉協議会）",
-                    "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi", "2026-11-16"),
+                    "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi", "2026-11-23"),
     "houterasu": ("法テラス：サポートダイヤル（受付時間・通話料・案内の範囲）",
                   "https://www.houterasu.or.jp/site/soudanmadoguchi-houseido/support-dial.html", "2026-11-17"),
     "mlit": ("国土交通省：家賃債務保証業者登録制度（2022年12月12日の最高裁判決を受けた周知）",
