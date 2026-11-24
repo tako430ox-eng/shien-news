@@ -4,8 +4,8 @@
    "name": "厚生労働省",
    "failures": 0,
    "url": "https://www.mhlw.go.jp/stf/new-info/index.html",
-   "last_ok": "2026-11-24T07:59:37+09:00",
-   "last_count": 502,
+   "last_ok": "2026-11-24T19:17:52+09:00",
+   "last_count": 505,
    "last_error": null
   },
   "cfa": {
@@ -14,14 +14,14 @@
    "url": "https://www.cfa.go.jp/news",
    "last_error": null,
    "last_fail": "2026-11-13T17:58:32+09:00",
-   "last_ok": "2026-11-24T07:59:37+09:00",
+   "last_ok": "2026-11-24T19:17:52+09:00",
    "last_count": 9
   },
   "isa": {
    "name": "出入国在留管理庁",
    "failures": 0,
    "url": "https://www.moj.go.jp/isa/publications/newslist/index.html",
-   "last_ok": "2026-11-24T07:59:37+09:00",
+   "last_ok": "2026-11-24T19:17:52+09:00",
    "last_count": 68,
    "last_error": null
   },
@@ -29,10 +29,10 @@
    "name": "デジタル庁",
    "failures": 0,
    "url": "https://www.digital.go.jp/rss/news.xml",
-   "last_ok": "2026-11-24T07:59:37+09:00",
-   "last_count": 36,
+   "last_ok": "2026-11-24T19:17:52+09:00",
+   "last_count": 31,
    "last_error": null
   }
  },
- "checked": "2026-11-24T07:59:37+09:00"
+ "checked": "2026-11-24T19:17:52+09:00"
 }
