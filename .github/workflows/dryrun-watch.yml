@@ -7,19 +7,11 @@ on:
 permissions:
   contents: read
 jobs:
-  live:
+  measure:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python .github/dryrun/measure.py live
-  wayback:
-    runs-on: ubuntu-latest
-    timeout-minutes: 50
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: python .github/dryrun/measure.py wayback
+      - run: python .github/dryrun/measure.py tokyo

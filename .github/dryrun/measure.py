@@ -73,3 +73,25 @@ else:  # wayback
             time.sleep(1)
         print("WB", url, " ".join(res))
     print("WB_TOTAL", dict(tot))
+
+if mode == "tokyo":
+    from watch_extract import _Tree
+    cfg = json.loads(cfg_path.read_text())
+    url = sys.argv[2] if len(sys.argv) > 2 else "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi"
+    page = next(p for p in cfg["pages"] if p["url"] == url)
+    runs = []
+    for i in range(4):
+        body, hd = lib.fetch(url, retries=1)
+        text = lib.decode(body, hd)
+        t = _Tree(); t.feed(text); t.close()
+        lm = [[(a.tag, a.attrs.get("id", "")) for a in reversed(list(n.ancestors()))] for n in t.nodes
+              if not n.skipped and (n.tag in {"main", "article"} or n.attrs.get("role") == "main")]
+        r = extract_html(text, url, page, cfg.get("ignore", []))
+        runs.append(r)
+        print("FETCH", i, len(body), hashlib.sha256(body).hexdigest()[:12], "layout", r["layout"][:12], "blocks", len(r["blocks"]), "chars", r["body_chars"])
+        for x in lm: print("   LM", x)
+        time.sleep(3)
+    base = Counter((b["hash"], b["text"][:150]) for b in runs[0]["blocks"])
+    for i, r in enumerate(runs[1:], 1):
+        cur = Counter((b["hash"], b["text"][:150]) for b in r["blocks"])
+        print("DIFF0-%d" % i, "added", [k[1] for k in (cur - base)][:10], "removed", [k[1] for k in (base - cur)][:10])
