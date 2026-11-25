@@ -21,10 +21,13 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lib import ROOT, decode, fetch, load_json, now_jst, save_json  # noqa: E402
+from lib import ROOT, _Walker, clean, decode, fetch, load_json, now_jst, save_json  # noqa: E402
 from watch_extract import extract_html  # noqa: E402
 
 VERSION = 2
+# 旧方式（〜2026-11）の除外語。移行の回に、旧方式の基準と同じ条件で比べるためだけに使う。
+LEGACY_IGNORE = ("閲覧数", "アクセス数", "ページ番号", r"^\d+$")
+REPORT_LIMIT = 60000  # GitHub の Issue 本文の上限（65,536文字）より小さくする
 POLICY_KEYS = ("content_selectors", "peripheral", "min_body_chars", "required_text", "format")
 
 
@@ -122,6 +125,29 @@ def describe_change(old: dict, new: dict, blocks: list[dict]) -> dict | None:
             "zones": sorted(zones)}
 
 
+def legacy_change(st: dict, body: bytes, headers: dict) -> dict | None:
+    """旧方式の基準（本文行のハッシュ）と、今回の取得を旧方式で比べる。
+
+    前回の確認から変わっていなければ、移行だけを理由に通知しない。変わっていれば、
+    旧方式が出していたのと同じ「新しく出てきた行」を示して通知する。
+    """
+    try:
+        walker = _Walker()
+        walker.feed(decode(body, headers))
+        pats = [re.compile(p) for p in LEGACY_IGNORE]
+        lines = [s for s in (clean(t["text"]) for t in walker.tokens)
+                 if len(s) >= 2 and not any(p.search(s) for p in pats)]
+    except Exception:  # noqa: BLE001
+        return {"type": "review", "reason": "baseline_migration"}
+    if hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest() == st["digest"]:
+        return None
+    old = set(st.get("lines") or [])
+    keys = [hashlib.sha1(line.encode("utf-8")).hexdigest()[:10] for line in lines]
+    added = [line for line, key in zip(lines, keys) if key not in old]
+    return {"type": "changed", "change": "legacy", "added": [line[:120] for line in added[:15]],
+            "added_count": len(added), "removed": len(old - set(keys)) if old else 0}
+
+
 def review_reason(old: dict, new: dict) -> str | None:
     if not isinstance(old, dict):
         return "invalid_state"
@@ -203,6 +229,8 @@ def run(cfg_path: Path, state_path: Path, report_path: Path, *, accept_baselines
                         # 旧PDFは同じバイトハッシュで比較可能。旧HTMLは構造/リンクの記録がなく比較不能。
                         if new["kind"] == "pdf" and not st.get("lines"):
                             change = describe_change({"digest": st["digest"]}, new, blocks)
+                        elif new["kind"] == "html" and st.get("lines") is not None:
+                            change = legacy_change(st, body, headers)
                         else:
                             change = {"type": "review", "reason": "baseline_migration"}
                     if change:
@@ -245,37 +273,59 @@ def render(changes: list[dict], cfg: dict) -> str:
            f"対象：{quote(cfg.get('used_by', ''), 400)}", ""]
     labels = {"added": "追加", "removed": "削除", "modified": "追加と削除（書き換えを含む）", "reordered": "並べ替え（順序のみ）"}
     zones = {"body": "本文", "outer": "本文外の未除外情報", "peripheral": "関連欄の未確認情報"}
+    footer = ["本文外も原則として監視します。設定で範囲・リンク先・見出しを確認した周辺リンクだけを通知から除外します。",
+              "リンク先URLの変更は検知します。同じURLのPDFの中身を見張るには、そのPDF自体をconfig/watch.jsonに登録してください。",
+              "構造・設定の変化を確認して基準を更新するときは、docs/watch-design.md の --accept-baseline の手順を使ってください。",
+              "公式ページと照合して必要な文面や確認日を更新した後、Issueを閉じてください。"]
+    budget = REPORT_LIMIT - sum(len(x) + 1 for x in out + footer) - 2000
     for c in changes:
-        out += [f"### {quote(c['what'])}", f"- {c['url']}"]
-        if c["type"] == "changed":
-            if c["change"] == "pdf_binary":
-                out.append("- PDFのバイト列が変わりました。本文・画像・メタデータのどれが変わったかは解析していません。PDFを開いて確認してください。")
-            else:
-                out.append(f"- {labels[c['change']]}：追加 {c['added_count']} ブロック、削除 {c['removed']} ブロック。")
-                if c.get("zones"):
-                    out.append("- 範囲：" + "、".join(zones[z] for z in c["zones"]))
-                if c["change"] == "reordered":
-                    out.append("- ブロックの内容と個数は同じです。順番による条件・金額の対応の変化があり得るため通知しています。")
-                if c["added"]:
-                    out.append("- 今回の追加ブロック（最大15件、各120文字。比較用に表記を正規化）：")
-                    out += [f"  - {quote(line)}" for line in c["added"]]
-                if c["removed"]:
-                    out.append("- 旧本文は保存していないため、削除された文そのものは復元できません。以下は削除候補の旧位置と照合できた現在の見出しです（最大15件。同一ブロックが重複する場合、位置は一意に決まりません）。")
-                    out += [f"  - 旧位置 {d['position']}、見出し {quote(d['section'])}、照合ID {d['hash']}" for d in c["removed_details"]]
-        elif c["type"] == "unreachable":
-            out += [f"- 開けませんでした（{c['since']} から）：{quote(c['error'], 200)}",
-                    "- 最後の正常な基準を保持しています。継続する場合は移動・削除を確認してください。"]
-        elif c["type"] == "inspection_error":
-            out += [f"- 取得内容を安全に比較できません：{quote(c['error'], 200)}",
-                    "- 最後の正常な基準を保持しています。本文が空・範囲が不明な状態を無変化とは扱いません。"]
-        else:
-            out.append("- " + REASONS[c["reason"]])
-        out.append("")
-    out += ["本文外も原則として監視します。設定で範囲・リンク先・見出しを確認した周辺リンクだけを通知から除外します。",
-            "リンク先URLの変更は検知します。同じURLのPDFの中身を見張るには、そのPDF自体をconfig/watch.jsonに登録してください。",
-            "構造・設定の変化を確認して基準を更新するときは、docs/watch-design.md の --accept-baseline の手順を使ってください。",
-            "公式ページと照合して必要な文面や確認日を更新した後、Issueを閉じてください。"]
+        section = render_change(c, labels, zones)
+        size = sum(len(x) + 1 for x in section)
+        if size > budget:
+            # Issue が上限で作れず知らせが消えるのを防ぐ。ページ名とURLだけは必ず残す。
+            section = [f"### {quote(c['what'])}", f"- {c['url']}",
+                       "- 知らせが長いため詳細を省きました。公式ページを開いて確認してください。", ""]
+            size = sum(len(x) + 1 for x in section)
+        budget -= size
+        out += section
+    out += footer
     return "\n".join(out) + "\n"
+
+
+def render_change(c: dict, labels: dict, zones: dict) -> list[str]:
+    out = [f"### {quote(c['what'])}", f"- {c['url']}"]
+    if c["type"] == "changed":
+        if c["change"] == "legacy":
+            out.append(f"- 新しい比較方式へ移る回です。前回の確認からの変化を旧方式（本文の行だけを比べる）で調べました：新しく出てきた行 {c['added_count']}、消えた行 {c['removed']}。次回から新方式で比べます。")
+            if c["added"]:
+                out.append("- 新しく出てきた行（最大15行、各120文字）：")
+                out += [f"  - {quote(line)}" for line in c["added"]]
+            else:
+                out.append("- 新しく出てきた行はなく、削除または並べ替えだけです。旧本文は保存していないので、消えた文そのものは示せません。")
+        elif c["change"] == "pdf_binary":
+            out.append("- PDFのバイト列が変わりました。本文・画像・メタデータのどれが変わったかは解析していません。PDFを開いて確認してください。")
+        else:
+            out.append(f"- {labels[c['change']]}：追加 {c['added_count']} ブロック、削除 {c['removed']} ブロック。")
+            if c.get("zones"):
+                out.append("- 範囲：" + "、".join(zones[z] for z in c["zones"]))
+            if c["change"] == "reordered":
+                out.append("- ブロックの内容と個数は同じです。順番による条件・金額の対応の変化があり得るため通知しています。")
+            if c["added"]:
+                out.append("- 今回の追加ブロック（最大15件、各120文字。比較用に表記を正規化）：")
+                out += [f"  - {quote(line)}" for line in c["added"]]
+            if c["removed"]:
+                out.append("- 旧本文は保存していないため、削除された文そのものは復元できません。以下は削除候補の旧位置と照合できた現在の見出しです（最大15件。同一ブロックが重複する場合、位置は一意に決まりません）。")
+                out += [f"  - 旧位置 {d['position']}、見出し {quote(d['section'])}、照合ID {d['hash']}" for d in c["removed_details"]]
+    elif c["type"] == "unreachable":
+        out += [f"- 開けませんでした（{c['since']} から）：{quote(c['error'], 200)}",
+                "- 最後の正常な基準を保持しています。継続する場合は移動・削除を確認してください。"]
+    elif c["type"] == "inspection_error":
+        out += [f"- 取得内容を安全に比較できません：{quote(c['error'], 200)}",
+                "- 最後の正常な基準を保持しています。本文が空・範囲が不明な状態を無変化とは扱いません。"]
+    else:
+        out.append("- " + REASONS[c["reason"]])
+    out.append("")
+    return out
 
 
 def main():

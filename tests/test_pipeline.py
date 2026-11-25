@@ -2,6 +2,7 @@
 
 実行: python -m unittest discover -s tests -v
 """
+import hashlib
 import http.server
 import json
 import os
@@ -1005,10 +1006,47 @@ class TestWatch(unittest.TestCase):
         self.check(self.html("<p>申請できます。</p>"))
         self.review_preserves(b"%PDF-1.4\nreplacement bytes\n%%EOF", headers={"Content-Type": "application/pdf"})
 
-    def test_legacy_hash_state_migrates_once_with_explicit_notice(self):
+    def legacy_state(self, source):
+        """旧 watch.py（2026-11-25 まで）と同じ計算で作った旧状態。"""
+        walker = lib._Walker()
+        walker.feed(source)
+        lines = [t for t in (lib.clean(x["text"]) for x in walker.tokens)
+                 if len(t) >= 2 and not any(re.search(p, t) for p in ("閲覧数", "アクセス数", "ページ番号", r"^\d+$"))]
+        return {"digest": hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest(),
+                "lines": [hashlib.sha1(t.encode("utf-8")).hexdigest()[:10] for t in lines],
+                "first_seen": "2026-11-23T09:00:00+09:00"}
+
+    def test_legacy_state_changed_since_last_check_is_reported_with_new_lines(self):
+        lib.save_json(self.state_path, {"pages": {self.URL: self.legacy_state(
+            self.html("<p>申請できます。</p>"))}})
+        source = self.html("<p>申請できます。</p><p>上限額は月5万円です。</p>")
+        item = self.changed(self.check(source), "legacy")
+        self.assertEqual(item["added"], ["上限額は月5万円です。"])
+        self.assertIn("上限額は月5万円です。", self.report_path.read_text(encoding="utf-8"))
+        self.assertEqual(self.state()["first_seen"], "2026-11-23T09:00:00+09:00")
+        self.assertEqual(self.state()["snapshot"]["version"], 2)
+        self.assertNotIn("lines", self.state())
+        self.assertEqual(self.check(source), [])
+
+    def test_legacy_state_unchanged_since_last_check_migrates_silently(self):
+        source = self.html("<p>申請できます。</p>", outside="<footer><a href='/x'>サイトマップ</a></footer>")
+        lib.save_json(self.state_path, {"pages": {self.URL: self.legacy_state(source)}})
+        self.assertEqual(self.check(source), [])
+        self.assertFalse(self.report_path.exists())
+        self.assertEqual(self.state()["snapshot"]["version"], 2)
+        self.assertNotIn("digest", self.state())
+        # 移行後は新方式で、旧方式が見ていなかったリンク先の変更も知らせる。
+        self.changed(self.check(source.replace("/x", "/y")))
+
+    def test_legacy_state_removed_line_only_is_reported(self):
+        lib.save_json(self.state_path, {"pages": {self.URL: self.legacy_state(
+            self.html("<p>申請できます。</p><p>窓口は区役所です。</p>"))}})
+        item = self.changed(self.check(self.html("<p>申請できます。</p>")), "legacy")
+        self.assertEqual((item["added"], item["removed"]), ([], 1))
+
+    def test_unparseable_legacy_hash_state_migrates_once_with_explicit_notice(self):
         lib.save_json(self.state_path, {"pages": {self.URL: {
-            "digest": "a" * 64, "lines": ["b" * 10],
-            "first_seen": "2026-11-23T09:00:00+09:00",
+            "digest": "a" * 64, "first_seen": "2026-11-23T09:00:00+09:00",
         }}})
         source = self.html("<p>申請できます。</p>")
         changes = self.check(source)
@@ -1018,6 +1056,17 @@ class TestWatch(unittest.TestCase):
         self.assertEqual(self.state()["first_seen"], "2026-11-23T09:00:00+09:00")
         self.assertEqual(self.state()["snapshot"]["version"], 2)
         self.assertEqual(self.check(source), [])
+
+    def test_report_stays_under_issue_body_limit_and_names_every_page(self):
+        changes = [{"type": "changed", "change": "modified", "url": f"https://example.go.jp/{i}",
+                    "what": f"架空の出典{i}", "added_count": 15, "removed": 15, "zones": ["body"],
+                    "added": ["あ" * 120] * 15,
+                    "removed_details": [{"position": 1, "section": "い" * 120, "hash": "0" * 12}] * 15}
+                   for i in range(80)]
+        text = watch.render(changes, self.cfg)
+        self.assertLess(len(text), 65536)
+        for i in range(80):
+            self.assertIn(f"https://example.go.jp/{i}\n", text)
 
     def test_policy_change_preserves_baseline_until_explicit_acceptance(self):
         source = self.html("<p>申請できます。</p>")
