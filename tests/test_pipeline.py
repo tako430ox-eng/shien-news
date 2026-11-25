@@ -636,6 +636,70 @@ class TestEndToEnd(unittest.TestCase):
         self.assertNotIn('"onmouseover="', index)
 
 
+class TestNoticeDisplayPeriod(unittest.TestCase):
+    obon = "https://www.moj.go.jp/isa/publications/materials/2026obon.html"
+    # 次年度版と相談案内は、同じ情報源・分野・掲載日の架空の対照記事。
+    next_year = obon.replace("2026obon", "2027obon")
+    guide = "https://www.moj.go.jp/isa/test-guide.html"
+
+    def setUp(self):
+        self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.sources = self.tmp / "sources.json"
+        lib.save_json(self.sources, {"sources": [SOURCES["isa"]]})
+        self.rows = [
+            {"url": self.obon, "title": "2026年お盆期間における開閉庁日案内", "date": "2026-08-07"},
+            {"url": self.next_year, "title": "2027年お盆期間における開閉庁日案内", "date": "2026-08-07"},
+            {"url": self.guide, "title": "在留手続の相談窓口のご案内", "date": "2026-08-07"},
+        ]
+        self.enterContext(patch.dict(os.environ, SHIEN_SLEEP="0", SHIEN_SOURCE_OVERRIDE="{}"))
+
+    def collect_at(self, when, rows):
+        with patch.object(update, "now_jst", return_value=when), patch.object(update, "collect", return_value=rows):
+            result = update.run(self.sources, self.tmp)
+        self.assertTrue(result["sources"]["isa"]["ok"], result)
+        return result["new"]
+
+    def site_at(self, when):
+        with patch.object(build, "now_jst", return_value=when):
+            return build.Site(self.tmp)
+
+    def test_rebuild_across_last_day_without_refetch(self):
+        last_minute = datetime(2026, 8, 22, 23, 59, 59, tzinfo=lib.JST)
+        midnight = datetime(2026, 8, 23, tzinfo=lib.JST)
+        self.collect_at(last_minute, self.rows)
+        before = (self.tmp / "items.json").read_bytes()
+        self.assertIn(self.obon, [i["url"] for i in self.site_at(last_minute).useful])
+        self.assertCountEqual([i["url"] for i in self.site_at(midnight).useful], [self.next_year, self.guide])
+        self.assertEqual((self.tmp / "items.json").read_bytes(), before)
+
+    def test_refetch_and_cached_notice_stay_out_of_public_outputs(self):
+        now = datetime(2026, 11, 22, 7, 49, tzinfo=lib.JST)
+        # 空の取得データから始め、同じ記事の再取得、公式一覧から消えた後の再分類も通す。
+        first_id = None
+        for rows, expected_new in [(self.rows, 3), (self.rows, 0), (self.rows[1:], 0)]:
+            with self.subTest(fetched=len(rows), expected_new=expected_new):
+                self.assertEqual(self.collect_at(now, rows), expected_new)
+                site = self.site_at(now)
+                raw = next(i for i in site.store["items"] if i["url"] == self.obon)
+                # 新着の識別の変更（告知ID）後も、再取得・一覧から消えた後で同じ記事のIDが変わらない。
+                first_id = first_id or raw["id"]
+                self.assertEqual(raw["id"], first_id)
+                self.assertEqual(raw["publish"], "auto")
+                self.assertFalse(raw["excluded"])
+                self.assertCountEqual([i["url"] for i in site.items], [self.next_year, self.guide])
+
+        out = self.tmp / "site"
+        self.site_at(now).build(out)
+        for path in ("index.html", "t/foreign.html", "feed.xml"):
+            with self.subTest(path=path):
+                content = (out / path).read_text(encoding="utf-8")
+                self.assertNotIn(self.obon, content)
+                self.assertIn(self.next_year, content)
+                self.assertIn(self.guide, content)
+        public_items = lib.load_json(out / "items.json", {})["items"]
+        self.assertCountEqual([i["url"] for i in public_items], [self.next_year, self.guide])
+
+
 class TestWatch(unittest.TestCase):
     def test_detects_change_and_unreachable(self):
         os.environ["SHIEN_SLEEP"] = "0"

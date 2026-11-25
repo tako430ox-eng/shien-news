@@ -178,7 +178,13 @@ class Site:
         self.topics = {t["slug"]: t for t in self.rules["topics"]}
         self.kinds = {k["id"]: k for k in self.rules["kinds"]}
         self.kinds[self.rules["default_kind"]["id"]] = self.rules["default_kind"]
-        self.items = [it for it in self.store["items"] if visible(it)]
+        self.built = now_jst()
+        # 公式資料で対象期間を確認した記事だけ、最終日の翌日（日本時間）から掲載を終える。
+        expired_urls = {
+            url for url, period in self.rules.get("reviewed_notice_periods", {}).items()
+            if date.fromisoformat(period["last_day"]) < self.built.date()
+        }
+        self.items = [it for it in self.store["items"] if visible(it) and it["url"] not in expired_urls]
         talk_kinds = {k["id"] for k in self.rules["kinds"] if k.get("group") == "talk"}
         useful_kinds = set(self.rules.get("useful_kinds", []))
         # 3つに分ける。暮らしに役立つお知らせ（制度の変更・募集/申請・相談窓口・注意）、
@@ -190,7 +196,6 @@ class Site:
         self.useful = [it for it in self.items if it["kind"] in useful_kinds]
         self.talk = [it for it in self.items if it["kind"] in talk_kinds]
         self.other = [it for it in self.items if it["kind"] not in useful_kinds and it["kind"] not in talk_kinds]
-        self.built = now_jst()
         oks = [h.get("last_ok") for h in self.health.get("sources", {}).values() if h.get("last_ok")]
         # 「最後に情報源から実際に取れた時刻」。ページを作り直しただけでは新しくならない
         self.fresh = max(oks) if oks else ""
