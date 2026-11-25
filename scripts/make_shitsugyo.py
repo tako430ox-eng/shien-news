@@ -25,7 +25,7 @@ OUT = ROOT / "pages" / "shitsugyo"
 BASE = "https://tako430ox-eng.github.io/shien-news/"
 PATH = "shitsugyo/"
 UPDATED = "2026年11月18日"
-REVISED = "2026年11月21日"  # 再確認（2026-11-21）で、窓口の探し方と市区町村の入力を足した。 外部点検（2026-11-19 公開版レビュー）の指摘で、国保の軽減・住居確保給付金の2年・任意継続の期限判定・相談先へのリンク・職業訓練の出席・すぐ働けないとき・離職票の案内を直した
+REVISED = "2026年11月25日"  # 市区町村名だけで相談窓口を探せるようにした。
 
 # ---------------------------------------------------------------- 出典
 # (名前, URL, 確かめた日)。名前の中の更新日は、そのページに書いてあったもの。
@@ -77,11 +77,15 @@ SRC = {
     "hogoSeido": ("厚生労働省：生活保護制度",
                   "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html", "2026-11-17"),
     "hogoApply": ("厚生労働省：生活保護を申請したい方へ",
-                  "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html", "2026-11-16"),
+                  "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html", "2026-11-25"),
     "konkyu": ("厚生労働省：生活困窮者自立支援制度",
                "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html", "2026-11-16"),
+    "localSites": ("地方公共団体情報システム機構：全国自治体マップ検索（市区町村の公式サイト）",
+                   "https://www.j-lis.go.jp/spd/map-search/cms_1069.html", "2026-11-25"),
+    "areaExample": ("埼玉県：福祉事務所等一覧（生活保護法。町村を担当する県の窓口の例）",
+                    "https://www.pref.saitama.lg.jp/a0602/seihozenpan/910-20091208-75.html", "2026-11-25"),
     "ichiran": ("自立相談支援機関 相談窓口一覧（生活困窮者支援情報共有サイト）",
-                "https://minna-tunagaru.jp/ichiran/", "2026-11-12"),
+                "https://minna-tunagaru.jp/ichiran/", "2026-11-25"),
     "jukyo": ("厚生労働省：住居確保給付金（家賃補助）の制度概要",
               "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html", "2026-11-16"),
     "jukyoKisoku": ("厚生労働省：生活困窮者自立支援法施行規則 第10条（離職・廃業から2年。病気・けが・育児などで30日以上求職活動ができなかった日数を足す。最長4年）",
@@ -143,8 +147,8 @@ def more(summary: str, body: str, did: str = "") -> str:
 # ---------------------------------------------------------------- 本文
 SAFETY = """<div class="notice">
 <p class="notice-h">今夜寝る場所がない、今日食べるものやお金がないとき</p>
-<p>この先の手続きより先に、いま居る場所の市区町村の<b>福祉事務所</b>（役所の生活保護の窓口）に、そのことを伝えてください。住むところがなくても、生活保護は申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
-<p>探し方：<a href="#city">下の欄に市区町村名を入れる</a>と、福祉事務所を探す検索のボタンが出ます。<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>もあります。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
+<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）に、今日困っていることを伝えてください。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
+<p>探し方：<a href="#city">市区町村名を入力する</a>と、その下に「生活保護の相談窓口を探す」ボタンが出ます。ほかの質問は飛ばせます。<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>もあります。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
 <p class="notice-h">命の危険があるとき</p>
 <ul>
 <li>命の危険があるとき：<a href="tel:119">119番</a>・<a href="tel:110">110番</a></li>
@@ -156,7 +160,7 @@ SAFETY = """<div class="notice">
 TOOL = (
     '<section id="tool" class="choose stack" aria-labelledby="tool-h">\n'
     '<h2 id="tool-h">あなたの場合を選ぶ（どれも任意）</h2>\n'
-    '<p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。選んだ内容はこの画面の中だけで使い、どこにも送らず、保存もしません。</p>\n'
+    '<p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。質問の回答と退職日はこの画面の中だけで使い、保存しません。</p>\n'
     + radio("why", [("company", "会社の都合（解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた）"),
                     ("self", "自分から辞めた"),
                     ("notyet", "まだ辞めていない（辞めるように言われている）"),
@@ -171,7 +175,35 @@ TOOL = (
     + radio("money", [("short", "家賃や今月の生活費が足りない・足りなくなりそう"),
                       ("ok", "しばらくは暮らせる")], "4. お金")
     + '<div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>\n'
-    '<div class="field"><label for="city">6. 住んでいる市区町村（窓口を探す検索のボタンを出すときだけ）</label><input type="text" id="city" autocomplete="address-level2" placeholder="例：横浜市"></div>\n'
+    """<div class="field">
+  <label for="city">6. 窓口を探す市区町村（任意）</label>
+  <div id="cityHint">
+    <p class="small">お住まいの市区町村を入力します。住むところがなくて生活保護を相談するときは、今いる市区町村を入力してください。区は「東京都中央区」「福岡市中央区」のように。番地や氏名は不要です。</p>
+    <p class="small">検索ボタンを押すと、市区町村名と選んだ用件がGoogleに送られます。</p>
+  </div>
+  <input type="text" id="city" aria-describedby="cityHint" autocomplete="off" maxlength="60" placeholder="例：埼玉県小川町">
+</div>
+<noscript><p>市区町村名からの検索にはJavaScriptが必要です。下の「検索で見つからないとき」から役所を探せます。</p></noscript>
+<div id="officeSearch" class="stack" hidden>
+  <h3><span id="officeCity"></span>の窓口をGoogleで探す</h3>
+  <div class="btn-row"><a class="btn" id="officeHogo" data-office-query="生活保護 相談窓口 電話">生活保護の相談窓口を探す</a></div>
+  <p class="small">検索結果では広告を飛ばし、自治体の案内で地域名・相談内容・担当の電話番号を確かめます。年金は日本年金機構の案内も使えます。</p>
+  <details class="more" id="officeMore"><summary>生活費・国保・年金の窓口を探す</summary>
+    <div class="more-body">
+      <a class="btn" id="officeJiritsu" data-office-query="生活困窮 自立相談 窓口 電話">生活費や仕事の相談</a>
+      <a class="btn" id="officeKokuho" data-office-query="国民健康保険 退職 加入 窓口">退職後の国民健康保険</a>
+      <a class="btn" id="officeNenkin" data-office-query="国民年金 窓口">国民年金の切り替え・免除</a>
+    </div>
+  </details>
+</div>
+<details class="more"><summary>検索で見つからないとき</summary>
+  <div class="more-body">
+    <p><a href="https://www.j-lis.go.jp/spd/map-search/cms_1069.html" rel="noopener">全国の役所の公式サイトから選ぶ</a> → 都道府県 → 市区町村。代表番号に「生活保護の相談です」「退職後の国保のことです」など、用件を一つ伝えてください。</p>
+    <p>町村では、都道府県の窓口が担当することもあります。「担当町村」「所管区域」に自分の町村名があるかを見てください。窓口の住所が別の市町にあることもあります。</p>
+    <p>生活費に困っているときは、<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">都道府県別の自立相談窓口一覧</a>でも探せます。自治体が案内する社会福祉協議会なども相談先です。</p>
+  </div>
+</details>
+"""
     '<div id="todayOut" class="today stack" aria-live="polite">'
     '<h3>今日やること</h3>'
     '<p>会社の健康保険に入っていた人は、退職後の健康保険を、国民健康保険・任意継続・家族の扶養から選びます。期限は<b>退職日の翌日から14日・20日</b>です。'
@@ -482,14 +514,14 @@ SCRIPT = r"""<script>
     var list = [], keys = [];
     function add(x, k) { list.push(x); keys.push(k); }
     if (a.money === "short") add(jiritsu, "jiritsu");
-    if (a.kenpo === "company") { add(choose, "yakusho"); add(nenkin, "yakusho"); }
+    if (a.kenpo === "company") { add(choose, "kokuho"); add(nenkin, "nenkin"); }
     else if (a.kenpo !== "kokuho" && a.kenpo !== "family") add(check, "");
     if (a.ins === "no") add(kyu, "kyu"); else add(hw, "hw");
     if (a.kenpo === "company") {
-      if (a.why === "company") add("国民健康保険の窓口で、会社の都合で辞めた人の保険料の軽減を入れた額を聞き、任意継続と比べる", "yakusho");
-      else if (a.why === "self" || a.why === "unknown" || !a.why) add("病気・けが・家族の看護など、やむを得ない事情で辞めたときは、自分から辞めても国民健康保険料が軽くなる場合がある。当てはまるかは離職理由の判定で決まるので、国民健康保険の窓口で軽減を入れた額を聞き、任意継続と比べる", "yakusho");
+      if (a.why === "company") add("国民健康保険の窓口で、会社の都合で辞めた人の保険料の軽減を入れた額を聞き、任意継続と比べる", "kokuho");
+      else if (a.why === "self" || a.why === "unknown" || !a.why) add("病気・けが・家族の看護など、やむを得ない事情で辞めたときは、自分から辞めても国民健康保険料が軽くなる場合がある。当てはまるかは離職理由の判定で決まるので、国民健康保険の窓口で軽減を入れた額を聞き、任意継続と比べる", "kokuho");
     }
-    if (a.why === "company" || a.money === "short") add(menjo, "yakusho");
+    if (a.why === "company" || a.money === "short") add(menjo, "nenkin");
     t.today = list[0];
     t.next = list.slice(1);
     t.keys = keys;
@@ -514,23 +546,37 @@ SCRIPT = r"""<script>
   };
   var LINKS = {
     jiritsu: [FIND.jiritsu, ["#say_jiritsu_d", "電話で言う文"]],
-    yakusho: [["#say_yakusho_d", "役所で言う文"]],
+    kokuho: [["#say_yakusho_d", "役所で言う文"]],
+    nenkin: [["#say_yakusho_d", "役所で言う文"]],
     hw: [FIND.hw, ["#say_hw_d", "ハローワークで言う文"], ["#say_kaisha_d", "会社に言う文（離職票が届かないとき）"]],
     kyu: [FIND.hw, ["#kyushoku", "求職者支援制度の説明"]],
     corner: [FIND.corner]
   };
-  // 市区町村名を入れたときだけ出す検索のボタン（押すと Google の検索が開く。入れた名前はこのページからは送らない）
-  var SEARCH = { jiritsu: ["自立相談支援機関", "福祉事務所 生活保護"], yakusho: ["国民健康保険 窓口", "国民年金 窓口"], hw: [], kyu: [], corner: [] };
-  var city = "", searched = {};
-  function links(k, big) {
+  var OFFICE_JUMPS = {
+    jiritsu: ["#officeJiritsu", "生活費の相談窓口を探す"],
+    kokuho: ["#officeKokuho", "国保の窓口を探す"],
+    nenkin: ["#officeNenkin", "年金の窓口を探す"]
+  };
+  function updateOfficeSearch(city) {
+    $("officeCity").textContent = city;
+    $("officeSearch").hidden = !city;
+    if (!city) $("officeMore").open = false;
+    document.querySelectorAll("[data-office-query]").forEach(function (link) {
+      if (city) {
+        var query = new URLSearchParams({q: city + " " + link.dataset.officeQuery});
+        link.href = "https://www.google.com/search?" + query.toString();
+      } else {
+        link.removeAttribute("href");
+      }
+    });
+  }
+  function links(k, big, seen) {
     var l = LINKS[k];
     if (!l) return "";
-    // 検索のボタンは、同じ窓口について最初の1回だけ出す
-    var add = city && SEARCH[k] && !searched[k] ? SEARCH[k] : [];
-    if (add.length) searched[k] = true;
-    l = l.concat(add.map(function (t) {
-      return ["https://www.google.com/search?q=" + encodeURIComponent(city + " " + t), "検索：" + city + " " + t];
-    }));
+    if (seen && OFFICE_JUMPS[k] && !seen[k]) {
+      l = l.concat([OFFICE_JUMPS[k]]);
+      seen[k] = true;
+    }
     return "<span class=\"" + (big ? "act-links" : "act-links small") + "\">" + l.map(function (x) {
       var ext = x[0].charAt(0) !== "#";
       return "<a href=\"" + esc(x[0]) + "\"" + (ext ? " rel=\"noopener\"" : "") + ">" + esc(x[1]) + "</a>";
@@ -539,18 +585,25 @@ SCRIPT = r"""<script>
 
   function render() {
     var a = read();
-    city = $("city").value.trim().slice(0, 30);
-    searched = {};
+    var city = $("city").value.trim();
+    updateOfficeSearch(city);
+    var seen = city ? {} : null;
     var leave = parseDate($("leave").value);
     var today = todayJst();
-    var any = a.why || a.ins || a.kenpo || a.money || leave || city;
-    $("toolBtns").hidden = !any;
-    if (!any) return;
+    var any = a.why || a.ins || a.kenpo || a.money || leave;
+    $("toolBtns").hidden = !any && !city;
+    if (!any) {
+      if ($("todayOut").innerHTML !== DEFAULT_TODAY) $("todayOut").innerHTML = DEFAULT_TODAY;
+      $("datesOut").innerHTML = "";
+      return;
+    }
     var p = plan(a, leave, today);
-    var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>" + links(p.keys[0], true);
-    if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x, i) { return "<li>" + esc(x) + links(p.keys[i + 1], false) + "</li>"; }).join("") + "</ol>";
+    var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>" + links(p.keys[0], true, seen);
+    if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x, i) { return "<li>" + esc(x) + links(p.keys[i + 1], false, seen) + "</li>"; }).join("") + "</ol>";
     h += "<p class=\"small\">病気・けが・出産・育児などで、すぐ働けないときは：<a href=\"#hatarakenai\">" + (a.ins === "no" ? "傷病手当金など" : "受け取れる期間の延長と、傷病手当金") + "</a></p>";
-    if (!city && (p.keys.indexOf("jiritsu") >= 0 || p.keys.indexOf("yakusho") >= 0)) h += "<p class=\"small\">6 の欄に市区町村名を入れると、窓口を探す検索のボタンが出ます。</p>";
+    if (!city && p.keys.some(function (key) { return OFFICE_JUMPS[key]; })) {
+      h += '<p class="small"><a href="#city">市区町村名を入力</a>すると、地域の窓口を探せます。</p>';
+    }
     $("todayOut").innerHTML = h;
     var ds = deadlines(a, leave);
     if (!ds.length) { $("datesOut").innerHTML = leave ? "" : "<p class=\"small\">退職日を入れると、期限の日付が出ます。</p>"; return; }
@@ -662,11 +715,10 @@ SCRIPT = r"""<script>
     QS.forEach(function (n) { $("qd_" + n).open = false; });
     updateSummaries();
     openFirstUnanswered();
-    $("todayOut").innerHTML = DEFAULT_TODAY;
-    $("datesOut").innerHTML = "";
-    $("toolBtns").hidden = true;
+    render();
     $("status").textContent = "選んだ内容を消しました。";
   });
+  render();
 })();
 </script>"""
 
