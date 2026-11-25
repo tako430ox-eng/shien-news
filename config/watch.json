@@ -1,5 +1,5 @@
 {
- "_説明": "行動支援の試作（家賃の次の一歩）が出典にしている公式ページ。内容が変わったら、人が試作の文面を見直すために知らせる。公開はしない（変化の検知だけ）。ignore は毎回変わってしまう部分（アクセス数など）を無視する正規表現。 法テラスのトップページ（https://www.houterasu.or.jp/）は、お知らせ・イベントの入れ替わりで毎週のように変わり、サイトはそこから事実を引いていない（運営者ページの案内リンクだけ）ので、2026-11-17 に見張りから外した。電話番号・受付時間などの根拠はサポートダイヤルのページで見張る。",
+ "_説明": "出典の本文・本文外を監視し、人が制度の記述を見直すために知らせる。標準ライブラリのみ。本文/見出しは保存せず、ブロックのハッシュ・順序・個数だけを保存。本文は数字1桁やリンク先も含めて比較する。本文範囲の未設定ページは文書全体を本文として保守的に監視する。ignore は本文外に限り全文一致するメタデータだけに適用。周辺欄の無条件除外はしない。法テラスのトップは2026-11-17に監視から除外し、根拠となるサポートダイヤルの監視を継続。詳細はdocs/watch-design.md。",
  "used_by": "pages/yachin/index.html, pages/sasaeru/（scripts/make_sasaeru.py）, pages/shitsugyo/（scripts/make_shitsugyo.py）",
  "pages": [
   {
@@ -48,7 +48,8 @@
   },
   {
    "url": "https://www.fukushi.metro.tokyo.lg.jp/ja/seikatsu/seikatusikinn_fukushi",
-   "what": "生活福祉資金（東京都）"
+   "what": "生活福祉資金（東京都）",
+   "_監視範囲の根拠": "2026-11-25のraw HTML取得は403。11月23日の差分は旧本文未保存のため不明。セレクタを推測で設定せず、文書全体を監視する。"
   },
   {
    "url": "https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf",
@@ -72,7 +73,38 @@
   },
   {
    "url": "https://www.city.ota.tokyo.jp/seikatsu/fukushi/jyuutaku-kakuho-kyuufu-kin.html",
-   "what": "住居確保給付金（大田区）"
+   "what": "住居確保給付金（大田区）",
+   "content_selectors": [
+    "#h1-zone",
+    "#main"
+   ],
+   "min_body_chars": 500,
+   "required_text": [
+    "住居確保給付金",
+    "支給対象となる方",
+    "申請",
+    "JOBOTA"
+   ],
+   "peripheral": [
+    {
+     "selector": "#losubnaviinfo01",
+     "known_links": [
+      {
+       "href": "https://www.city.ota.tokyo.jp/oshirase/mokutekibetsu/fukushi/iten_hokatsunishikamata.html",
+       "text_pattern": "地域包括支援センター西蒲田を移転します。"
+      },
+      {
+       "href": "https://www.city.ota.tokyo.jp/seikatsu/fukushi/kouryucenter/gaiyou/nennkannyotei.html",
+       "text_pattern": "【令和[0-9]+年[0-9]+月[0-9]+日更新】大田区福祉人材育成・交流センター年間予定表"
+      },
+      {
+       "href": "https://www.city.ota.tokyo.jp/seikatsu/fukushi/kourei/kaigo-syuusyoku-setumeikai.html",
+       "text_pattern": "「第[0-9]+回おおた介護のお仕事相談・面接会」の実施について"
+      }
+     ]
+    }
+   ],
+   "_監視範囲の根拠": "2026-11-25取得HTMLで各IDの一意性、本文の条件・金額・連絡先を確認。関連欄の上記3リンクのみ、URLと見出し全文が一致する場合に通知を抑える。未知のリンク、本文に移ったリンク、見出し変更や構造異常は通知する。"
   },
   {
    "url": "https://www.city.setagaya.lg.jp/02409/1025.html",
@@ -192,9 +224,6 @@
   }
  ],
  "ignore": [
-  "閲覧数",
-  "アクセス数",
-  "ページ番号",
-  "^\\d+$"
+  "^(?:閲覧数|アクセス数|ページ番号)\\s*[:：]?\\s*[0-9,]+(?:\\s*(?:回|件))?$"
  ]
 }

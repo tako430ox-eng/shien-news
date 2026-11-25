@@ -701,6 +701,75 @@ class TestNoticeDisplayPeriod(unittest.TestCase):
 
 
 class TestWatch(unittest.TestCase):
+    """実ページの転載を使わず、架空の小さなHTML/PDFとモック取得で監視を検証する。"""
+
+    NOW = datetime.fromisoformat("2026-11-25T09:00:00+09:00")
+    URL = "https://example.go.jp/support"
+    KNOWN_TEXT = "地域包括支援センター西蒲田を移転します。"
+    KNOWN_HREF = "https://example.go.jp/unrelated"
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.tmp = Path(temp.name)
+        self.config_path = self.tmp / "watch.json"
+        self.state_path = self.tmp / "state.json"
+        self.report_path = self.tmp / "report.md"
+        self.cfg = {"used_by": "架空のテスト", "ignore": [], "pages": [{
+            "url": self.URL, "what": "架空の出典", "content_selectors": ["#main"],
+            "min_body_chars": 1,
+        }]}
+        env = patch.dict(os.environ, {"SHIEN_SLEEP": "0"})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def html(self, content, related="", outside=""):
+        return ('<!doctype html><html><body><main id="main">' + content
+                + '</main><aside id="related"><h2>関連情報</h2>' + related
+                + '</aside>' + outside + '</body></html>')
+
+    def known_link(self, href=None, text=None):
+        return f'<a href="{href or self.KNOWN_HREF}">{text or self.KNOWN_TEXT}</a>'
+
+    def allow_known_links(self):
+        self.cfg["pages"][0]["peripheral"] = [{
+            "selector": "#related", "known_links": [
+                {"href": self.KNOWN_HREF, "text_pattern": re.escape(self.KNOWN_TEXT)},
+                {"href": "https://example.go.jp/unrelated-2", "text_pattern": "別の施設案内です。"},
+            ],
+        }]
+
+    def check(self, body, headers=None, **kwargs):
+        lib.save_json(self.config_path, self.cfg)
+        if isinstance(body, str):
+            body = body.encode("utf-8")
+        fetch_args = ({"side_effect": body} if isinstance(body, Exception) else {
+            "return_value": (body, headers or {"Content-Type": "text/html; charset=utf-8"}),
+        })
+        with patch.object(watch, "fetch", **fetch_args), patch.object(watch, "now_jst", return_value=self.NOW):
+            return watch.run(self.config_path, self.state_path, self.report_path, **kwargs)
+
+    def state(self):
+        return lib.load_json(self.state_path, {})["pages"][self.cfg["pages"][0]["url"]]
+
+    def changed(self, changes, kind=None):
+        self.assertEqual(len(changes), 1, changes)
+        item = changes[0]
+        self.assertEqual(item["type"], "changed", item)
+        if kind:
+            self.assertEqual(item["change"], kind, item)
+        self.assertTrue(self.report_path.exists())
+        return item
+
+    def review_preserves(self, body, *, headers=None, **kwargs):
+        previous = deepcopy(self.state()["snapshot"])
+        changes = self.check(body, headers, **kwargs)
+        self.assertTrue(changes)
+        self.assertIn(changes[0]["type"], {"review", "inspection_error"}, changes)
+        self.assertEqual(self.state()["snapshot"], previous)
+        self.assertTrue(self.report_path.exists())
+        return changes
+
     def test_detects_change_and_unreachable(self):
         os.environ["SHIEN_SLEEP"] = "0"
         tmp = Path(tempfile.mkdtemp())
@@ -718,11 +787,371 @@ class TestWatch(unittest.TestCase):
             ch2 = watch.run(tmp / "w.json", tmp / "state.json", r)
             changed = [c for c in ch2 if c["type"] == "changed"]
             self.assertEqual(len(changed), 1)
-            self.assertEqual(changed[0]["added"], ["家賃の上限は6万円です。"])  # ヘッダーの変化は無視
+            self.assertIn("家賃の上限は6万円です。", changed[0]["added"])
             self.assertIn("6万円", r.read_text(encoding="utf-8"))
             state = json.loads((tmp / "state.json").read_text(encoding="utf-8"))
             self.assertNotIn("家賃", json.dumps(state, ensure_ascii=False))  # 本文は保存しない
         shutil.rmtree(tmp)
+
+    def test_initial_and_unchanged_pages_are_silent_and_remove_stale_report(self):
+        source = self.html("<p>家賃の上限は5万円です。</p>")
+        self.assertEqual(self.check(source), [])
+        self.report_path.write_text("以前の報告", encoding="utf-8")
+        self.assertEqual(self.check(source), [])
+        self.assertFalse(self.report_path.exists())
+
+    def test_reviewed_related_links_can_be_added_removed_and_reordered_silently(self):
+        self.allow_known_links()
+        one = self.known_link()
+        two = self.known_link("https://example.go.jp/unrelated-2", "別の施設案内です。")
+        for links in ("", one, one + two, two + one, two, ""):
+            with self.subTest(links=links):
+                self.assertEqual(self.check(self.html("<p>家賃の上限は5万円です。</p>", links)), [])
+                self.assertFalse(self.report_path.exists())
+
+    def test_reviewed_related_list_items_are_silent(self):
+        self.allow_known_links()
+        one = "<li>" + self.known_link() + "</li>"
+        two = "<li>" + self.known_link("https://example.go.jp/unrelated-2", "別の施設案内です。") + "</li>"
+        for links in ("", one, one + two, two + one, two, ""):
+            with self.subTest(links=links):
+                self.assertEqual(self.check(self.html("<p>家賃の上限は5万円です。</p>", "<ul>" + links + "</ul>")), [])
+                self.assertFalse(self.report_path.exists())
+
+    def test_unknown_related_link_is_not_suppressed(self):
+        self.allow_known_links()
+        self.assertEqual(self.check(self.html("<p>申請を受け付けています。</p>")), [])
+        changed = self.changed(self.check(self.html("<p>申請を受け付けています。</p>",
+                               '<a href="/new-rules">申請条件の変更について</a>')))
+        self.assertTrue(changed["added"])
+        self.assertIn("申請条件", self.report_path.read_text(encoding="utf-8"))
+
+    def test_reviewed_related_label_requires_full_match(self):
+        self.allow_known_links()
+        source = "<p>申請を受け付けています。</p>"
+        self.check(self.html(source, self.known_link()))
+        changed = self.changed(self.check(self.html(source, self.known_link(
+            text=self.KNOWN_TEXT + " 申請の条件も変わります。"))))
+        self.assertTrue(changed["added"])
+
+    def test_reviewed_label_with_new_url_is_not_suppressed(self):
+        self.allow_known_links()
+        source = "<p>申請を受け付けています。</p>"
+        self.check(self.html(source, self.known_link()))
+        self.changed(self.check(self.html(source, self.known_link(href="https://example.go.jp/new-rules"))))
+
+    def test_unknown_peripheral_text_addition_and_removal_are_reported(self):
+        self.allow_known_links()
+        source = "<p>申請を受け付けています。</p>"
+        self.check(self.html(source))
+        self.changed(self.check(self.html(source, "<p>来月から受付を終了します。</p>")), "added")
+        self.changed(self.check(self.html(source)), "removed")
+
+    def test_body_change_is_reported_alongside_suppressed_related_link(self):
+        self.allow_known_links()
+        self.check(self.html("<p>上限は5万円です。</p>"))
+        changed = self.changed(self.check(self.html("<p>上限は6万円です。</p>", self.known_link())), "modified")
+        self.assertIn("上限は6万円です。", changed["added"])
+
+    def test_addition_has_separate_counts(self):
+        self.check(self.html("<p>申請できます。</p>"))
+        changed = self.changed(self.check(self.html("<p>申請できます。</p><p>窓口は市役所です。</p>")), "added")
+        self.assertEqual(changed["added_count"], 1)
+        self.assertEqual(changed["removed"], 0)
+
+    def test_deletion_reports_count_and_location_without_claiming_reorder(self):
+        self.check(self.html("<h2>申請の条件</h2><p>市内に住む方が対象です。</p><p>所得制限があります。</p>"))
+        changed = self.changed(self.check(self.html("<h2>申請の条件</h2><p>市内に住む方が対象です。</p>")), "removed")
+        self.assertEqual(changed["added_count"], 0)
+        self.assertEqual(changed["removed"], 1)
+        self.assertTrue(changed["removed_details"])
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("削除", report)
+        self.assertNotIn("削除または並べ替え", report)
+
+    def test_replacement_reports_both_added_and_removed_counts(self):
+        self.check(self.html("<p>申請は市役所で行います。</p>"))
+        changed = self.changed(self.check(self.html("<p>申請は福祉事務所で行います。</p>")), "modified")
+        self.assertEqual((changed["added_count"], changed["removed"]), (1, 1))
+
+    def test_pure_reordering_is_reported_with_no_addition_or_deletion(self):
+        self.check(self.html("<p>まず窓口で相談してください。</p><p>次に書類を提出してください。</p>"))
+        changed = self.changed(self.check(self.html("<p>次に書類を提出してください。</p><p>まず窓口で相談してください。</p>")), "reordered")
+        self.assertEqual((changed["added_count"], changed["removed"]), (0, 0))
+        self.assertIn("並べ替え", self.report_path.read_text(encoding="utf-8"))
+
+    def test_duplicate_line_counts_are_preserved(self):
+        one = "<p>同居する方も申請できます。</p>"
+        self.check(self.html(one + one))
+        removed = self.changed(self.check(self.html(one)), "removed")
+        self.assertEqual((removed["added_count"], removed["removed"]), (0, 1))
+        added = self.changed(self.check(self.html(one + one)), "added")
+        self.assertEqual((added["added_count"], added["removed"]), (1, 0))
+
+    def test_phone_number_and_tel_target_changes_are_detected(self):
+        for old, new in (
+            ("<p>窓口 03-1234-5678</p>", "<p>窓口 03-1234-5679</p>"),
+            ('<p><a href="tel:0312345678">窓口に電話する</a></p>',
+             '<p><a href="tel:0312345679">窓口に電話する</a></p>'),
+        ):
+            with self.subTest(old=old):
+                self.state_path.unlink(missing_ok=True)
+                self.check(self.html(old))
+                self.changed(self.check(self.html(new)), "modified")
+
+    def test_single_digit_and_numeric_table_cells_survive_legacy_ignore(self):
+        self.cfg["ignore"] = [r"^\d+$"]
+        for old, new in (
+            ("<p>申請回数</p><p>1</p>", "<p>申請回数</p><p>2</p>"),
+            ("<table><tr><th>上限額</th><td>50000</td></tr></table>",
+             "<table><tr><th>上限額</th><td>60000</td></tr></table>"),
+        ):
+            with self.subTest(old=old):
+                self.state_path.unlink(missing_ok=True)
+                self.check(self.html(old))
+                self.changed(self.check(self.html(new)), "modified")
+
+    def test_non_numeric_eligibility_change_is_detected(self):
+        self.check(self.html("<p>学生も対象になります。</p>"))
+        changed = self.changed(self.check(self.html("<p>学生は対象になりません。</p>")), "modified")
+        self.assertIn("学生は対象になりません。", changed["added"])
+
+    def test_body_link_destination_change_is_detected_with_same_label(self):
+        self.check(self.html('<p><a href="/rules-v1.pdf">申請の手引き</a></p>'))
+        self.changed(self.check(self.html('<p><a href="/rules-v2.pdf">申請の手引き</a></p>')), "modified")
+
+    def test_inline_markup_width_and_whitespace_only_changes_are_silent(self):
+        self.check(self.html("<p>家賃の上限は ５万円 です。</p>"))
+        self.assertEqual(self.check(self.html("<p>家賃の上限は\n<strong>5万円</strong>   です。</p>")), [])
+
+    def test_default_document_scope_keeps_footer_contact_information(self):
+        self.cfg["pages"][0].pop("content_selectors")
+        self.check(self.html("<p>申請できます。</p>", outside="<footer>電話 03-1234-5678</footer>"))
+        self.changed(self.check(self.html("<p>申請できます。</p>", outside="<footer>電話 03-1234-5679</footer>")), "modified")
+
+    def test_missing_duplicate_and_empty_content_selectors_preserve_baseline(self):
+        self.check(self.html("<p>上限は5万円です。</p>"))
+        for broken in (
+            '<html><body><main id="renamed"><p>上限は5万円です。</p></main></body></html>',
+            '<html><body><main id="main"><p>本文です。</p></main><main id="main"><p>別の本文です。</p></main></body></html>',
+            '<html><body><main id="main"></main></body></html>',
+        ):
+            with self.subTest(broken=broken):
+                self.review_preserves(broken)
+        # 明示的な基準承認でも、抽出に失敗したページは採用しない。
+        self.review_preserves(broken, accept_baselines=[self.URL])
+
+    def test_missing_required_text_preserves_last_good_baseline(self):
+        self.cfg["pages"][0]["required_text"] = ["住居確保給付金"]
+        self.check(self.html("<h1>住居確保給付金</h1><p>申請を受け付けています。</p>"))
+        self.review_preserves(self.html("<h1>ただいまメンテナンス中です</h1><p>後でお試しください。</p>"))
+
+    def test_severe_body_shrink_preserves_last_good_baseline(self):
+        long_text = "この文章は監視の欠落を確認するための架空の案内です。" * 15
+        self.check(self.html("<p>" + long_text + "</p>"))
+        self.review_preserves(self.html("<p>一部しか読み込めていません。</p>"))
+
+    def test_layout_change_requires_review_before_replacing_baseline(self):
+        source = self.html("<p>家賃の上限は5万円です。</p>")
+        self.check(source)
+        changed = source.replace('<main id="main">', '<section id="main">').replace("</main>", "</section>")
+        self.review_preserves(changed)
+
+    def test_fetch_failure_preserves_baseline_and_recovery_clears_error(self):
+        source = self.html("<p>申請できます。</p>")
+        self.check(source)
+        previous = deepcopy(self.state()["snapshot"])
+        failed = self.check(OSError("一時的な取得失敗"))
+        self.assertEqual([item["type"] for item in failed], ["unreachable"])
+        self.assertEqual(self.state()["snapshot"], previous)
+        self.assertIn("unreachable_since", self.state())
+        self.assertIn("error", self.state())
+        self.assertEqual(self.check(source), [])
+        self.assertNotIn("unreachable_since", self.state())
+        self.assertNotIn("error", self.state())
+
+    def test_empty_html_response_preserves_baseline(self):
+        self.check(self.html("<p>申請できます。</p>"))
+        self.review_preserves(b"")
+
+    def test_pdf_binary_changes_are_not_misreported_as_deletions(self):
+        headers = {"Content-Type": "application/pdf"}
+        self.cfg["pages"][0] = {"url": self.URL + "/guide.pdf", "what": "架空のPDF"}
+        self.assertEqual(self.check(b"%PDF-1.4\noriginal bytes\n%%EOF", headers), [])
+        changed = self.changed(self.check(b"%PDF-1.4\nreplaced bytes\n%%EOF", headers), "pdf_binary")
+        self.assertEqual(changed["added"], [])
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("PDF", report)
+        self.assertNotIn("削除または並べ替え", report)
+
+    def test_pdf_query_url_and_magic_with_binary_content_type(self):
+        self.cfg["pages"][0] = {"url": self.URL + "/guide.pdf?revision=2", "what": "架空のPDF"}
+        headers = {"Content-Type": "application/octet-stream"}
+        self.assertEqual(self.check(b"%PDF-1.4\nfirst version\n%%EOF", headers), [])
+        self.changed(self.check(b"%PDF-1.4\nsecond version\n%%EOF", headers), "pdf_binary")
+
+    def test_invalid_pdf_responses_preserve_last_good_binary(self):
+        self.cfg["pages"][0] = {"url": self.URL + "/guide.pdf", "what": "架空のPDF"}
+        self.check(b"%PDF-1.4\noriginal bytes\n%%EOF", {"Content-Type": "application/pdf"})
+        for body, headers in (
+            (b"<html><body>Error</body></html>", {"Content-Type": "application/pdf"}),
+            (b"<html><body>Error</body></html>", {"Content-Type": "text/html"}),
+            (b"%PDF-1.4\ntruncated bytes", {"Content-Type": "application/pdf"}),
+        ):
+            with self.subTest(body=body, headers=headers):
+                self.review_preserves(body, headers=headers)
+
+    def test_html_to_pdf_format_change_requires_review(self):
+        self.check(self.html("<p>申請できます。</p>"))
+        self.review_preserves(b"%PDF-1.4\nreplacement bytes\n%%EOF", headers={"Content-Type": "application/pdf"})
+
+    def test_legacy_hash_state_migrates_once_with_explicit_notice(self):
+        lib.save_json(self.state_path, {"pages": {self.URL: {
+            "digest": "a" * 64, "lines": ["b" * 10],
+            "first_seen": "2026-11-23T09:00:00+09:00",
+        }}})
+        source = self.html("<p>申請できます。</p>")
+        changes = self.check(source)
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["type"], "review")
+        self.assertEqual(changes[0]["reason"], "baseline_migration")
+        self.assertEqual(self.state()["first_seen"], "2026-11-23T09:00:00+09:00")
+        self.assertEqual(self.state()["snapshot"]["version"], 2)
+        self.assertEqual(self.check(source), [])
+
+    def test_policy_change_preserves_baseline_until_explicit_acceptance(self):
+        source = self.html("<p>申請できます。</p>")
+        self.check(source)
+        previous = deepcopy(self.state()["snapshot"])
+        self.cfg["pages"][0]["required_text"] = ["申請できます"]
+        changes = self.review_preserves(source)
+        self.assertEqual(changes[0]["reason"], "policy_changed")
+        self.check(source, accept_baselines=[self.URL])
+        self.assertNotEqual(self.state()["snapshot"]["policy"], previous["policy"])
+        self.assertEqual(self.check(source), [])
+
+    def test_unknown_future_snapshot_schema_is_not_overwritten(self):
+        source = self.html("<p>申請できます。</p>")
+        self.check(source)
+        stored = lib.load_json(self.state_path, {})
+        stored["pages"][self.URL]["snapshot"]["version"] = 999
+        lib.save_json(self.state_path, stored)
+        changes = self.review_preserves(source)
+        self.assertEqual(changes[0]["reason"], "unsupported_state")
+
+    def test_state_keeps_no_source_text_and_report_quotes_are_bounded(self):
+        self.check(self.html("<h2>保存してはいけない架空見出し</h2><p>最初の案内です。</p>"))
+        paragraphs = [f"追加の架空案内{i:02d}です。" + "長い説明です。" * 30 for i in range(20)]
+        source = "<h2>保存してはいけない架空見出し</h2><p>最初の案内です。</p>"
+        source += "".join(f"<p>{line}</p>" for line in paragraphs)
+        changed = self.changed(self.check(self.html(source)), "added")
+        self.assertEqual(changed["added_count"], 20)
+        self.assertLessEqual(len(changed["added"]), 15)
+        state_text = self.state_path.read_text(encoding="utf-8")
+        for raw in ("保存してはいけない架空見出し", "最初の案内です。", "追加の架空案内", "長い説明です。"):
+            self.assertNotIn(raw, state_text)
+        report = self.report_path.read_text(encoding="utf-8")
+        quoted = [line.removeprefix("  - ") for line in report.splitlines() if line.startswith("  - ")]
+        self.assertLessEqual(len(quoted), 15)
+        self.assertTrue(quoted)
+        self.assertTrue(all(len(line) <= 120 for line in quoted), quoted)
+        self.assertNotIn(paragraphs[-1], report)
+
+    def test_non_content_script_style_template_and_svg_changes_are_silent(self):
+        before = ("<html><head><title>検索用の旧題名</title><style>.old{color:red}</style></head><body>"
+                  '<main id="main"><p>申請できます。</p><script>old()</script><template>旧部品</template>'
+                  "<svg><text>旧アイコン</text></svg></main></body></html>")
+        self.check(before)
+        after = before.replace("旧", "新").replace("old", "new").replace("red", "blue")
+        self.assertEqual(self.check(after), [])
+
+    def test_swapping_amounts_between_household_rows_is_not_a_benign_reorder(self):
+        before = "<table><tr><th>単身</th><td>50000</td></tr><tr><th>二人</th><td>60000</td></tr></table>"
+        after = "<table><tr><th>単身</th><td>60000</td></tr><tr><th>二人</th><td>50000</td></tr></table>"
+        self.check(self.html(before))
+        changed = self.changed(self.check(self.html(after)), "modified")
+        self.assertGreater(changed["added_count"], 0)
+        self.assertGreater(changed["removed"], 0)
+
+    def test_ordered_list_values_change_eligibility_even_when_text_stays_same(self):
+        note = "<p>第2号に該当する方は対象外です。</p>"
+        before = note + '<ol><li value="1">市内に住む方</li><li value="2">学生の方</li></ol>'
+        after = note + '<ol><li value="2">市内に住む方</li><li value="1">学生の方</li></ol>'
+        self.check(self.html(before))
+        changed = self.changed(self.check(self.html(after)), "modified")
+        self.assertGreater(changed["added_count"], 0)
+        self.assertGreater(changed["removed"], 0)
+
+    def test_reviewed_peripheral_link_moved_into_body_is_reported(self):
+        self.allow_known_links()
+        content = "<p>申請を受け付けています。</p>"
+        self.check(self.html(content, self.known_link()))
+        changed = self.changed(self.check(self.html(content + self.known_link())))
+        self.assertIn("body", changed["zones"])
+        self.assertIn(self.KNOWN_TEXT, self.report_path.read_text(encoding="utf-8"))
+
+    def test_missing_or_duplicate_peripheral_selector_preserves_baseline(self):
+        self.allow_known_links()
+        source = self.html("<p>申請できます。</p>", self.known_link())
+        self.check(source)
+        for broken in (
+            source.replace('id="related"', 'id="renamed"'),
+            source.replace("</body>", '<aside id="related"><p>別の関連情報</p></aside></body>'),
+        ):
+            with self.subTest(broken=broken):
+                self.review_preserves(broken)
+
+    def test_corrupt_snapshot_block_is_reviewed_and_preserved(self):
+        source = self.html("<p>申請できます。</p>")
+        self.check(source)
+        stored = lib.load_json(self.state_path, {})
+        stored["pages"][self.URL]["snapshot"]["blocks"][0]["noise"] = "yes"
+        lib.save_json(self.state_path, stored)
+        changes = self.review_preserves(source)
+        self.assertEqual(changes[0]["type"], "review")
+        self.assertEqual(changes[0]["reason"], "invalid_state")
+
+    def test_default_scope_still_detects_main_structure_disappearance(self):
+        self.cfg["pages"][0].pop("content_selectors")
+        source = self.html("<p>家賃の上限は5万円です。</p>")
+        self.check(source)
+        for changed in (
+            source.replace('<main id="main">', '<div id="main">').replace("</main>", "</div>"),
+            source.replace('id="main"', 'id="renamed"'),
+        ):
+            with self.subTest(changed=changed):
+                changes = self.review_preserves(changed)
+                self.assertEqual(changes[0]["reason"], "layout_changed")
+
+    def test_known_http_200_error_heading_is_not_hidden_by_large_navigation(self):
+        self.cfg["pages"][0].pop("content_selectors")
+        navigation = "<nav>" + "<p>市の施設と暮らしの各種案内はこちらです。</p>" * 80 + "</nav>"
+        before = self.html("<h1>住居確保給付金</h1><p>申請を受け付けています。</p>", outside=navigation)
+        self.check(before)
+        for heading in ("ただいまメンテナンス中です", "Access Denied"):
+            with self.subTest(heading=heading):
+                error = self.html(f"<h1>{heading}</h1><p>後でお試しください。</p>", outside=navigation)
+                changes = self.review_preserves(error)
+                self.assertEqual(changes[0]["type"], "inspection_error")
+
+    def test_body_image_source_and_alt_changes_are_detected(self):
+        before = '<p>窓口はこちらです。<img src="/help-v1.png" alt="市役所の窓口"></p>'
+        for after in (
+            before.replace("/help-v1.png", "/help-v2.png"),
+            before.replace("市役所の窓口", "福祉事務所の窓口"),
+        ):
+            with self.subTest(after=after):
+                self.state_path.unlink(missing_ok=True)
+                self.check(self.html(before))
+                self.changed(self.check(self.html(after)), "modified")
+
+    def test_amounts_moved_between_headings_change_their_meaning(self):
+        before = "<h2>単身世帯</h2><p>5万円</p><h2>二人世帯</h2><p>6万円</p>"
+        after = "<h2>単身世帯</h2><p>6万円</p><h2>二人世帯</h2><p>5万円</p>"
+        self.check(self.html(before))
+        changed = self.changed(self.check(self.html(after)), "modified")
+        self.assertGreater(changed["added_count"], 0)
+        self.assertGreater(changed["removed"], 0)
 
 
 class TestPages(unittest.TestCase):
