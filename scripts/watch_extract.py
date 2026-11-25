@@ -33,6 +33,15 @@ _ERROR_HEADING = re.compile(
     r"|(?:ただいま)?メンテナンス中です[。.!]?", re.I)
 
 
+# CMSが表示のたびに振り直すID（例：東京都の fragment-<UUID>）を構造の比較から外す。
+# 2026-11-25 の実測で、東京都のページは取得のたびに祖先の id が変わり、毎回「構造の変化」になった。
+_GENERATED_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{16,}|[0-9]{4,}", re.I)
+
+
+def _stable_id(value: str) -> str:
+    return _GENERATED_ID.sub("*", value)
+
+
 def _hash(value) -> str:
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()
 
@@ -346,7 +355,7 @@ def extract_html(html: str, url: str, page: dict, ignore: list[str]) -> dict:
     landmarks = (selected if selected else
                  [n for n in tree.nodes if not n.skipped and
                   (n.tag in {"main", "article"} or n.attrs.get("role") == "main")])
-    layout = [[(a.tag, a.attrs.get("id", "")) for a in reversed(list(node.ancestors()))]
+    layout = [[(a.tag, _stable_id(a.attrs.get("id") or "")) for a in reversed(list(node.ancestors()))]
               for node in landmarks]
     return {"blocks": blocks, "layout": _hash(layout), "body_chars": body_chars,
             "body_blocks": sum(b["zone"] == "body" for b in blocks)}

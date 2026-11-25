@@ -1057,6 +1057,17 @@ class TestWatch(unittest.TestCase):
         self.assertEqual(self.state()["snapshot"]["version"], 2)
         self.assertEqual(self.check(source), [])
 
+    def test_generated_ids_around_main_do_not_count_as_layout_change(self):
+        # 東京都のページは取得のたびに祖先の id（fragment-<UUID>）が変わる（2026-11-25 実測）。
+        self.cfg["pages"][0].pop("content_selectors")
+        page = ('<!doctype html><html><body><div id="fragment-{}"><main id="main">'
+                '<p>申請は区市町村の社会福祉協議会です。</p></main></div></body></html>')
+        self.check(page.format("065c5cbe-8316-3a88-8101-ae2979c162a8"))
+        self.assertEqual(self.check(page.format("61ee7d48-307c-9fac-6857-a4ee5f018112")), [])
+        # 意味のある構造の変化（main の外側が別の要素になる）は引き続き確認に回す。
+        moved = page.format("61ee7d48-307c-9fac-6857-a4ee5f018112").replace('<div id="fragment', '<section id="fragment').replace("</div></body>", "</section></body>")
+        self.assertEqual(self.check(moved)[0]["reason"], "layout_changed")
+
     def test_report_stays_under_issue_body_limit_and_names_every_page(self):
         changes = [{"type": "changed", "change": "modified", "url": f"https://example.go.jp/{i}",
                     "what": f"架空の出典{i}", "added_count": 15, "removed": 15, "zones": ["body"],
