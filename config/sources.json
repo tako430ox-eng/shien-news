@@ -77,6 +77,7 @@
    "name": "デジタル庁",
    "type": "rss",
    "url": "https://www.digital.go.jp/rss/news.xml",
+   "item_href": "^https://www\\.digital\\.go\\.jp/",
    "publish": "auto",
    "license": "公共データ利用規約（第1.0版）",
    "license_url": "https://www.digital.go.jp/copyright-policy",

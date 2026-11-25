@@ -784,6 +784,44 @@ class TestPages(unittest.TestCase):
             self.assertNotIn("fonts.googleapis.com", text, f.name)
             self.assertNotRegex(text, r'<script[^>]+src="https?://', f.name)
 
+    def test_every_page_has_csp_before_scripts(self):
+        """どのページにも、外への読み込み・送信を止める CSP の meta が、最初のスクリプトより前にある。"""
+        out = self.tmp / "site"
+        self.site.build(out)
+        pages = list(out.rglob("*.html"))
+        self.assertGreater(len(pages), 10)
+        for f in pages:
+            text = f.read_text(encoding="utf-8")
+            if text.startswith("google-site-verification"):
+                continue
+            self.assertEqual(text.count(build.CSP_META), 1, f.name)
+            script = text.find("<script")
+            self.assertTrue(script < 0 or text.index(build.CSP_META) < script, f.name)
+        self.assertIn("connect-src 'none'", build.CSP)
+        self.assertIn("form-action 'none'", build.CSP)
+
+
+class TestUnsafeLinks(unittest.TestCase):
+    """情報源から来たリンクが javascript: などでも、サイトに載せない（押すとこのサイトの中でプログラムが動くため）。"""
+
+    def test_collect_drops_non_http_and_foreign_links(self):
+        feed = ('<?xml version="1.0"?><rss><channel>'
+                '<item><title>給付金の申請受付を始めました</title><link>javascript:alert(1)</link></item>'
+                '<item><title>給付金の申請受付を始めました2</title><link>https://evil.example/x</link></item>'
+                '<item><title>給付金の申請受付を始めました3</title><link>https://www.digital.go.jp/news/ok</link></item>'
+                '</channel></rss>').encode("utf-8")
+        with patch.object(update, "fetch", return_value=(feed, {"Content-Type": "application/rss+xml; charset=utf-8"})):
+            got = update.collect(SOURCES["digital"])
+        self.assertEqual([g["url"] for g in got], ["https://www.digital.go.jp/news/ok"])
+        self.assertFalse(update.allowed_link("data:text/html,x", {}))
+        self.assertFalse(update.allowed_link(" JavaScript:alert(1)", {}))
+        self.assertTrue(update.allowed_link("https://www.mhlw.go.jp/a", {}))
+
+    def test_build_hides_stored_unsafe_link(self):
+        it = {"publish": "auto", "excluded": False, "topics": ["money"], "url": "javascript:alert(1)"}
+        self.assertFalse(build.visible(it))
+        self.assertTrue(build.visible({**it, "url": "https://www.mhlw.go.jp/a"}))
+
 
 if __name__ == "__main__":
     unittest.main()

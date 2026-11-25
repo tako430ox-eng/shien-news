@@ -14,7 +14,7 @@ import sys
 from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urljoin, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import JST, ROOT, load_json, notice_url, now_jst, save_json  # noqa: E402
@@ -30,6 +30,25 @@ SURVEY_URL = re.compile(r"https://[A-Za-z0-9.-]+/[^\s\"'<>]*")
 SURVEY_ENTRY = re.compile(r"entry\.[0-9]{3,20}")
 # 家賃編の「最初に出る画面」を公開する HTML に書き込むスクリプト（node で動かす）。理由はスクリプトの先頭に書いた
 PRERENDER = ROOT / "scripts" / "prerender_yachin.cjs"
+
+
+# ページの中から外のサーバーへ読み込み・送信をさせない決まり（Content-Security-Policy）。
+# 「ページを開いても外に接続しない」「入力を送らない」という約束を、ブラウザの側でも守らせる二重の備え。
+# リンクを押して公式ページや Google 検索・アンケートへ移ることは妨げない（移動はこの決まりの対象外）。
+# GitHub Pages は応答ヘッダーを変えられないので meta で書く（frame-ancestors は meta では効かない）。
+# 家賃編などはページの中にスクリプトと style を書いているので 'unsafe-inline' を許す。
+CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+       "img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; "
+       "base-uri 'none'; form-action 'none'")
+CSP_META = f'<meta http-equiv="Content-Security-Policy" content="{CSP}">'
+CHARSET_META = '<meta charset="utf-8">'
+
+
+def add_csp(text: str) -> str:
+    """pages/ から写す HTML に CSP の meta を足す（文字コードの meta のすぐ後ろ。スクリプトより前）。"""
+    if CSP_META in text or CHARSET_META not in text:
+        return text
+    return text.replace(CHARSET_META, CHARSET_META + "\n" + CSP_META, 1)
 
 
 MENU_MARK = "<!--site-menu-->"
@@ -114,8 +133,13 @@ def jdate(iso: str | None, with_year=False) -> str:
     return f"{d.year}年{s}" if with_year else s
 
 
+def safe_link(url) -> bool:
+    """リンクに出してよいURLか（http・https だけ）。取得側でも捨てているが、保存データが古い・壊れたときの二重の備え。"""
+    return isinstance(url, str) and urlsplit(url.strip()).scheme.lower() in ("http", "https")
+
+
 def visible(it: dict) -> bool:
-    return it.get("publish") == "auto" and not it.get("excluded") and bool(it.get("topics"))
+    return it.get("publish") == "auto" and not it.get("excluded") and bool(it.get("topics")) and safe_link(it.get("url"))
 
 
 def resolve_notes(store: dict, notes: list[dict]) -> dict[str, dict]:
@@ -224,6 +248,7 @@ class Site:
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+{CSP_META}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
@@ -633,6 +658,7 @@ class Site:
                 text = SURVEY_MARK.sub(lambda m: self.survey_unei() if m.group(1) == "unei" else self.survey_block(m.group(1), depth), text)
                 if rel.as_posix() == "yachin/index.html":
                     text = prerender_yachin(text)
+                text = add_csp(text)
                 dst.write_text(text, encoding="utf-8")
             else:
                 shutil.copy2(f, dst)

@@ -18,6 +18,8 @@ from urllib.parse import urldefrag, urljoin
 ROOT = Path(__file__).resolve().parent.parent
 JST = timezone(timedelta(hours=9))
 USER_AGENT = "shien-news-bot/1.0 (+non-profit; daily check of public notices)"
+# 1回の取得で読む大きさの上限。情報源の不調や差し替えで巨大な応答が来ても、取得の仕組みを止めないため
+MAX_BYTES = 50 * 1024 * 1024
 
 
 def now_jst() -> datetime:
@@ -49,7 +51,9 @@ def fetch(url: str, timeout: int = 30, retries: int = 2) -> tuple[bytes, dict]:
         try:
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept-Language": "ja"})
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                body = r.read()
+                body = r.read(MAX_BYTES + 1)
+                if len(body) > MAX_BYTES:
+                    raise RuntimeError(f"応答が大きすぎます（{MAX_BYTES // (1024 * 1024)}MB 超）: {url}")
                 return body, dict(r.headers)
         except urllib.error.HTTPError as e:
             last = e
