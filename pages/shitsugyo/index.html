@@ -27,8 +27,8 @@
 </header>
 <div class="notice">
 <p class="notice-h">今夜寝る場所がない、今日食べるものやお金がないとき</p>
-<p>この先の手続きより先に、いま居る場所の市区町村の<b>福祉事務所</b>（役所の生活保護の窓口）に、そのことを伝えてください。住むところがなくても、生活保護は申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
-<p>探し方：<a href="#city">下の欄に市区町村名を入れる</a>と、福祉事務所を探す検索のボタンが出ます。<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>もあります。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
+<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）に、今日困っていることを伝えてください。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
+<p>探し方：<a href="#city">市区町村名を入力する</a>と、その下に「生活保護の相談窓口を探す」ボタンが出ます。ほかの質問は飛ばせます。<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>もあります。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
 <p class="notice-h">命の危険があるとき</p>
 <ul>
 <li>命の危険があるとき：<a href="tel:119">119番</a>・<a href="tel:110">110番</a></li>
@@ -56,9 +56,36 @@
 
 <section id="tool" class="choose stack" aria-labelledby="tool-h">
 <h2 id="tool-h">あなたの場合を選ぶ（どれも任意）</h2>
-<p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。選んだ内容はこの画面の中だけで使い、どこにも送らず、保存もしません。</p>
+<p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。質問の回答と退職日はこの画面の中だけで使い、保存しません。</p>
 <details class="q" id="qd_why" open><summary><span class="q-label">1. 辞めた理由</span><span class="q-ans" id="qa_why"></span></summary><fieldset><legend class="sr-only">1. 辞めた理由</legend><div class="opts"><label class="opt"><input type="radio" name="why" value="company"><span>会社の都合（解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた）</span></label><label class="opt"><input type="radio" name="why" value="self"><span>自分から辞めた</span></label><label class="opt"><input type="radio" name="why" value="notyet"><span>まだ辞めていない（辞めるように言われている）</span></label><label class="opt"><input type="radio" name="why" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_ins" open><summary><span class="q-label">2. 雇用保険</span><span class="q-ans" id="qa_ins"></span></summary><fieldset><legend class="sr-only">2. 雇用保険</legend><div class="opts"><label class="opt"><input type="radio" name="ins" value="yes"><span>入っていた（給与明細で「雇用保険」が引かれていた）</span></label><label class="opt"><input type="radio" name="ins" value="no"><span>入っていなかった・自営業やフリーランスだった</span></label><label class="opt"><input type="radio" name="ins" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_kenpo" open><summary><span class="q-label">3. 辞める前の健康保険</span><span class="q-ans" id="qa_kenpo"></span></summary><fieldset><legend class="sr-only">3. 辞める前の健康保険</legend><div class="opts"><label class="opt"><input type="radio" name="kenpo" value="company"><span>会社の健康保険（保険証に協会けんぽや健康保険組合の名前）</span></label><label class="opt"><input type="radio" name="kenpo" value="kokuho"><span>もともと国民健康保険</span></label><label class="opt"><input type="radio" name="kenpo" value="family"><span>家族の健康保険の扶養に入っている</span></label><label class="opt"><input type="radio" name="kenpo" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_money" open><summary><span class="q-label">4. お金</span><span class="q-ans" id="qa_money"></span></summary><fieldset><legend class="sr-only">4. お金</legend><div class="opts"><label class="opt"><input type="radio" name="money" value="short"><span>家賃や今月の生活費が足りない・足りなくなりそう</span></label><label class="opt"><input type="radio" name="money" value="ok"><span>しばらくは暮らせる</span></label></div></fieldset></details><div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>
-<div class="field"><label for="city">6. 住んでいる市区町村（窓口を探す検索のボタンを出すときだけ）</label><input type="text" id="city" autocomplete="address-level2" placeholder="例：横浜市"></div>
+<div class="field">
+  <label for="city">6. 窓口を探す市区町村（任意）</label>
+  <div id="cityHint">
+    <p class="small">お住まいの市区町村を入力します。住むところがなくて生活保護を相談するときは、今いる市区町村を入力してください。区は「東京都中央区」「福岡市中央区」のように。番地や氏名は不要です。</p>
+    <p class="small">検索ボタンを押すと、市区町村名と選んだ用件がGoogleに送られます。</p>
+  </div>
+  <input type="text" id="city" aria-describedby="cityHint" autocomplete="off" maxlength="60" placeholder="例：埼玉県小川町">
+</div>
+<noscript><p>市区町村名からの検索にはJavaScriptが必要です。下の「検索で見つからないとき」から役所を探せます。</p></noscript>
+<div id="officeSearch" class="stack" hidden>
+  <h3><span id="officeCity"></span>の窓口をGoogleで探す</h3>
+  <div class="btn-row"><a class="btn" id="officeHogo" data-office-query="生活保護 相談窓口 電話">生活保護の相談窓口を探す</a></div>
+  <p class="small">検索結果では広告を飛ばし、自治体の案内で地域名・相談内容・担当の電話番号を確かめます。年金は日本年金機構の案内も使えます。</p>
+  <details class="more" id="officeMore"><summary>生活費・国保・年金の窓口を探す</summary>
+    <div class="more-body">
+      <a class="btn" id="officeJiritsu" data-office-query="生活困窮 自立相談 窓口 電話">生活費や仕事の相談</a>
+      <a class="btn" id="officeKokuho" data-office-query="国民健康保険 退職 加入 窓口">退職後の国民健康保険</a>
+      <a class="btn" id="officeNenkin" data-office-query="国民年金 窓口">国民年金の切り替え・免除</a>
+    </div>
+  </details>
+</div>
+<details class="more"><summary>検索で見つからないとき</summary>
+  <div class="more-body">
+    <p><a href="https://www.j-lis.go.jp/spd/map-search/cms_1069.html" rel="noopener">全国の役所の公式サイトから選ぶ</a> → 都道府県 → 市区町村。代表番号に「生活保護の相談です」「退職後の国保のことです」など、用件を一つ伝えてください。</p>
+    <p>町村では、都道府県の窓口が担当することもあります。「担当町村」「所管区域」に自分の町村名があるかを見てください。窓口の住所が別の市町にあることもあります。</p>
+    <p>生活費に困っているときは、<a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">都道府県別の自立相談窓口一覧</a>でも探せます。自治体が案内する社会福祉協議会なども相談先です。</p>
+  </div>
+</details>
 <div id="todayOut" class="today stack" aria-live="polite"><h3>今日やること</h3><p>会社の健康保険に入っていた人は、退職後の健康保険を、国民健康保険・任意継続・家族の扶養から選びます。期限は<b>退職日の翌日から14日・20日</b>です。年金の手続きは別にあり、次の勤め先や配偶者の扶養に入るかで手続き先が変わります。雇用保険に入っていた人は、離職票が届いたら住所地のハローワークへ。お金が足りないときは、<a href="#money">5. お金が足りないとき</a>を先に読んでください。</p></div>
 <div id="datesOut" aria-live="polite"></div>
 <p class="btn-row" hidden id="toolBtns"><button type="button" class="btn" id="printBtn">このページを印刷する</button> <button type="button" class="btn ghost" id="resetBtn">選んだ内容を消す</button></p>
@@ -235,10 +262,10 @@
 <!--survey:shitsugyo-->
 </main>
 <footer class="foot">
- <p>このページは「くらしの非常口」の案内です（2026年11月18日作成、2026年11月21日更新）。制度の内容は、下の出典で確かめたものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
+ <p>このページは「くらしの非常口」の案内です（2026年11月18日作成、2026年11月25日更新）。制度の内容は、下の出典で確かめたものです。制度は変わることがあり、地域によって違います。申し込む前に、必ず窓口で確かめてください。</p>
  <p>このページは無償で提供しています。利用する人からお金を受け取ることはなく、書類を代わりに作ることもしません。ハローワークや役所の手続きに、当サイトの手数料はかかりません。手数料や成功報酬を求める業者には注意してください。困ったときは、消費者ホットライン <a href="tel:188">188</a> に相談できます。</p>
  <p><a href="../unei.html">運営者と連絡先</a> ・ <a href="../yachin/">家賃が払えないとき</a> ・ <a href="../sasaeru/">支える人へ</a> ・ <a href="../">支援の新着</a></p>
- <details><summary>出典と確認日</summary><ul class="srcs"><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html" rel="noopener">ハローワークインターネットサービス：基本手当について（受給要件・受給期間）</a>（2026-11-17 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_procedure.html" rel="noopener">ハローワークインターネットサービス：雇用保険の具体的な手続き（持ち物・待期・離職理由の判定・不正受給・離職票が交付されないとき・受付時間と16時前の来所）</a>（2026-11-21 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyushokusha_shien/index.html" rel="noopener">厚生労働省：求職者支援制度のご案内（受講の要件、給付金の要件、出席の条件と育児・介護中などの例外）</a>（2026-11-21 確認）</li><li><a href="https://www.check-roudou.mhlw.go.jp/study/roudousya_taisyoku.html" rel="noopener">厚生労働省 確かめよう労働条件：退職・解雇（解雇予告と解雇予告手当）</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html" rel="noopener">厚生労働省：総合労働相談コーナーのご案内</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/stf/newpage_21517.html" rel="noopener">厚生労働省：国民健康保険の保険料・保険税について（非自発的失業者の軽減。疾病等の正当な理由のある自己都合も対象、減免）</a>（2026-11-21 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_range.html" rel="noopener">ハローワークインターネットサービス：特定受給資格者及び特定理由離職者の範囲の概要（病気・けが、家族の看護などの正当な理由）</a>（2026-11-21 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html" rel="noopener">厚生労働省：ハローワーク（全国のハローワークの所在案内。都道府県から探す）</a>（2026-11-21 確認）</li><li><a href="https://jsite.mhlw.go.jp/tokyo-hellowork/kakushu_jouhou/koyouhoken/koyouhoken/QA/kyuusyokusyakyuufu_QA.html" rel="noopener">東京労働局（ハローワーク）：求職者給付Q&amp;A（30日以上働けないときの受給期間の延長、最長3年）</a>（2026-11-21 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/benefit/injury_and_sickness_allowance/" rel="noopener">全国健康保険協会（協会けんぽ）：病気やケガで会社を休んだとき（傷病手当金。資格喪失後の継続給付）</a>（2026-11-21 確認）</li><li><a href="https://www.city.saitama.lg.jp/001/153/002/004/p010048.html" rel="noopener">さいたま市：国民健康保険税の軽減（非自発的失業者）（2023年4月1日更新。対象・期間・持ち物の例）</a>（2026-11-17 確認）</li><li><a href="https://www.city.yokohama.lg.jp/faq/kukyoku/kenko/hoken-nenkin/20211014092646834.html" rel="noopener">横浜市：会社を退職して国民健康保険に加入したいのですが（2025年1月15日更新。14日以内の届出・持ち物の例）</a>（2026-11-17 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html" rel="noopener">ハローワークインターネットサービス：基本手当について（高年齢求職者給付金。65歳以上の高年齢被保険者）</a>（2026-11-19 確認）</li><li><a href="https://www.mhlw.go.jp/hellotraining/about/" rel="noopener">厚生労働省：ハロートレーニングについて知る（受講料は無料、テキスト代は自己負担）</a>（2026-11-19 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/benefit/voluntary_continuation/" rel="noopener">全国健康保険協会（協会けんぽ）：任意継続（退職後の健康保険の3つの選択、20日以内・翌営業日、郵送は20日以内に必着）</a>（2026-11-19 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/faq/voluntary_continuation/002/index.html" rel="noopener">全国健康保険協会（協会けんぽ）：任意継続の加入条件（よくある質問）</a>（2026-11-19 確認）</li><li><a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" rel="noopener">内閣府：国民の祝日について（2026年・2027年の祝日と休日。任意継続の期限の計算に使用）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-04.html" rel="noopener">日本年金機構：国民年金に加入するための手続き（2025年9月11日更新。退職日の翌日から14日以内、市区町村）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html" rel="noopener">日本年金機構：会社を退職したときの国民年金の手続き（2024年7月1日更新。第1号・第3号の分かれ方、配偶者の手続き）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/section/faq/kokunen/seido/kanyu/haigusha/20130322.html" rel="noopener">日本年金機構：退職して配偶者の扶養に入る予定のとき（よくある質問、2022年7月29日更新。配偶者の勤め先に提出）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/menjo/20150428.html" rel="noopener">日本年金機構：国民年金保険料の免除制度・納付猶予制度（2026年11月5日更新。失業等の特例、納付猶予の審査）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/menjo/20150402-01.html" rel="noopener">日本年金機構：国民年金保険料の免除等の申請が可能な期間（2026年8月3日更新。2年1か月前まで、世帯主・配偶者の所得審査）</a>（2026-11-19 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html" rel="noopener">厚生労働省：生活保護制度</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html" rel="noopener">厚生労働省：生活保護を申請したい方へ</a>（2026-11-16 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html" rel="noopener">厚生労働省：生活困窮者自立支援制度</a>（2026-11-16 確認）</li><li><a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関 相談窓口一覧（生活困窮者支援情報共有サイト）</a>（2026-11-12 確認）</li><li><a href="https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html" rel="noopener">厚生労働省：住居確保給付金（家賃補助）の制度概要</a>（2026-11-16 確認）</li><li><a href="https://www.mhlw.go.jp/web/t_doc?dataId=82ab4498&amp;dataType=0&amp;pageNo=1" rel="noopener">厚生労働省：生活困窮者自立支援法施行規則 第10条（離職・廃業から2年。病気・けが・育児などで30日以上求職活動ができなかった日数を足す。最長4年）</a>（2026-11-21 確認）</li><li><a href="https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf" rel="noopener">愛知県社会福祉協議会：緊急小口資金のご案内（2025年7月版。条件は都道府県で違う場合があります）</a>（2026-11-16 確認）</li><li><a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel" rel="noopener">厚生労働省「まもろうよ こころ」電話相談</a>（2026-11-13 確認）</li><li><a href="https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/" rel="noopener">内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋</a>（2026-11-14 確認）</li></ul></details>
+ <details><summary>出典と確認日</summary><ul class="srcs"><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html" rel="noopener">ハローワークインターネットサービス：基本手当について（受給要件・受給期間）</a>（2026-11-17 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_procedure.html" rel="noopener">ハローワークインターネットサービス：雇用保険の具体的な手続き（持ち物・待期・離職理由の判定・不正受給・離職票が交付されないとき・受付時間と16時前の来所）</a>（2026-11-21 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyushokusha_shien/index.html" rel="noopener">厚生労働省：求職者支援制度のご案内（受講の要件、給付金の要件、出席の条件と育児・介護中などの例外）</a>（2026-11-21 確認）</li><li><a href="https://www.check-roudou.mhlw.go.jp/study/roudousya_taisyoku.html" rel="noopener">厚生労働省 確かめよう労働条件：退職・解雇（解雇予告と解雇予告手当）</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html" rel="noopener">厚生労働省：総合労働相談コーナーのご案内</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/stf/newpage_21517.html" rel="noopener">厚生労働省：国民健康保険の保険料・保険税について（非自発的失業者の軽減。疾病等の正当な理由のある自己都合も対象、減免）</a>（2026-11-21 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_range.html" rel="noopener">ハローワークインターネットサービス：特定受給資格者及び特定理由離職者の範囲の概要（病気・けが、家族の看護などの正当な理由）</a>（2026-11-21 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html" rel="noopener">厚生労働省：ハローワーク（全国のハローワークの所在案内。都道府県から探す）</a>（2026-11-21 確認）</li><li><a href="https://jsite.mhlw.go.jp/tokyo-hellowork/kakushu_jouhou/koyouhoken/koyouhoken/QA/kyuusyokusyakyuufu_QA.html" rel="noopener">東京労働局（ハローワーク）：求職者給付Q&amp;A（30日以上働けないときの受給期間の延長、最長3年）</a>（2026-11-21 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/benefit/injury_and_sickness_allowance/" rel="noopener">全国健康保険協会（協会けんぽ）：病気やケガで会社を休んだとき（傷病手当金。資格喪失後の継続給付）</a>（2026-11-21 確認）</li><li><a href="https://www.city.saitama.lg.jp/001/153/002/004/p010048.html" rel="noopener">さいたま市：国民健康保険税の軽減（非自発的失業者）（2023年4月1日更新。対象・期間・持ち物の例）</a>（2026-11-17 確認）</li><li><a href="https://www.city.yokohama.lg.jp/faq/kukyoku/kenko/hoken-nenkin/20211014092646834.html" rel="noopener">横浜市：会社を退職して国民健康保険に加入したいのですが（2025年1月15日更新。14日以内の届出・持ち物の例）</a>（2026-11-17 確認）</li><li><a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_basicbenefit.html" rel="noopener">ハローワークインターネットサービス：基本手当について（高年齢求職者給付金。65歳以上の高年齢被保険者）</a>（2026-11-19 確認）</li><li><a href="https://www.mhlw.go.jp/hellotraining/about/" rel="noopener">厚生労働省：ハロートレーニングについて知る（受講料は無料、テキスト代は自己負担）</a>（2026-11-19 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/benefit/voluntary_continuation/" rel="noopener">全国健康保険協会（協会けんぽ）：任意継続（退職後の健康保険の3つの選択、20日以内・翌営業日、郵送は20日以内に必着）</a>（2026-11-19 確認）</li><li><a href="https://www.kyoukaikenpo.or.jp/faq/voluntary_continuation/002/index.html" rel="noopener">全国健康保険協会（協会けんぽ）：任意継続の加入条件（よくある質問）</a>（2026-11-19 確認）</li><li><a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" rel="noopener">内閣府：国民の祝日について（2026年・2027年の祝日と休日。任意継続の期限の計算に使用）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-04.html" rel="noopener">日本年金機構：国民年金に加入するための手続き（2025年9月11日更新。退職日の翌日から14日以内、市区町村）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html" rel="noopener">日本年金機構：会社を退職したときの国民年金の手続き（2024年7月1日更新。第1号・第3号の分かれ方、配偶者の手続き）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/section/faq/kokunen/seido/kanyu/haigusha/20130322.html" rel="noopener">日本年金機構：退職して配偶者の扶養に入る予定のとき（よくある質問、2022年7月29日更新。配偶者の勤め先に提出）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/menjo/20150428.html" rel="noopener">日本年金機構：国民年金保険料の免除制度・納付猶予制度（2026年11月5日更新。失業等の特例、納付猶予の審査）</a>（2026-11-19 確認）</li><li><a href="https://www.nenkin.go.jp/service/kokunen/menjo/20150402-01.html" rel="noopener">日本年金機構：国民年金保険料の免除等の申請が可能な期間（2026年8月3日更新。2年1か月前まで、世帯主・配偶者の所得審査）</a>（2026-11-19 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatuhogo/index.html" rel="noopener">厚生労働省：生活保護制度</a>（2026-11-17 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/seikatsuhogopage.html" rel="noopener">厚生労働省：生活保護を申請したい方へ</a>（2026-11-25 確認）</li><li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000059425.html" rel="noopener">厚生労働省：生活困窮者自立支援制度</a>（2026-11-16 確認）</li><li><a href="https://www.j-lis.go.jp/spd/map-search/cms_1069.html" rel="noopener">地方公共団体情報システム機構：全国自治体マップ検索（市区町村の公式サイト）</a>（2026-11-25 確認）</li><li><a href="https://www.pref.saitama.lg.jp/a0602/seihozenpan/910-20091208-75.html" rel="noopener">埼玉県：福祉事務所等一覧（生活保護法。町村を担当する県の窓口の例）</a>（2026-11-25 確認）</li><li><a href="https://minna-tunagaru.jp/ichiran/" rel="noopener">自立相談支援機関 相談窓口一覧（生活困窮者支援情報共有サイト）</a>（2026-11-25 確認）</li><li><a href="https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html" rel="noopener">厚生労働省：住居確保給付金（家賃補助）の制度概要</a>（2026-11-16 確認）</li><li><a href="https://www.mhlw.go.jp/web/t_doc?dataId=82ab4498&amp;dataType=0&amp;pageNo=1" rel="noopener">厚生労働省：生活困窮者自立支援法施行規則 第10条（離職・廃業から2年。病気・けが・育児などで30日以上求職活動ができなかった日数を足す。最長4年）</a>（2026-11-21 確認）</li><li><a href="https://www.aichi-fukushi.or.jp/wp-content/uploads/kinkyukoguchishikin_pamphlet_250710.pdf" rel="noopener">愛知県社会福祉協議会：緊急小口資金のご案内（2025年7月版。条件は都道府県で違う場合があります）</a>（2026-11-16 確認）</li><li><a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel" rel="noopener">厚生労働省「まもろうよ こころ」電話相談</a>（2026-11-13 確認）</li><li><a href="https://www.gender.go.jp/policy/sokushin/ouen/safe/dv/" rel="noopener">内閣府 男女共同参画局：DV相談ナビ #8008・DV相談＋</a>（2026-11-14 確認）</li></ul></details>
 </footer>
 </div>
 <script>
@@ -345,14 +372,14 @@
     var list = [], keys = [];
     function add(x, k) { list.push(x); keys.push(k); }
     if (a.money === "short") add(jiritsu, "jiritsu");
-    if (a.kenpo === "company") { add(choose, "yakusho"); add(nenkin, "yakusho"); }
+    if (a.kenpo === "company") { add(choose, "kokuho"); add(nenkin, "nenkin"); }
     else if (a.kenpo !== "kokuho" && a.kenpo !== "family") add(check, "");
     if (a.ins === "no") add(kyu, "kyu"); else add(hw, "hw");
     if (a.kenpo === "company") {
-      if (a.why === "company") add("国民健康保険の窓口で、会社の都合で辞めた人の保険料の軽減を入れた額を聞き、任意継続と比べる", "yakusho");
-      else if (a.why === "self" || a.why === "unknown" || !a.why) add("病気・けが・家族の看護など、やむを得ない事情で辞めたときは、自分から辞めても国民健康保険料が軽くなる場合がある。当てはまるかは離職理由の判定で決まるので、国民健康保険の窓口で軽減を入れた額を聞き、任意継続と比べる", "yakusho");
+      if (a.why === "company") add("国民健康保険の窓口で、会社の都合で辞めた人の保険料の軽減を入れた額を聞き、任意継続と比べる", "kokuho");
+      else if (a.why === "self" || a.why === "unknown" || !a.why) add("病気・けが・家族の看護など、やむを得ない事情で辞めたときは、自分から辞めても国民健康保険料が軽くなる場合がある。当てはまるかは離職理由の判定で決まるので、国民健康保険の窓口で軽減を入れた額を聞き、任意継続と比べる", "kokuho");
     }
-    if (a.why === "company" || a.money === "short") add(menjo, "yakusho");
+    if (a.why === "company" || a.money === "short") add(menjo, "nenkin");
     t.today = list[0];
     t.next = list.slice(1);
     t.keys = keys;
@@ -377,23 +404,37 @@
   };
   var LINKS = {
     jiritsu: [FIND.jiritsu, ["#say_jiritsu_d", "電話で言う文"]],
-    yakusho: [["#say_yakusho_d", "役所で言う文"]],
+    kokuho: [["#say_yakusho_d", "役所で言う文"]],
+    nenkin: [["#say_yakusho_d", "役所で言う文"]],
     hw: [FIND.hw, ["#say_hw_d", "ハローワークで言う文"], ["#say_kaisha_d", "会社に言う文（離職票が届かないとき）"]],
     kyu: [FIND.hw, ["#kyushoku", "求職者支援制度の説明"]],
     corner: [FIND.corner]
   };
-  // 市区町村名を入れたときだけ出す検索のボタン（押すと Google の検索が開く。入れた名前はこのページからは送らない）
-  var SEARCH = { jiritsu: ["自立相談支援機関", "福祉事務所 生活保護"], yakusho: ["国民健康保険 窓口", "国民年金 窓口"], hw: [], kyu: [], corner: [] };
-  var city = "", searched = {};
-  function links(k, big) {
+  var OFFICE_JUMPS = {
+    jiritsu: ["#officeJiritsu", "生活費の相談窓口を探す"],
+    kokuho: ["#officeKokuho", "国保の窓口を探す"],
+    nenkin: ["#officeNenkin", "年金の窓口を探す"]
+  };
+  function updateOfficeSearch(city) {
+    $("officeCity").textContent = city;
+    $("officeSearch").hidden = !city;
+    if (!city) $("officeMore").open = false;
+    document.querySelectorAll("[data-office-query]").forEach(function (link) {
+      if (city) {
+        var query = new URLSearchParams({q: city + " " + link.dataset.officeQuery});
+        link.href = "https://www.google.com/search?" + query.toString();
+      } else {
+        link.removeAttribute("href");
+      }
+    });
+  }
+  function links(k, big, seen) {
     var l = LINKS[k];
     if (!l) return "";
-    // 検索のボタンは、同じ窓口について最初の1回だけ出す
-    var add = city && SEARCH[k] && !searched[k] ? SEARCH[k] : [];
-    if (add.length) searched[k] = true;
-    l = l.concat(add.map(function (t) {
-      return ["https://www.google.com/search?q=" + encodeURIComponent(city + " " + t), "検索：" + city + " " + t];
-    }));
+    if (seen && OFFICE_JUMPS[k] && !seen[k]) {
+      l = l.concat([OFFICE_JUMPS[k]]);
+      seen[k] = true;
+    }
     return "<span class=\"" + (big ? "act-links" : "act-links small") + "\">" + l.map(function (x) {
       var ext = x[0].charAt(0) !== "#";
       return "<a href=\"" + esc(x[0]) + "\"" + (ext ? " rel=\"noopener\"" : "") + ">" + esc(x[1]) + "</a>";
@@ -402,18 +443,25 @@
 
   function render() {
     var a = read();
-    city = $("city").value.trim().slice(0, 30);
-    searched = {};
+    var city = $("city").value.trim();
+    updateOfficeSearch(city);
+    var seen = city ? {} : null;
     var leave = parseDate($("leave").value);
     var today = todayJst();
-    var any = a.why || a.ins || a.kenpo || a.money || leave || city;
-    $("toolBtns").hidden = !any;
-    if (!any) return;
+    var any = a.why || a.ins || a.kenpo || a.money || leave;
+    $("toolBtns").hidden = !any && !city;
+    if (!any) {
+      if ($("todayOut").innerHTML !== DEFAULT_TODAY) $("todayOut").innerHTML = DEFAULT_TODAY;
+      $("datesOut").innerHTML = "";
+      return;
+    }
     var p = plan(a, leave, today);
-    var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>" + links(p.keys[0], true);
-    if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x, i) { return "<li>" + esc(x) + links(p.keys[i + 1], false) + "</li>"; }).join("") + "</ol>";
+    var h = "<h3>今日やること</h3><p class=\"big\">" + esc(p.today) + "</p>" + links(p.keys[0], true, seen);
+    if (p.next.length) h += "<p class=\"small\">続けてやること</p><ol>" + p.next.map(function (x, i) { return "<li>" + esc(x) + links(p.keys[i + 1], false, seen) + "</li>"; }).join("") + "</ol>";
     h += "<p class=\"small\">病気・けが・出産・育児などで、すぐ働けないときは：<a href=\"#hatarakenai\">" + (a.ins === "no" ? "傷病手当金など" : "受け取れる期間の延長と、傷病手当金") + "</a></p>";
-    if (!city && (p.keys.indexOf("jiritsu") >= 0 || p.keys.indexOf("yakusho") >= 0)) h += "<p class=\"small\">6 の欄に市区町村名を入れると、窓口を探す検索のボタンが出ます。</p>";
+    if (!city && p.keys.some(function (key) { return OFFICE_JUMPS[key]; })) {
+      h += '<p class="small"><a href="#city">市区町村名を入力</a>すると、地域の窓口を探せます。</p>';
+    }
     $("todayOut").innerHTML = h;
     var ds = deadlines(a, leave);
     if (!ds.length) { $("datesOut").innerHTML = leave ? "" : "<p class=\"small\">退職日を入れると、期限の日付が出ます。</p>"; return; }
@@ -525,11 +573,10 @@
     QS.forEach(function (n) { $("qd_" + n).open = false; });
     updateSummaries();
     openFirstUnanswered();
-    $("todayOut").innerHTML = DEFAULT_TODAY;
-    $("datesOut").innerHTML = "";
-    $("toolBtns").hidden = true;
+    render();
     $("status").textContent = "選んだ内容を消しました。";
   });
+  render();
 })();
 </script>
 </body>

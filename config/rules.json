@@ -406,6 +406,13 @@
   "製造販売",
   "薬局"
  ],
+ "reviewed_notice_periods": {
+  "https://www.moj.go.jp/isa/publications/materials/2026obon.html": {
+   "last_day": "2026-08-22",
+   "evidence_url": "https://www.moj.go.jp/isa/content/001468329.pdf",
+   "checked": "2026-11-22"
+  }
+ },
  "max_age_days": 120,
  "_区分": "kinds の group が talk のもの（検討中・意見募集・調査）は『国で話し合っていること』（talk.html）に出す。それ以外は『暮らしに役立つお知らせ』に出す。useful_kinds（例：[\"change\",\"apply\",\"consult\",\"warning\"]）を書くと、役立つ欄をその種類だけに絞り、残りを『そのほかのお知らせ』（other.html）に出す（2026-11-14 に試して、利用者の判断でいったん外した）。"
 }

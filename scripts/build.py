@@ -11,12 +11,13 @@ import re
 import shutil
 import subprocess
 import sys
+from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import quote, urljoin
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lib import JST, ROOT, load_json, now_jst, save_json  # noqa: E402
+from lib import JST, ROOT, load_json, notice_url, now_jst, save_json  # noqa: E402
 
 WD = "月火水木金土日"
 PLACEHOLDER = "【未記入"
@@ -117,6 +118,53 @@ def visible(it: dict) -> bool:
     return it.get("publish") == "auto" and not it.get("excluded") and bool(it.get("topics"))
 
 
+def resolve_notes(store: dict, notes: list[dict]) -> dict[str, dict]:
+    """説明を告知IDに結ぶ。共有URL・旧混在行への曖昧な説明は公開しない。"""
+    items_by_id = defaultdict(list)
+    items_by_url = defaultdict(list)
+    for it in store["items"]:  # 非表示の告知も数える。表示対象だけでは一意とは限らない。
+        items_by_id[it["id"]].append(it)
+        items_by_url[notice_url(it["url"])].append(it)
+    shared = {notice_url(url) for url in store.get("shared_urls", [])}
+    shared.update(notice_url(it["url"]) for it in store.get("legacy_items", []))
+    explicit = defaultdict(list)
+    legacy = defaultdict(list)
+    invalid_urls = set()
+    for n in notes:
+        url = notice_url(n["url"]) if isinstance(n.get("url"), str) else ""
+        if "item_id" in n:
+            iid = n["item_id"]
+            if not isinstance(iid, str) or not iid:
+                invalid_urls.add(url)
+                print("やさしい説明を保留：item_id が空か文字列ではありません", file=sys.stderr)
+                continue
+            explicit[iid].append(n)
+        else:
+            legacy[url].append(n)
+
+    resolved = {}
+    for iid, group in explicit.items():
+        candidates = items_by_id.get(iid, [])
+        if len(group) != 1 or len(candidates) != 1 or group[0].get("url") != candidates[0]["url"]:
+            invalid_urls.update(notice_url(n["url"]) for n in group if isinstance(n.get("url"), str))
+            print(f"やさしい説明を保留：item_id={iid} の指定が重複・不明、または URL が一致しません", file=sys.stderr)
+            continue
+        resolved[iid] = group[0]
+    for url, group in legacy.items():
+        candidates = items_by_url.get(url, [])
+        if not url or len(group) != 1 or len(candidates) != 1 or url in shared or url in invalid_urls:
+            print(f"やさしい説明を保留：URL だけでは対象を一意に決められません：{url}", file=sys.stderr)
+            continue
+        iid = candidates[0]["id"]
+        if len(items_by_id[iid]) != 1:
+            print(f"やさしい説明を保留：告知IDが重複しています：{iid}", file=sys.stderr)
+            continue
+        # ID指定に誤り・重複がある場合も、古いURL指定へ戻して隠さない。
+        if iid not in explicit:
+            resolved[iid] = group[0]
+    return resolved
+
+
 class Site:
     def __init__(self, data_dir: Path, sample: bool = False):
         self.cfg = load_json(ROOT / "config" / "site.json", {})
@@ -124,13 +172,19 @@ class Site:
         self.sources = {s["id"]: s for s in load_json(ROOT / "config" / "sources.json", {"sources": []})["sources"]}
         self.store = load_json(data_dir / "items.json", {"items": [], "updated": None})
         self.health = load_json(data_dir / "health.json", {"sources": {}})
-        self.notes = {n["url"]: n for n in load_json(data_dir / "notes.json", {"notes": []})["notes"]}
+        self.notes = resolve_notes(self.store, load_json(data_dir / "notes.json", {"notes": []})["notes"])
         self.deadlines = load_json(data_dir / "deadlines.json", {"deadlines": []})["deadlines"]
         self.sample = sample
         self.topics = {t["slug"]: t for t in self.rules["topics"]}
         self.kinds = {k["id"]: k for k in self.rules["kinds"]}
         self.kinds[self.rules["default_kind"]["id"]] = self.rules["default_kind"]
-        self.items = [it for it in self.store["items"] if visible(it)]
+        self.built = now_jst()
+        # 公式資料で対象期間を確認した記事だけ、最終日の翌日（日本時間）から掲載を終える。
+        expired_urls = {
+            url for url, period in self.rules.get("reviewed_notice_periods", {}).items()
+            if date.fromisoformat(period["last_day"]) < self.built.date()
+        }
+        self.items = [it for it in self.store["items"] if visible(it) and it["url"] not in expired_urls]
         talk_kinds = {k["id"] for k in self.rules["kinds"] if k.get("group") == "talk"}
         useful_kinds = set(self.rules.get("useful_kinds", []))
         # 3つに分ける。暮らしに役立つお知らせ（制度の変更・募集/申請・相談窓口・注意）、
@@ -142,7 +196,6 @@ class Site:
         self.useful = [it for it in self.items if it["kind"] in useful_kinds]
         self.talk = [it for it in self.items if it["kind"] in talk_kinds]
         self.other = [it for it in self.items if it["kind"] not in useful_kinds and it["kind"] not in talk_kinds]
-        self.built = now_jst()
         oks = [h.get("last_ok") for h in self.health.get("sources", {}).values() if h.get("last_ok")]
         # 「最後に情報源から実際に取れた時刻」。ページを作り直しただけでは新しくならない
         self.fresh = max(oks) if oks else ""
@@ -328,7 +381,7 @@ class Site:
         extra = ""
         if it.get("business"):
             extra += '<li class="biz">事業者向けかもしれません</li>'
-        note = self.notes.get(it["url"])
+        note = self.notes.get(it["id"])
         note_html = ""
         if note:
             note_html = (f'<div class="plain"><p class="plain-h">やさしい説明（人が公式ページで確かめました：{e(jdate(note["checked"], True))}）</p>'

@@ -11,7 +11,10 @@ import sys
 import tempfile
 import threading
 import unittest
+from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 FX = ROOT / "tests" / "fixtures"
@@ -90,6 +93,398 @@ class TestFeeds(unittest.TestCase):
     def test_rss1(self):
         items = lib.parse_feed((FX / "rss1.rdf").read_text(encoding="utf-8"))
         self.assertEqual(items, [{"title": "テストの見出し", "url": "https://example.go.jp/a", "date": "2026-11-12", "category": ""}])
+
+
+class TestNoticeParsing(unittest.TestCase):
+    """同じリンク先でも、別の新着を解析時に捨てない。すべて架空の見本。"""
+
+    def test_rss_guid_is_retained_for_shared_urls(self):
+        xml = '''<rss version="2.0"><channel>
+          <item><title>医療費助成の対象施設を掲載しました</title>
+            <link>https://example.go.jp/pmh</link><guid>medical-1</guid>
+            <pubDate>Mon, 16 Nov 2026 15:00:00 +0900</pubDate></item>
+          <item><title>PIAひな形を掲載しました</title>
+            <link>https://example.go.jp/pmh</link><guid>pia-1</guid>
+            <pubDate>Fri, 20 Nov 2026 15:00:00 +0900</pubDate></item>
+        </channel></rss>'''
+        items = lib.parse_feed(xml)
+        self.assertEqual([i["entry_id"] for i in items], ["medical-1", "pia-1"])
+        self.assertEqual([i["date"] for i in items], ["2026-11-16", "2026-11-20"])
+
+    def test_atom_id_alternate_and_publication_are_order_independent(self):
+        links = [
+            '<link rel="alternate" href="https://example.go.jp/notice"/>',
+            '<link rel="self" href="https://example.go.jp/feed/entry"/>',
+            '<link rel="enclosure" href="https://example.go.jp/file.pdf"/>',
+        ]
+        dates = ['<updated>2026-11-24T23:30:00Z</updated>',
+                 '<published>2026-11-15T15:30:00Z</published>']
+        for link_order in (links, list(reversed(links))):
+            for date_order in (dates, list(reversed(dates))):
+                with self.subTest(links=link_order, dates=date_order):
+                    xml = ('<feed xmlns="http://www.w3.org/2005/Atom"><entry>'
+                           '<id>urn:notice:medical-1</id><title>医療費助成の案内</title>'
+                           + ''.join(link_order + date_order) + '</entry></feed>')
+                    item = lib.parse_feed(xml)[0]
+                    self.assertEqual(item["entry_id"], "urn:notice:medical-1")
+                    self.assertEqual(item["url"], "https://example.go.jp/notice")
+                    self.assertEqual(item["date"], "2026-11-16")
+
+    def test_html_shared_url_keeps_titles_and_publication_days(self):
+        html = '''<main><p>2026年11月24日</p>
+          <a href="/notice">医療費助成の案内です</a>
+          <a href="/notice">PIAひな形の案内です</a>
+          <a href="/notice">医療費助成の案内です</a>
+          <p>2026年11月23日</p><a href="/notice">医療費助成の案内です</a>
+        </main>'''
+        items = lib.parse_html_list(html, "https://example.go.jp/news", r"/notice$")
+        self.assertEqual(len(items), 3)
+        self.assertEqual({(i["title"], i["date"]) for i in items}, {
+            ("医療費助成の案内です", "2026-11-24"),
+            ("PIAひな形の案内です", "2026-11-24"),
+            ("医療費助成の案内です", "2026-11-23"),
+        })
+
+    def test_html_only_normalization_duplicates_are_removed(self):
+        html = '''<p>2026年11月24日</p>
+          <a href="/notice">医療費助成 第１回 の案内</a>
+          <a href="/notice">医療費助成 第1回   の案内</a>
+          <a href="/notice">医療費助成 第2回 の案内</a>'''
+        items = lib.parse_html_list(html, "https://example.go.jp/news", r"/notice$")
+        self.assertEqual(len(items), 2)
+
+
+class TestNoticeIdentity(unittest.TestCase):
+    """取得・移行の契約を、固定時刻・一時データで検証する。外部通信なし。"""
+
+    NOW = datetime.fromisoformat("2026-11-25T09:00:00+09:00")
+    PMH = "https://example.go.jp/pmh"
+    MEDICAL = "医療費助成のオンライン資格確認の対象施設を掲載しました"
+    PIA = "PMHにおけるPIAひな形を掲載しました"
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.tmp = Path(temp.name)
+        self.sources = [deepcopy(SOURCES["digital"])]
+        self.env = patch.dict(os.environ, {"SHIEN_SLEEP": "0", "SHIEN_SOURCE_OVERRIDE": "{}"})
+        self.env.start()
+        self.addCleanup(self.env.stop)
+
+    def entry(self, title=None, *, guid=None, url=None, date="2026-11-24", category=""):
+        row = {"title": title or self.MEDICAL, "url": url or self.PMH,
+               "date": date, "category": category}
+        if guid is not None:
+            row["entry_id"] = guid
+        return row
+
+    def old_item(self, title=None, *, history=None, **changes):
+        title = title or self.MEDICAL
+        item = {"id": "old-url-id", "source": "digital", "source_name": "デジタル庁",
+                "title": title, "url": self.PMH, "published": "2026-11-24", "category": "",
+                "first_seen": "2026-11-24T08:00:00+09:00", "last_seen": "2026-11-24T19:00:00+09:00",
+                "publish": "auto", **lib.classify(title, RULES)}
+        if history is not None:
+            item["title_history"] = list(history)
+        item.update(changes)
+        return item
+
+    def write_store(self, items, **extra):
+        lib.save_json(self.tmp / "items.json", {"updated": "2026-11-24T19:00:00+09:00",
+                                               "items": items, **extra})
+
+    def read_store(self):
+        return json.loads((self.tmp / "items.json").read_text(encoding="utf-8"))
+
+    def collect(self, records, *, today=None):
+        """recordsの値を例外にすると、その情報源の取得失敗を再現する。"""
+        if isinstance(records, list):
+            records = {"digital": records}
+        sources_path = self.tmp / "sources.json"
+        lib.save_json(sources_path, {"sources": self.sources})
+
+        def mocked(src):
+            result = records[src["id"]]
+            if isinstance(result, Exception):
+                raise result
+            return deepcopy(result)
+
+        with patch.object(update, "collect", side_effect=mocked), patch.object(update, "now_jst", return_value=self.NOW):
+            return update.run(sources_path, self.tmp, today=today or self.NOW.date())
+
+    def test_pmh_announcements_keep_independent_topics_and_ids(self):
+        notices = [self.entry(guid="medical-1", date="2026-11-16"),
+                   self.entry(self.PIA, guid="pia-1", date="2026-11-20")]
+        self.assertEqual(self.collect(notices)["new"], 2)
+        items = {i["title"]: i for i in self.read_store()["items"]}
+        self.assertEqual(len(items), 2)
+        self.assertNotEqual(items[self.MEDICAL]["id"], items[self.PIA]["id"])
+        self.assertEqual(items[self.MEDICAL]["topics"], ["health"])
+        self.assertEqual(items[self.PIA]["topics"], [])
+        before = {i["id"]: i for i in items.values()}
+        self.assertEqual(self.collect(list(reversed(notices)))["new"], 0)
+        self.assertEqual({i["id"]: i for i in self.read_store()["items"]}, before)
+
+    def test_twenty_procurement_titles_do_not_create_title_history_cycles(self):
+        notices = [self.entry(f"一般競争入札：架空の調達案件{i:02d}を掲載しました", guid=f"procurement-{i}",
+                              url="https://example.go.jp/procurement") for i in range(20)]
+        self.assertEqual(self.collect(notices)["new"], 20)
+        before = {i["id"]: i for i in self.read_store()["items"]}
+        for batch in (list(reversed(notices)), notices + notices, notices):
+            self.assertEqual(self.collect(batch)["new"], 0)
+            items = self.read_store()["items"]
+            self.assertEqual({i["id"]: i for i in items}, before)
+            self.assertTrue(all(not i.get("title_history") for i in items))
+
+    def test_native_id_correction_updates_metadata_without_new_item(self):
+        old = self.entry(guid="stable-entry", date="2026-11-23", category="お知らせ")
+        self.collect([old])
+        first = self.read_store()["items"][0]
+        fixed = self.entry(self.MEDICAL + "（訂正）", guid="stable-entry", date="2026-11-24",
+                           category="調達", url="https://example.go.jp/pmh-corrected")
+        self.assertEqual(self.collect([fixed])["new"], 0)
+        item = self.read_store()["items"][0]
+        self.assertEqual(item["id"], first["id"])
+        self.assertEqual(item["first_seen"], first["first_seen"])
+        self.assertEqual(item["title"], fixed["title"])
+        self.assertEqual(item["published"], fixed["date"])
+        self.assertEqual(item["url"], fixed["url"])
+        self.assertEqual(item["category"], "調達")
+        self.assertTrue(item["excluded"])
+        self.assertEqual(item["title_history"], [old["title"]])
+        self.collect([fixed, fixed])
+        self.assertEqual(self.read_store()["items"], [item])
+
+    def test_fallback_distinguishes_day_and_title_without_guessing_corrections(self):
+        notices = [self.entry(date="2026-11-23"), self.entry(date="2026-11-24"),
+                   self.entry(self.MEDICAL + "（更新）", date="2026-11-24")]
+        self.assertEqual(self.collect(notices)["new"], 3)
+        self.assertEqual(self.collect(list(reversed(notices)))["new"], 0)
+        self.assertEqual(len(self.read_store()["items"]), 3)
+        self.assertTrue(all(not i.get("title_history") for i in self.read_store()["items"]))
+
+    def test_url_guid_does_not_merge_distinct_announcements(self):
+        notices = [self.entry(guid=self.PMH), self.entry(self.PIA, guid=self.PMH)]
+        self.assertEqual(self.collect(notices)["new"], 2)
+        self.assertEqual(self.collect(list(reversed(notices)))["new"], 0)
+        self.assertEqual(len(self.read_store()["items"]), 2)
+
+    def test_fallback_duplicates_use_normalized_title(self):
+        first = self.entry("医療費助成 第１回 の案内")
+        duplicate = self.entry("医療費助成 第1回   の案内")
+        self.assertEqual(self.collect([first, duplicate, first])["new"], 1)
+        initial_id = self.read_store()["items"][0]["id"]
+        self.assertEqual(self.collect([duplicate, first])["new"], 0)
+        items = self.read_store()["items"]
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["id"], initial_id)
+        self.assertFalse(items[0].get("title_history"))
+
+    def test_missing_date_is_deduplicated_without_inventing_publication_date(self):
+        notice = self.entry(date=None)
+        self.collect([notice, notice])
+        self.collect([notice])
+        items = self.read_store()["items"]
+        self.assertEqual(len(items), 1)
+        self.assertIsNone(items[0]["published"])
+
+    def test_identical_native_ids_are_scoped_to_source(self):
+        self.sources.append({**SOURCES["digital"], "id": "other", "name": "別の情報源"})
+        shared = self.entry(guid="1")
+        result = self.collect({"digital": [shared], "other": [shared]})
+        self.assertEqual(result["new"], 2)
+        items = self.read_store()["items"]
+        self.assertEqual({i["source"] for i in items}, {"digital", "other"})
+        self.assertEqual(len({i["id"] for i in items}), 2)
+
+    def test_conflicting_native_id_fails_source_without_partial_writes(self):
+        valid = self.entry(guid="stable-entry")
+        self.collect([valid])
+        before = self.read_store()["items"]
+        self.sources.append({**SOURCES["digital"], "id": "other", "name": "別の情報源"})
+        # 衝突行の前にも新規行を置き、途中まで保存されないことを確かめる。
+        conflict = self.entry(self.PIA, guid="stable-entry")
+        batch = [self.entry("給付金の案内を掲載しました", guid="new-before-error"), valid, conflict]
+        result = self.collect({"digital": batch, "other": [self.entry(guid="other-1")]})
+        self.assertFalse(result["sources"]["digital"]["ok"])
+        self.assertTrue(result["sources"]["other"]["ok"])
+        self.assertEqual([i for i in self.read_store()["items"] if i["source"] == "digital"], before)
+        self.assertEqual(result["new"], 1)
+
+    def test_same_native_id_with_different_dates_is_a_batch_conflict(self):
+        result = self.collect([self.entry(guid="reused", date="2026-11-23"),
+                               self.entry(guid="reused", date="2026-11-24")])
+        self.assertFalse(result["sources"]["digital"]["ok"])
+        self.assertEqual(self.read_store()["items"], [])
+
+    def test_clean_legacy_record_keeps_id_dates_and_manual_publish(self):
+        original = self.old_item(publish="review")
+        self.write_store([original])
+        self.assertEqual(self.collect([self.entry(guid="medical-1")])["new"], 0)
+        item = self.read_store()["items"][0]
+        self.assertEqual(item["id"], original["id"])
+        self.assertEqual(item["first_seen"], original["first_seen"])
+        self.assertEqual(item["published"], original["published"])
+        self.assertEqual(item["publish"], "review")
+        self.assertTrue(item.get("identity_key"))
+        self.assertEqual(self.collect([self.entry(guid="medical-1")])["new"], 0)
+        self.assertEqual(self.read_store()["items"], [item])
+
+    def test_contaminated_legacy_history_is_archived_without_fabricated_dates(self):
+        original = self.old_item(self.PIA, history=[self.MEDICAL, self.PIA] * 13 + [self.MEDICAL],
+                                 published="2026-11-16")
+        self.write_store([original])
+        # 現在のフィードにはPIAだけ残り、医療費助成の公表日を確認できない場合。
+        current = self.entry(self.PIA, guid="pia-1", date="2026-11-20")
+        self.collect([current])
+        store = self.read_store()
+        self.assertEqual(store["legacy_items"], [original])
+        self.assertEqual(len(store["items"]), 1)
+        pia = store["items"][0]
+        self.assertEqual(pia["title"], self.PIA)
+        self.assertEqual(pia["published"], "2026-11-20")
+        self.assertNotEqual(pia["id"], original["id"])
+        self.assertFalse(pia.get("title_history"))
+        self.assertIn(self.PMH, store["shared_urls"])
+        self.assertEqual(self.collect([current])["new"], 0)
+        self.assertEqual(self.read_store(), store)
+
+    def test_524_legacy_changes_are_preserved_once_and_not_reexpanded(self):
+        titles = [f"一般競争入札：架空の調達案件{i:02d}を掲載しました" for i in range(20)]
+        original = self.old_item(titles[-1], history=[titles[i % 20] for i in range(524)],
+                                 url="https://example.go.jp/procurement", published="2026-11-12")
+        self.write_store([original])
+        current = [self.entry(t, guid=f"procurement-{i}", url=original["url"]) for i, t in enumerate(titles)]
+        self.collect(current)
+        first = self.read_store()
+        self.assertEqual(first["legacy_items"], [original])
+        self.assertEqual(len(first["items"]), 20)
+        self.assertEqual({i["published"] for i in first["items"]}, {"2026-11-24"})
+        self.assertTrue(all(not i.get("title_history") for i in first["items"]))
+        self.assertEqual(self.collect(list(reversed(current)))["new"], 0)
+        self.assertEqual(self.read_store(), first)
+
+    def test_failed_fetch_does_not_partially_migrate_legacy_data(self):
+        original = self.old_item(self.PIA, history=[self.MEDICAL])
+        self.write_store([original])
+        result = self.collect({"digital": RuntimeError("fixture failure")})
+        self.assertFalse(result["sources"]["digital"]["ok"])
+        store = self.read_store()
+        self.assertEqual(store["items"], [original])
+        self.assertEqual(store.get("legacy_items", []), [])
+
+    def test_notes_and_deadlines_are_byte_for_byte_unchanged(self):
+        original = self.old_item(self.PIA, history=[self.MEDICAL])
+        self.write_store([original])
+        files = {
+            "notes.json": {"notes": [{"url": self.PMH, "text": "人が確認した説明", "checked": "2026-11-20"}]},
+            "deadlines.json": {"deadlines": [{"url": self.PMH, "title": "人が確認した手続き", "who": "対象者",
+                                               "deadline": "2026-12-28", "checked": "2026-11-20",
+                                               "source_name": "確認元"}]},
+        }
+        for name, data in files.items():
+            lib.save_json(self.tmp / name, data)
+        before = {name: (self.tmp / name).read_bytes() for name in files}
+        self.collect([self.entry(self.PIA, guid="pia-1")])
+        self.assertEqual({name: (self.tmp / name).read_bytes() for name in files}, before)
+
+    def test_shared_url_warning_survives_retention_of_one_announcement(self):
+        old = self.entry(guid="older", date="2026-08-01")
+        recent = self.entry(self.PIA, guid="recent", date="2026-11-24")
+        self.collect([old, recent])
+        self.assertEqual(len(self.read_store()["items"]), 2)
+        self.collect([recent], today=datetime.fromisoformat("2026-12-01").date())
+        store = self.read_store()
+        self.assertEqual(len(store["items"]), 1)
+        self.assertIn(self.PMH, store["shared_urls"])
+
+    def test_distinct_notices_reach_topic_page_public_json_and_atom(self):
+        notices = [self.entry("医療費助成の申請案内を掲載しました", guid="medical-apply"),
+                   self.entry("医療費助成の相談窓口を掲載しました", guid="medical-consult")]
+        self.collect(notices)
+        items = self.read_store()["items"]
+        out = self.tmp / "site"
+        build.Site(self.tmp).build(out)
+        public = json.loads((out / "items.json").read_text(encoding="utf-8"))["items"]
+        self.assertEqual({i["id"] for i in public}, {i["id"] for i in items})
+        topic = (out / "t" / "health.html").read_text(encoding="utf-8")
+        atom = (out / "feed.xml").read_text(encoding="utf-8")
+        for item in items:
+            self.assertIn(item["title"], topic)
+            self.assertIn(item["title"], atom)
+            self.assertIn(f'urn:shien-news:{item["id"]}', atom)
+        self.assertEqual(atom.count("<entry>"), 2)
+
+    def test_entry_id_can_appear_and_disappear_without_duplicates(self):
+        self.collect([self.entry()])
+        iid = self.read_store()["items"][0]["id"]
+        for entry in (self.entry(guid="stable"), self.entry(), self.entry(guid="stable")):
+            self.assertEqual(self.collect([entry])["new"], 0)
+            items = self.read_store()["items"]
+            self.assertEqual(len(items), 1)
+            self.assertEqual(items[0]["id"], iid)
+            self.assertEqual(items[0]["entry_id"], "stable")
+
+    def test_native_correction_overlapping_fallback_is_held_without_merging_manual_data(self):
+        self.collect([self.entry(guid="stable")])
+        corrected = self.MEDICAL + "（訂正）"
+        self.collect([self.entry(corrected)])  # ID欠落中は別件か訂正かを断定できない
+        before = self.read_store()["items"]
+        before[0]["publish"] = "review"
+        self.write_store(before)
+        for published in ("2026-11-24", None):
+            result = self.collect([self.entry(corrected, guid="stable", date=published)])
+            self.assertFalse(result["sources"]["digital"]["ok"])
+            self.assertEqual(result["new"], 0)
+            self.assertEqual(self.read_store()["items"], before)
+        self.assertEqual(len({i["title"] for i in before}), 2)
+
+    def test_missing_date_on_known_native_entry_keeps_publication_date(self):
+        self.collect([self.entry(guid="stable", date="2026-11-16")])
+        before = self.read_store()["items"][0]
+        self.collect([self.entry(guid="stable", date=None)])
+        self.assertEqual(self.read_store()["items"], [before])
+        self.assertEqual(self.collect([self.entry(date="2026-11-16")])["new"], 0)
+        self.assertEqual(self.read_store()["items"], [before])
+
+    def test_distinct_native_ids_with_identical_metadata_remain_distinct(self):
+        entries = [self.entry(guid="one"), self.entry(guid="two"), self.entry()]
+        self.assertEqual(self.collect(entries)["new"], 2)
+        before = self.read_store()["items"]
+        self.assertEqual(self.collect(list(reversed(entries)))["new"], 0)
+        self.assertEqual(self.read_store()["items"], before)
+        # IDがなければどちらに対応するか不明。3件目を作らず情報源の更新を保留する。
+        self.assertFalse(self.collect([self.entry()])["sources"]["digital"]["ok"])
+        self.assertEqual(self.read_store()["items"], before)
+
+    def test_html_category_conflict_is_not_lost_before_validation(self):
+        rows = ['<p>調達情報</p><a href="/notice">医療費助成システムのお知らせ</a>',
+                '<p>お知らせ</p><a href="/notice">医療費助成システムのお知らせ</a>']
+        for ordered in (rows, list(reversed(rows))):
+            html = '<p>2026年11月24日</p>' + ''.join(ordered)
+            entries = lib.parse_html_list(html, "https://example.go.jp/news", r"/notice$")
+            self.assertEqual(len(entries), 2)
+            self.assertFalse(self.collect(entries)["sources"]["digital"]["ok"])
+            self.assertEqual(self.read_store()["items"], [])
+
+    def test_subset_source_config_does_not_remove_other_sources_default_topics(self):
+        other = self.old_item("年次報告を掲載しました", id="isa-item", source="isa", topics=["foreign"])
+        self.write_store([other])
+        self.collect([self.entry(guid="medical")])
+        self.assertEqual(next(i for i in self.read_store()["items"] if i["id"] == "isa-item"), other)
+
+    def test_archived_manual_review_decision_is_not_automatically_undone(self):
+        self.write_store([self.old_item(self.PIA, history=[self.MEDICAL], publish="review")])
+        self.collect([self.entry(self.PIA, guid="pia")])
+        self.assertEqual(self.read_store()["items"][0]["publish"], "review")
+
+    def test_mixed_id_duplicates_do_not_discard_conflicting_categories(self):
+        entries = [self.entry(guid="stable", category="調達"), self.entry(category="お知らせ")]
+        self.assertFalse(self.collect(entries)["sources"]["digital"]["ok"])
+        self.assertEqual(self.read_store()["items"], [])
+        entries = [self.entry(guid="stable"), self.entry(category="調達")]
+        self.assertEqual(self.collect(entries)["new"], 1)
+        self.assertTrue(self.read_store()["items"][0]["excluded"])
 
 
 class TestClassify(unittest.TestCase):
@@ -239,6 +634,70 @@ class TestEndToEnd(unittest.TestCase):
         self.assertNotIn("<script>alert", index)
         self.assertIn("&lt;script&gt;", index)
         self.assertNotIn('"onmouseover="', index)
+
+
+class TestNoticeDisplayPeriod(unittest.TestCase):
+    obon = "https://www.moj.go.jp/isa/publications/materials/2026obon.html"
+    # 次年度版と相談案内は、同じ情報源・分野・掲載日の架空の対照記事。
+    next_year = obon.replace("2026obon", "2027obon")
+    guide = "https://www.moj.go.jp/isa/test-guide.html"
+
+    def setUp(self):
+        self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.sources = self.tmp / "sources.json"
+        lib.save_json(self.sources, {"sources": [SOURCES["isa"]]})
+        self.rows = [
+            {"url": self.obon, "title": "2026年お盆期間における開閉庁日案内", "date": "2026-08-07"},
+            {"url": self.next_year, "title": "2027年お盆期間における開閉庁日案内", "date": "2026-08-07"},
+            {"url": self.guide, "title": "在留手続の相談窓口のご案内", "date": "2026-08-07"},
+        ]
+        self.enterContext(patch.dict(os.environ, SHIEN_SLEEP="0", SHIEN_SOURCE_OVERRIDE="{}"))
+
+    def collect_at(self, when, rows):
+        with patch.object(update, "now_jst", return_value=when), patch.object(update, "collect", return_value=rows):
+            result = update.run(self.sources, self.tmp)
+        self.assertTrue(result["sources"]["isa"]["ok"], result)
+        return result["new"]
+
+    def site_at(self, when):
+        with patch.object(build, "now_jst", return_value=when):
+            return build.Site(self.tmp)
+
+    def test_rebuild_across_last_day_without_refetch(self):
+        last_minute = datetime(2026, 8, 22, 23, 59, 59, tzinfo=lib.JST)
+        midnight = datetime(2026, 8, 23, tzinfo=lib.JST)
+        self.collect_at(last_minute, self.rows)
+        before = (self.tmp / "items.json").read_bytes()
+        self.assertIn(self.obon, [i["url"] for i in self.site_at(last_minute).useful])
+        self.assertCountEqual([i["url"] for i in self.site_at(midnight).useful], [self.next_year, self.guide])
+        self.assertEqual((self.tmp / "items.json").read_bytes(), before)
+
+    def test_refetch_and_cached_notice_stay_out_of_public_outputs(self):
+        now = datetime(2026, 11, 22, 7, 49, tzinfo=lib.JST)
+        # 空の取得データから始め、同じ記事の再取得、公式一覧から消えた後の再分類も通す。
+        first_id = None
+        for rows, expected_new in [(self.rows, 3), (self.rows, 0), (self.rows[1:], 0)]:
+            with self.subTest(fetched=len(rows), expected_new=expected_new):
+                self.assertEqual(self.collect_at(now, rows), expected_new)
+                site = self.site_at(now)
+                raw = next(i for i in site.store["items"] if i["url"] == self.obon)
+                # 新着の識別の変更（告知ID）後も、再取得・一覧から消えた後で同じ記事のIDが変わらない。
+                first_id = first_id or raw["id"]
+                self.assertEqual(raw["id"], first_id)
+                self.assertEqual(raw["publish"], "auto")
+                self.assertFalse(raw["excluded"])
+                self.assertCountEqual([i["url"] for i in site.items], [self.next_year, self.guide])
+
+        out = self.tmp / "site"
+        self.site_at(now).build(out)
+        for path in ("index.html", "t/foreign.html", "feed.xml"):
+            with self.subTest(path=path):
+                content = (out / path).read_text(encoding="utf-8")
+                self.assertNotIn(self.obon, content)
+                self.assertIn(self.next_year, content)
+                self.assertIn(self.guide, content)
+        public_items = lib.load_json(out / "items.json", {})["items"]
+        self.assertCountEqual([i["url"] for i in public_items], [self.next_year, self.guide])
 
 
 class TestWatch(unittest.TestCase):

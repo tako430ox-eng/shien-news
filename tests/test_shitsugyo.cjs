@@ -207,3 +207,20 @@ test('職業訓練の出席：育児・介護中や基礎コースの人の例�
   assert.match(html, /2年を過ぎていても相談してください/);
   assert.doesNotMatch(html, /払えないまま放っておかず/);
 });
+
+test('窓口への近道は「今日やること」の用件に合わせる', () => {
+  const plan = api.plan({kenpo: 'company', money: 'short'}, null, D('2026-11-25'));
+  const actions = [plan.today, ...plan.next];
+  const seen = {};
+  const links = plan.keys.map(key => api.links(key, false, seen));
+  const linksFor = text => {
+    const index = actions.findIndex(action => action.includes(text));
+    assert.notEqual(index, -1, text);
+    return links[index];
+  };
+  assert.match(linksFor('自立相談支援機関'), /href="#officeJiritsu"/);
+  assert.match(linksFor('健康保険を、'), /href="#officeKokuho"/);
+  assert.match(linksFor('年金の手続きをする'), /href="#officeNenkin"/);
+  assert.doesNotMatch(linksFor('失業による免除'), /href="#officeKokuho"/);
+  assert.doesNotMatch(linksFor('健康保険を、'), /href="#officeNenkin"/);
+});
