@@ -9,11 +9,9 @@ on:
     branches: [main]
     paths: ["config/**", "assets/**", "pages/**", "scripts/**", "data/notes.json", "data/deadlines.json"]
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-  issues: write
+# 権限は仕事ごとに分ける。外のサイトを読む「取得と作成」には公開の権限を渡さず、
+# 「公開」には読み書きの権限を渡さない（ここでは全体の既定を空にする）
+permissions: {}
 
 concurrency:
   group: update
@@ -23,6 +21,9 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -75,5 +76,20 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
+  # 公開は別の仕事にする。同じ仕事の中で公開すると、作ったサイトの包み（artifact）が
+  # まだ見えない瞬間に探しに行き「No artifacts named github-pages」で失敗することがあった（2026-11-25 に4回）
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: 公開
+        id: deployment
         uses: actions/deploy-pages@v4
