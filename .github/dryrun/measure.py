@@ -30,7 +30,7 @@ if mode == "live":
     for u, v in s["pages"].items():
         sn = v.get("snapshot", {})
         print("  S", sn.get("kind"), sn.get("body_chars"), len(sn.get("blocks", [])), u)
-else:  # wayback
+elif mode == "wayback":
     cfg = json.loads(cfg_path.read_text())
     LEG = ("閲覧数", "アクセス数", "ページ番号", r"^\d+$")
     def legacy(text):
