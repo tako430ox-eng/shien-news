@@ -1,0 +1,25 @@
+# 一時的な計測（マージ前に削除する）。読み取りだけ。状態の保存も Issue の作成もしない。
+name: 計測（出典監視の新方式・一時）
+on:
+  push:
+    branches: [claude/project-thread-rpjf33]
+    paths: [".github/dryrun/**", ".github/workflows/dryrun-watch.yml"]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python .github/dryrun/measure.py live
+  wayback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python .github/dryrun/measure.py wayback
