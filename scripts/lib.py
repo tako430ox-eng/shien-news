@@ -13,7 +13,7 @@ from datetime import date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urldefrag, urljoin
 
 ROOT = Path(__file__).resolve().parent.parent
 JST = timezone(timedelta(hours=9))
@@ -121,7 +121,34 @@ def find_date(text: str) -> date | None:
 
 
 def item_id(url: str) -> str:
+    """旧URL単位のID。既存IDの参照互換のため残す。新着の識別には使わない。"""
     return hashlib.sha1(url.encode("utf-8")).hexdigest()[:12]
+
+
+def notice_url(url: str) -> str:
+    """比較用URL。フラグメントだけ除く。パスやクエリは勝手に同一視しない。"""
+    return urldefrag(url.strip())[0]
+
+
+def entry_identifier(item: dict) -> str:
+    """情報源が付けた告知ID。リンクURLそのものは告知を区別できないため使わない。"""
+    value = (item.get("entry_id") or "").strip()
+    if not value or notice_url(value) == notice_url(item["url"]):
+        return ""
+    return value
+
+
+def notice_key(source: str, item: dict, *, use_entry_id: bool = True) -> str:
+    """告知の照合キー。見出しの類似度による統合はしない。
+
+    IDのない告知では訂正か別件かを確定できないため、異なる見出しは保持する。
+    JSON配列をハッシュ化し、区切り文字の混入や別情報源の同一GUIDを混同しない。
+    """
+    native = entry_identifier(item) if use_entry_id else ""
+    parts = (["entry-v2", source, native] if native else
+             ["notice-v2", source, notice_url(item["url"]),
+              item.get("date", item.get("published")), clean(item["title"])])
+    return hashlib.sha256(json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
 # ---------------------------------------------------------------- HTML の一覧ページ
@@ -226,9 +253,11 @@ def parse_html_list(html: str, base_url: str, item_href: str, strip_prefixes=(),
         if not category and last_text and len(last_text) <= 12:
             category = last_text
         d0 = d_in or last_date
-        if len(text) < 6 or url in seen or (require_date and d0 is None):
+        # カテゴリの食い違いは更新側で検出する。先の1件だけ残すと掲載判断が順序に依存する。
+        key = (notice_url(url), d0.isoformat() if d0 else None, clean(text), category)
+        if len(text) < 6 or key in seen or (require_date and d0 is None):
             continue
-        seen.add(url)
+        seen.add(key)
         d = d_in or last_date
         out.append({"title": text, "url": url, "date": d.isoformat() if d else None, "category": category})
     return out
@@ -236,7 +265,7 @@ def parse_html_list(html: str, base_url: str, item_href: str, strip_prefixes=(),
 
 # ---------------------------------------------------------------- RSS / Atom
 
-def parse_feed(xml_text: str) -> list[dict]:
+def parse_feed(xml_text: str, base_url: str = "") -> list[dict]:
     """RSS 1.0（RDF）・RSS 2.0・Atom を読む。"""
     root = ET.fromstring(xml_text.encode("utf-8") if isinstance(xml_text, str) else xml_text)
     out = []
@@ -247,30 +276,53 @@ def parse_feed(xml_text: str) -> list[dict]:
     for el in root.iter():
         if local(el.tag) not in ("item", "entry"):
             continue
-        title = link = when = None
+        title = link = None
+        native = None
+        dates = {}
+        links = []
         cats = []
         for c in el:
             n = local(c.tag)
             if n == "title":
                 title = tidy("".join(c.itertext()))
             elif n == "link":
-                link = (c.get("href") or c.text or "").strip() or link
-            elif n in ("date", "pubDate", "updated", "published") and not when:
-                when = (c.text or "").strip()
+                value = (c.get("href") or c.text or "").strip()
+                # Atomのself/enclosureは本文へのリンクではない。要素順に依存しない。
+                if value and (not c.get("href") or c.get("rel", "alternate") == "alternate"):
+                    links.append((0 if c.get("type", "text/html") == "text/html" else 1, value))
+            elif n in ("date", "pubDate", "updated", "published"):
+                dates[n] = (c.text or "").strip()
+            elif n in ("guid", "id"):
+                native = (c.text or "").strip() or native
             elif n in ("category", "subject"):
                 cats.append(clean(c.text or c.get("term") or ""))
+        if links:
+            link = urljoin(base_url, min(links)[1])
         if not title or not link:
             continue
         d = None
-        if when:
+        # published/pubDateを優先。updatedを先に見ても掲載日に採用しない。
+        for name in ("published", "pubDate", "date", "updated"):
+            when = dates.get(name)
+            if not when:
+                continue
             try:
-                d = datetime.fromisoformat(when.replace("Z", "+00:00")).astimezone(JST).date()
+                dt = datetime.fromisoformat(when.replace("Z", "+00:00"))
+                d = (dt if dt.tzinfo else dt.replace(tzinfo=JST)).astimezone(JST).date()
             except ValueError:
                 try:
-                    d = parsedate_to_datetime(when).astimezone(JST).date()
-                except (TypeError, ValueError):
+                    dt = parsedate_to_datetime(when)
+                    d = (dt if dt.tzinfo else dt.replace(tzinfo=JST)).astimezone(JST).date()
+                except (TypeError, ValueError, OverflowError):
                     d = find_date(when)
-        out.append({"title": title, "url": link, "date": d.isoformat() if d else None, "category": cats[0] if cats else ""})
+            if d:
+                break
+        item = {"title": title, "url": link, "date": d.isoformat() if d else None, "category": cats[0] if cats else ""}
+        # RDFのaboutが本文URL以外なら、それも告知IDとして保持する。
+        native = native or el.get("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")
+        if native and notice_url(native) != notice_url(link):
+            item["entry_id"] = native
+        out.append(item)
     return out
 
 
