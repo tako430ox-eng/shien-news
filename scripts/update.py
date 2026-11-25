@@ -9,10 +9,12 @@ import argparse
 import copy
 import json
 import os
+import re
 import sys
 import time
 from datetime import date, timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import (ROOT, classify, clean, decode, entry_identifier, fetch, load_json,  # noqa: E402
@@ -21,14 +23,25 @@ from lib import (ROOT, classify, clean, decode, entry_identifier, fetch, load_js
 DATA = ROOT / "data"
 
 
+def allowed_link(url: str, source: dict) -> bool:
+    """サイトに載せてよいリンクか。http(s) 以外（javascript: や data: など）は、押すとこのサイトの中で
+    プログラムが動くおそれがあるので捨てる。item_href があれば、RSS でもその形のURLだけを残す。"""
+    if not isinstance(url, str) or urlsplit(url.strip()).scheme.lower() not in ("http", "https"):
+        return False
+    pattern = source.get("item_href")
+    return not pattern or bool(re.search(pattern, url.strip()))
+
+
 def collect(source: dict) -> list[dict]:
     body, headers = fetch(source["url"])
     text = decode(body, headers)
     if source["type"] == "rss":
-        return parse_feed(text, source["url"])
-    if source["type"] == "html_list":
-        return parse_html_list(text, source["url"], source["item_href"], source.get("strip_prefixes", []), source.get("exclude_href"))
-    raise ValueError(f"未知の種類: {source['type']}")
+        got = parse_feed(text, source["url"])
+    elif source["type"] == "html_list":
+        got = parse_html_list(text, source["url"], source["item_href"], source.get("strip_prefixes", []), source.get("exclude_href"))
+    else:
+        raise ValueError(f"未知の種類: {source['type']}")
+    return [g for g in got if allowed_link(g.get("url"), source)]
 
 
 def prepare_entries(source: str, got: list[dict]) -> list[dict]:
