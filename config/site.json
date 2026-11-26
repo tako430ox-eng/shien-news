@@ -10,7 +10,8 @@
  "survey": {
   "url": "https://docs.google.com/forms/d/e/1FAIpQLSfNaOPD5nYzRIhKL_ifdKAG1mWGZGR-moQAhD82HJEAqEVKhg/viewform",
   "service": "Google フォーム",
-  "page_entry": "entry.563584129",
+  "page_entry": "",
+  "_page_entryの説明": "2026-11-26 運営者の判断で事前選択をやめた（開いた時点でページの種類が Google に伝わるため）。元の値は entry.563584129。page_values は戻すとき用に残す。",
   "page_values": {
    "yachin": "家賃が払えないとき（家賃編）",
    "news": "支援の新着",
