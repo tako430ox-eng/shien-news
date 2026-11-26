@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "pages" / "sasaeru"
 BASE = "https://tako430ox-eng.github.io/shien-news/"
 UPDATED = "2026年11月16日"
-REVISED = "2026年11月21日"
+REVISED = "2026年11月26日"
 
 # ---------------------------------------------------------------- 出典
 # c：その資料を読んで確かめた日。
@@ -91,15 +91,15 @@ PATH = '<svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" a
 
 SAFETY = ('<div class="notice">'
           '<p class="notice-h">命の危険があるとき、暴力を受けているとき</p>'
-          '<p>この先を読むより先に <a href="tel:110">110番</a>・<a href="tel:119">119番</a> へ。'
-          '「死にたい」と言われたときは、<a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel" rel="noopener">電話やSNSの相談窓口（まもろうよ こころ・厚生労働省）</a>'
+          '<p>この先を読むより先に、暴力などの危険が迫っていて警察にすぐ来てほしいときは <a href="tel:110">110番</a>、けがや急病で救急車が必要なときは <a href="tel:119">119番</a> へ。'
+          '「死にたい」と言われたときは、<a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel" rel="noopener">電話の相談窓口</a>か、声を出しにくいときは<a href="https://www.mhlw.go.jp/mamorouyokokoro/soudan/sns/" rel="noopener">SNS・チャットの相談窓口</a>（どちらも、まもろうよ こころ・厚生労働省）'
           'を本人と一緒に見てください。</p>'
           '<p class="notice-h">今日食べるものがない、今夜泊まる場所がないとき</p>'
           '<p>相談の予約の日を待たずに、'
           '本人がいま居る場所の近くの<b>福祉事務所</b>（市区町村の生活保護の窓口）に、そのことを最初に伝えてください。'
           '住むところがなくても、生活保護は申請できます（厚生労働省）。'
           '夜間や休日に電話がつながる窓口は、地域によって違います。</p>'
-          '<p>探し方：「（市区町村名） 福祉事務所」で検索するか、<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の一覧（厚生労働省、Excel）</a>を見ます。'
+          '<p>探し方：「（市区町村名） 福祉事務所」で検索するか、<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の名前の一覧（厚生労働省、Excel）</a>を見ます。電話番号は市区町村の公式ページで確かめます。'
           '見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。'
           '<a href="{up}sasaeru/seikatsuhogo/">生活保護の相談のしかた</a></p></div>')
 
@@ -117,6 +117,8 @@ def page(path: str, title: str, h1: str, lead: str, desc: str, body: str, srcs: 
     safety = SAFETY.replace("{up}", up)
     if path == "sasaeru/seikatsuhogo/":
         safety = safety.replace(f'href="{up}sasaeru/seikatsuhogo/"', 'href="#kyou"').replace("生活保護の相談のしかた</a>", "このページの「支える人ができること」</a>")
+    if path == "sasaeru/":  # 入口では、緊急の案内の前に場面の一覧への近道を置く（スマホの最初の画面から場面に進めるように）
+        jump = (jump or "") + '<p><a class="more-link" href="#basho">困っている場面を選ぶ（5つ）↓</a></p>'
     back = "" if path == "sasaeru/" else f'<p><a class="more-link" href="{up}sasaeru/">← 家族や友人が生活に困っているとき（場面の一覧）</a></p>'
     return f"""<!doctype html>
 <html lang="ja">
@@ -497,7 +499,8 @@ SCENES.append(dict(
 {say("付き添う人が最初に言う文",
      "「〇〇の家族（友人）の△△です。本人と一緒に、生活保護の相談に来ました。申請するかどうかは本人が決めます。親族への問い合わせについて本人が心配していることがあるので、あわせて相談させてください。」")}
 {say("本人が福祉事務所で言う文（申請すると決めたとき）",
-     "「生活保護の申請をしたいです。親族のことで事情があります。〇〇とは△年ほど連絡を取っていません（暴力を受けて逃げてきました）。親族への問い合わせについて相談させてください。」")}
+     "「生活保護を申請したいです。連絡されると困る親族がいます。親族への連絡について、先に相談したいです。」")}
+<p class="small">事情を足すときの例（本人が伝えたいことだけ。上の文には入っていません）：「〇〇とは△年ほど連絡を取っていません」「〇〇から暴力を受けて逃げてきました」。暴力のことを話すかどうかは、本人が決めます。</p>
 <p class="small">本人がその場にいない、まだ相談するか決めていないときは、支える人だけで先に相談のしかたを聞くこともできます。<a href="{{up}}sasaeru/denwa/">「本人がその場にいないとき」の文</a>を使ってください。</p>
 <p class="small">本人に代わって申請を決めたり、本人が言っていないことを言ったりはしないでください。</p>
 
@@ -518,7 +521,7 @@ def hub() -> str:
         f'<li class="card"><a class="title" href="{s["slug"]}/">{e(s["card"])}</a></li>' for s in SCENES)
     body = f"""
 <p>家族や友人が「お金がない」「家賃が払えない」と打ち明けてきたとき、そばにいる人ができることがあります。困っている場面を選んでください。</p>
-<ul class="cards">{cards}</ul>
+<ul class="cards" id="basho">{cards}</ul>
 
 <h2>どの場面でも役に立つ3つのこと</h2>
 <ol>

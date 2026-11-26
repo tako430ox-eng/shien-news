@@ -6,6 +6,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import hashlib
 import html
 import re
 import shutil
@@ -36,19 +38,40 @@ PRERENDER = ROOT / "scripts" / "prerender_yachin.cjs"
 # 「ページを開いても外に接続しない」「入力を送らない」という約束を、ブラウザの側でも守らせる二重の備え。
 # リンクを押して公式ページや Google 検索・アンケートへ移ることは妨げない（移動はこの決まりの対象外）。
 # GitHub Pages は応答ヘッダーを変えられないので meta で書く（frame-ancestors は meta では効かない）。
-# 家賃編などはページの中にスクリプトと style を書いているので 'unsafe-inline' を許す。
-CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
-       "img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; "
-       "base-uri 'none'; form-action 'none'")
+# スクリプトは、このサイトのファイル（'self'）と、ページの中に書いたスクリプトのうち公開時にハッシュを計算したものだけを動かす。
+# 'unsafe-inline' は使わない（2026-11-26 外部レビュー 10：万一ページに文字が差し込まれても、スクリプトとしては動かないように）。
+# style はページの中の style 属性を使っているので 'unsafe-inline' を許す（スクリプトは動かせない）。
+CSP_REST = ("style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; "
+            "base-uri 'none'; form-action 'none'")
+
+
+def csp(hashes: tuple[str, ...] = ()) -> str:
+    src = " ".join(["'self'"] + [f"'sha256-{h}'" for h in hashes])
+    return f"default-src 'self'; script-src {src}; {CSP_REST}"
+
+
+CSP = csp()
 CSP_META = f'<meta http-equiv="Content-Security-Policy" content="{CSP}">'
+CSP_META_RE = re.compile(r'<meta http-equiv="Content-Security-Policy" content="[^"]*">')
 CHARSET_META = '<meta charset="utf-8">'
+INLINE_SCRIPT = re.compile(r"<script>([\s\S]*?)</script>")
+
+
+def script_hashes(text: str) -> tuple[str, ...]:
+    """ページの中に書いたスクリプト（src のない <script>）の中身の SHA-256（ブラウザが比べるのと同じ、UTF-8 の文字列そのまま）。"""
+    return tuple(base64.b64encode(hashlib.sha256(m.group(1).encode("utf-8")).digest()).decode("ascii")
+                 for m in INLINE_SCRIPT.finditer(text))
 
 
 def add_csp(text: str) -> str:
-    """pages/ から写す HTML に CSP の meta を足す（文字コードの meta のすぐ後ろ。スクリプトより前）。"""
-    if CSP_META in text or CHARSET_META not in text:
+    """pages/ から写す HTML に CSP の meta を足す（文字コードの meta のすぐ後ろ。スクリプトより前）。
+    ページの中のスクリプトは、ここで計算したハッシュで許す。スクリプトを書き換えたあと（メニュー・アンケートの差し込み、
+    家賃編の書き込みのあと）に呼ぶこと。"""
+    if CSP_META_RE.search(text) or CHARSET_META not in text:
         return text
-    return text.replace(CHARSET_META, CHARSET_META + "\n" + CSP_META, 1)
+    meta = f'<meta http-equiv="Content-Security-Policy" content="{csp(script_hashes(text))}">'
+    return text.replace(CHARSET_META, CHARSET_META + "\n" + meta, 1)
 
 
 MENU_MARK = "<!--site-menu-->"
@@ -329,9 +352,18 @@ class Site:
             url += ("&" if "?" in url else "?") + "usp=pp_url&" + entry + "=" + quote(value)
         return url
 
-    def survey_note(self, up: str) -> str:
+    def survey_prefill(self, page: str) -> str:
+        """事前入力で Google に伝わるページの種類。事前入力しないなら空。"""
         sv = self.survey()
-        return (f'押すと、{e(sv.get("service", "外部のフォーム"))}が別の画面で開きます。このページで選んだ内容やメモは送られません。'
+        return (sv.get("page_values") or {}).get(page, "") if sv.get("page_entry") else ""
+
+    def survey_note(self, up: str, page: str = "") -> str:
+        sv = self.survey()
+        svc = e(sv.get("service", "外部のフォーム"))
+        # 事前入力の値はアドレスに入るので、送信しなくても、開いた時点でフォームの会社に伝わる（2026-11-26 外部レビュー 8）
+        kind = self.survey_prefill(page)
+        told = (f'開くと、このページの種類（「{e(kind)}」）がアドレスの一部として{svc}に伝わります。' if kind else "")
+        return (f'押すと、{svc}が別の画面で開きます。{told}このページで選んだ内容やメモは送られません。'
                 'アンケートの答えは、送信を押したときだけ運営者に届きます。名前や連絡先は聞きません。'
                 f'返事はできないので、困っていることは相談先に連絡してください。<a href="{up}unei.html#kansou">アンケートについて</a>')
 
@@ -344,7 +376,7 @@ class Site:
     <strong id="survey-h">使ってみて、どうでしたか</strong>
     <p>ページを直すために、1分ほどのアンケートに答えてもらえると助かります。答えなくても、このページはそのまま使えます。</p>
     <p><a class="survey-link" href="{e(self.survey_url(page))}" target="_blank" rel="noopener">感想のアンケートに答える（任意）</a></p>
-    <p class="muted">{self.survey_note(up)}</p>
+    <p class="muted">{self.survey_note(up, page)}</p>
   </section>"""
 
     def survey_unei(self) -> str:
@@ -357,7 +389,7 @@ class Site:
 <ul>
 <li>ページを直すための、任意のアンケートです。答えなくても、どのページもそのまま使えます。</li>
 <li>{svc}（Google社のサービス）を使っています。アンケートを開いたときと送信したときに Google社のサーバーに接続し、答えは Google社のサーバーに保存されます。</li>
-<li>運営者に届くのは、送信したアンケートの答えだけです。このサイトで選んだ内容やメモは送られません。メールアドレスは集めない設定にしています。どのページから開いたかは、最初から選んだ状態で開きます（変えられます）。</li>
+<li>運営者に届くのは、送信したアンケートの答えだけです。このサイトで選んだ内容やメモは送られません。メールアドレスは集めない設定にしています。どのページから開いたか（家賃・失業・支える人へ・新着）は、最初から選んだ状態で開きます（変えられます）。この選んだ状態はアンケートのアドレスに入っているので、送信しなくても、開いた時点で Google社に伝わります。</li>
 <li>名前・住所・電話番号・メールアドレスや、相談の具体的な中身は書かないでください。書かれていた場合は、運営者が見つけしだい消します。</li>
 <li>アンケートには返事ができません。困っていることは、下の相談先か、お住まいの市区町村の窓口に連絡してください。</li>
 <li>答えはページを直すためだけに使います。外に出すときは、人数や割合と、だれのものか分からないように直した要点だけにします。</li>
@@ -367,7 +399,7 @@ class Site:
     def survey_foot(self, up: str) -> str:
         if not self.survey():
             return ""
-        return f'  <p><a href="{e(self.survey_url("news"))}" target="_blank" rel="noopener">感想のアンケートに答える（任意・1分）</a><br>{self.survey_note(up)}</p>\n'
+        return f'  <p><a href="{e(self.survey_url("news"))}" target="_blank" rel="noopener">感想のアンケートに答える（任意・1分）</a><br>{self.survey_note(up, "news")}</p>\n'
 
     def updated_text(self) -> str:
         u = self.fresh
@@ -396,7 +428,7 @@ class Site:
             if not counts.get(slug) and not any(slug in it["topics"] for it in self.talk + self.other):
                 continue
             cls = ' aria-current="page"' if current == slug else ""
-            out.append(f'<a class="chip" href="{up}t/{slug}.html"{cls}>{e(t["label"])}<span class="n">{counts.get(slug, 0)}</span></a>')
+            out.append(f'<a class="chip" href="{up}t/{slug}.html"{cls}>{e(t["label"])}<span class="n">新着{counts.get(slug, 0)}件</span></a>')
         out.append("</nav>")
         return "\n".join(out)
 
@@ -498,6 +530,7 @@ class Site:
         return f"""<section class="box help guides" aria-labelledby="guides-h">
  <h2 id="guides-h">困りごとを選ぶ</h2>
  <ul class="links">{rows}</ul>
+ <p class="urgent-link small"><a href="{e(self.cfg.get("base_url", "") + "yachin/#safety")}">今夜寝る場所がない・今日の食べ物がない・命の危険・暴力から逃げたいときの相談先</a></p>
  <ul class="promise-plain small" aria-label="このサイトの約束"><li>無料です。登録はいらず、個人の情報も集めません。</li><li>制度の説明は、国などの公式資料で確かめ、出典を付けています。</li></ul>
 </section>"""
 
@@ -509,7 +542,7 @@ class Site:
         body.append(self.source_warnings())
         body.append(self.guides_html())
         # 2026-11-21 コタローさんの判断：トップの主役は3つの入口。新着はその下に続ける
-        body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページに出た新着を、1日2回自動で集めています。暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選び、見出しは公式のまま載せています。分野で絞り込めます。</p>')
+        body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページに出た新着を、1日2回自動で集めています。暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選び、見出しは公式のまま載せています。分野で絞り込めます。お知らせの種類と分野は、見出しの言葉からプログラムが自動で付けたもので、間違うことがあります。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
         body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{("制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.rules.get("useful_kinds") else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。コンクール・表彰式・イベントなどの行事は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。") if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')

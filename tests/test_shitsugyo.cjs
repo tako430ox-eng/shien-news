@@ -130,8 +130,8 @@ test('雇用保険なし：職業訓練の案内に、テキスト代の自己�
   const p = api.plan({why: 'self', kenpo: 'kokuho', ins: 'no'}, D('2026-11-10'), D('2026-11-18'));
   assert.ok(all(p).some(x => /求職者支援制度/.test(x) && /テキスト代は自己負担/.test(x) && /条件に合えば/.test(x)));
 });
-test('雇用保険なし：求職者支援制度を案内し、もともと国保なら役所の切り替えは出さない', () => {
-  const p = api.plan({why: 'self', kenpo: 'kokuho', ins: 'no'}, D('2026-11-10'), D('2026-11-18'));
+test('自営業・フリーランス：求職者支援制度を案内し、もともと国保なら役所の切り替えは出さない', () => {
+  const p = api.plan({why: 'self', kenpo: 'kokuho', ins: 'self'}, D('2026-11-10'), D('2026-11-18'));
   assert.match(p.today, /求職者支援制度/);
   assert.ok(![p.today, ...p.next].some(x => /切り替え|健康保険を、/.test(x)));
 });
@@ -223,4 +223,28 @@ test('窓口への近道は「今日やること」の用件に合わせる', ()
   assert.match(linksFor('年金の手続きをする'), /href="#officeNenkin"/);
   assert.doesNotMatch(linksFor('失業による免除'), /href="#officeKokuho"/);
   assert.doesNotMatch(linksFor('健康保険を、'), /href="#officeNenkin"/);
+});
+
+// ---- 2026-11-26 外部レビューの反映 ----
+test('雇われていたが未加入：まず加入の記録をハローワークで確かめ、求職者支援制度も残す（レビュー6）', () => {
+  const p = api.plan({why: 'self', kenpo: 'kokuho', ins: 'no'}, D('2026-11-10'), D('2026-11-18'));
+  assert.match(p.today, /給与明細/); assert.match(p.today, /管轄するハローワーク/);
+  assert.ok(all(p).some(x => /求職者支援制度/.test(x)));
+  assert.ok(!api.deadlines({kenpo: 'company', ins: 'self'}, D('2026-11-30')).some(d => /受給期間/.test(d.what)));
+});
+test('扶養に入っている人が失業給付を受けるときは、日額が分かった時点で扶養を確かめる（レビュー6）', () => {
+  for (const ins of ['yes', 'unknown', '']) {
+    const p = api.plan({why: 'self', kenpo: 'family', ins}, D('2026-11-10'), D('2026-11-18'));
+    assert.ok(all(p).some(x => /扶養のままでよいか/.test(x)), ins);
+  }
+  assert.ok(!all(api.plan({why: 'self', kenpo: 'family', ins: 'self'}, D('2026-11-10'), D('2026-11-18'))).some(x => /扶養のままでよいか/.test(x)));
+});
+test('受給期間は目安として出し、過ぎても「過ぎています」と言い切らない（レビュー4）', () => {
+  const d = api.deadlines({kenpo: 'company', ins: 'yes'}, D('2024-01-10')).find(x => /受給期間/.test(x.what));
+  assert.equal(d.sure, false); assert.match(d.note, /330日/); assert.match(d.note, /受給資格者証/);
+});
+test('本文：14日の根拠・給付制限1か月・通所手当のみ・扶養の再確認（レビュー6・7）', () => {
+  assert.match(html, /国民健康保険法施行規則第3条/); assert.doesNotMatch(html, /14日以内とする自治体があります/);
+  assert.match(html, /原則1か月/); assert.match(html, /通所手当）だけ受けられる/); assert.match(html, /扶養から外れる届出/);
+  assert.match(html, /soudan\/sns\//);
 });

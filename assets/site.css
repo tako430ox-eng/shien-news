@@ -159,6 +159,9 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .cards .card:has(> a.title:only-child:focus-visible) { outline: 3px solid var(--c-link); outline-offset: 2px; }
 .srcs { padding-left: 1.2em; display: grid; gap: var(--s-2); overflow-wrap: anywhere; }
 .guides .links .tool span { margin-top: var(--s-1); }
+.guides .urgent-link { margin: var(--s-3) 0 0; font-weight: 700; }
+/* スマホでは入口3つを最初の画面に収める（2026-11-26 外部レビュー 9：375×667 で3つ目が画面の外だった）。入口の説明は広い画面だけに出す */
+@media (max-width: 40rem) { .guides .links .tool span { display: none; } }
 .guides .promise-plain { margin: var(--s-4) 0 0; padding-left: 1.2em; display: grid; gap: var(--s-1); color: var(--c-ink-soft); } /* トップの約束：入口の下に、ふつうの箇条で */
 
 /* ---- 仕事を失ったとき（pages/shitsugyo/）：あなたの場合を選ぶ道具（家賃編の選択肢と同じ見た目） ---- */
