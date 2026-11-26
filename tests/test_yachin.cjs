@@ -20,7 +20,7 @@ function appAt(when='2026-11-16T01:00:00Z', saved=null) {
 }
 function ids(a){return Array.from(a.decide().c,x=>x.id);}
 test('income reduction over two years remains a consultation candidate',()=>{const {a}=appAt(); a.setState({a:{reason:'cut',when:'over2'}}); assert.ok(ids(a).includes('jukyo'));});
-test('job loss over two years still explains extension exceptions',()=>{const {a}=appAt(); a.setState({a:{reason:'jobloss',when:'over2'}}); assert.match(a.decide().ex.join(''),/病気|疾病/);});
+test('job loss over two years stays a candidate and explains the 30-day / 4-year extension (2026-11-26 review 4)',()=>{const {a}=appAt(); a.setState({a:{reason:'jobloss',when:'over2'}}); const d=a.decide(); const j=d.c.filter(x=>x.id==='jukyo')[0]; assert.ok(j); assert.match(j.why,/30日以上/); assert.match(j.why,/最長4年/); assert.equal(d.ex.join(''),''); assert.match(a.memoText(d),/仕事を探せなかった期間/);});
 test('pension household can ask about relocation independently of rent subsidy',()=>{const {a}=appAt(); a.setState({a:{reason:'pension',work:'retired',move:'ok'}}); assert.ok(ids(a).includes('tenkyo')); assert.ok(!ids(a).includes('jukyo'));});
 test('no pension/retirement exclusion from temporary loan with repayment prospect',()=>{const {a}=appAt(); a.setState({a:{reason:'pension',work:'retired',outlook:'back'}}); assert.ok(ids(a).includes('koguchi'));});
 test('life emergency overrides eviction and food in first action',()=>{const {a,el}=appAt(); a.setState({a:{rent:'evict'},safety:{life:true,food:true}});a.renderFirst(); assert.match(el('firstOut').innerHTML,/安全|命/); assert.doesNotMatch(el('firstOut').innerHTML,/法テラスに電話/);});
@@ -58,7 +58,7 @@ test('prerender fills the first screen for readers without JavaScript and leaves
   assert.equal(rest,html);
 });
 test('landlord script states only the chosen reason (pension is not "income decreased")',()=>{const {a}=appAt();
-  for (const rent of ['now','late1','evict','soon']) {
+  for (const rent of ['now','late1','soon']) {
     a.setState({a:{rent,reason:'pension'}});const s=a.landlordScript();assert.doesNotMatch(s,/収入が減/,rent);assert.match(s,/年金だけでは/,rent);
     a.setState({a:{rent,reason:'jobloss'}});assert.match(a.landlordScript(),/収入が減/,rent);
     a.setState({a:{rent}});assert.doesNotMatch(a.landlordScript(),/収入が減|年金/,rent);
@@ -109,5 +109,31 @@ test('Yorisoi shows the Fukushima and IP-phone numbers wherever offered (recheck
     const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML;
     assert.match(out,/福島県からは 0120-279-226/);assert.match(out,/IP電話からは 050-3655-0279/);
   }
-  assert.match(html,/第6\.2版、2026年11月2\d日更新/);
+  assert.match(html,/第6\.[2-9]版、2026年11月2\d日更新/);
 });
+
+// ---- 2026-11-26 外部レビューの反映 ----
+test('eviction notice alone: landlord script does not apologise for arrears or give a reason (review 2)',()=>{const {a}=appAt();
+  for (const reason of [undefined,'pension','jobloss']) { a.setState({a:reason?{rent:'evict',reason}:{rent:'evict'}}); const s=a.landlordScript();
+    assert.doesNotMatch(s,/遅れ|申し訳|収入が減|年金|生活費/,String(reason)); assert.match(s,/退去について連絡を受けました/); }});
+test('late rent without a chosen reason does not invent one (review 2)',()=>{const {a}=appAt(); a.setState({a:{rent:'late1'}}); assert.doesNotMatch(a.landlordScript(),/生活費が足りなく|ためです/);});
+test('night block and representative-number script use only what was chosen (review 2, 3)',()=>{
+  const {a,el}=appAt('2026-11-16T12:00:00Z'); // 21時、役所は閉まっている
+  a.setState({safety:{food:true}}); a.renderUrgent(); const u=el('urgentOut').innerHTML;
+  assert.doesNotMatch(u,/寝る場所がありません|泊まる場所がありません/); assert.match(u,/食べ物やお金がありません/);
+  a.setState({safety:{night:true},city:'〇〇市'}); a.renderFind(); const f=el('findOut').innerHTML;
+  assert.match(f,/今、〇〇市にいます。今夜泊まる場所がありません。今日対応できる福祉事務所/); assert.doesNotMatch(f,/自立相談支援機関」や/); assert.doesNotMatch(f,/minna-tunagaru/);
+  a.setState({}); a.renderFind(); assert.match(el('findOut').innerHTML,/minna-tunagaru/);});
+test('DV memo line does not disclose violence (review 2)',()=>{const {a}=appAt(); a.setState({safety:{dv:true},dvNote:true}); const m=a.memoText(a.decide());
+  assert.match(m,/居場所を伝えないでください/); assert.doesNotMatch(m,/暴力/);});
+test('110 and 119 are tappable whenever danger or violence is chosen (review 1)',()=>{const {a,el}=appAt();
+  for (const k of ['life','dv']) { a.setState({safety:{[k]:true}}); a.renderUrgent(); const u=el('urgentOut').innerHTML; assert.match(u,/href="tel:110"/,k); assert.match(u,/href="tel:119"/,k); }
+  const {a:b,el:e2}=appAt('2026-11-16T12:00:00Z'); b.setState({safety:{night:true}}); b.renderUrgent(); assert.match(e2('urgentOut').innerHTML,/href="tel:110"/);});
+test('emergency contacts and quick exit work without JavaScript (review 1)',()=>{
+  const ns=html.match(/<noscript>([\s\S]*?)<\/noscript>/)[1];
+  for (const n of ['tel:110','tel:119','tel:0120279338','tel:0120279889','tel:%238008']) assert.ok(ns.includes(n),n);
+  assert.match(ns,/福祉事務所/); assert.match(ns,/閲覧履歴に残ります/);
+  assert.match(html,/<a class="quick-exit" id="quickExit" href="https:\/\/tenki\.jp\/"/);});
+test('rent arrears are not covered by the housing benefit, and that is said (review 5)',()=>{const {a,el}=appAt();
+  a.setState({a:{rent:'late2'}}); const d=a.decide(); a.renderCandidates(d); assert.match(el('candOut').innerHTML,/滞納分）にはあてられません/);
+  a.renderPlan(d); assert.match(el('planOut').innerHTML,/滞納分）にはあてられません/);});

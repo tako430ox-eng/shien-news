@@ -513,6 +513,9 @@ class TestClassify(unittest.TestCase):
         # 「取組開始から8年目」のような言い回しを「制度の変更」にしない（2026-11-13 の本番データの例）
         self.assertNotEqual(self.c("応援サポーターが登場　取組開始から8年目")["kind"], "change")
         self.assertEqual(self.c("令和８年１０月１日付け永住許可に関するガイドラインを改定しました。")["kind"], "change")
+        # 2026-11-26 外部レビュー 9：劇の公演は行事、窓口（分室）の開設は相談窓口のお知らせ
+        self.assertEqual(self.c("みて かんじて つながる劇体験～優良児童劇等公演事業～令和8年12月19日（土）鳥取県琴浦町にて開催")["kind"], "event")
+        self.assertEqual(self.c("【福岡出入国在留管理局】「天神分室」開設のお知らせ（PDF：157KB）")["kind"], "consult")
 
     def test_excluded(self):
         self.assertTrue(self.c("上野厚生労働大臣 閣議後記者会見のお知らせ")["excluded"])
@@ -591,10 +594,11 @@ class TestEndToEnd(unittest.TestCase):
         # 関係のあるものは出す。公式へのリンクと出典つき
         self.assertIn("住居確保給付金の支給要件の見直し", index)
         self.assertIn("出典：厚生労働省ホームページ", index)
-        # useful_kinds を書かない今の設定では、話し合いと行事（group: other）以外はすべて役立つ欄に出す。見本に行事はないので「そのほか」は作らない
+        # useful_kinds を書かない今の設定では、話し合いと行事（group: other）以外はすべて役立つ欄に出す。
+        # 見本のこども家庭庁の劇の公演（2026-11-26 外部レビュー 9 で行事に分けた）は「そのほか」に出し、役立つ欄には出さない
         self.assertIn("生活オリエンテーション動画", index.split("class=\"box talk\"")[0])
-        self.assertFalse((out / "other.html").exists())
-        self.assertNotIn("other.html", (out / "sitemap.xml").read_text(encoding="utf-8"))
+        self.assertNotIn("劇体験", index.split("class=\"box talk\"")[0])
+        self.assertIn("劇体験", (out / "other.html").read_text(encoding="utf-8"))
         # 会議は「暮らしに役立つお知らせ」に混ぜず、「国で話し合っていること」に分ける
         useful_part = index.split("国で話し合っていること")[0]
         self.assertNotIn("ひとり親家庭支援ワーキンググループ", useful_part)
@@ -1283,9 +1287,17 @@ class TestPages(unittest.TestCase):
             text = f.read_text(encoding="utf-8")
             if text.startswith("google-site-verification"):
                 continue
-            self.assertEqual(text.count(build.CSP_META), 1, f.name)
+            metas = build.CSP_META_RE.findall(text)
+            self.assertEqual(len(metas), 1, f.name)
             script = text.find("<script")
-            self.assertTrue(script < 0 or text.index(build.CSP_META) < script, f.name)
+            self.assertTrue(script < 0 or text.index(metas[0]) < script, f.name)
+            # 'unsafe-inline' でスクリプトを許さない。ページの中のスクリプトは、その中身のハッシュだけを許す（2026-11-26 外部レビュー 10）
+            policy = metas[0].split('content="')[1]
+            script_src = policy.split("script-src ")[1].split(";")[0]
+            self.assertNotIn("unsafe-inline", script_src, f.name)
+            for h in build.script_hashes(text):
+                self.assertIn(f"'sha256-{h}'", script_src, f.name)
+            self.assertEqual(script_src.count("sha256-"), len(build.script_hashes(text)), f.name)
         self.assertIn("connect-src 'none'", build.CSP)
         self.assertIn("form-action 'none'", build.CSP)
 
@@ -1526,6 +1538,8 @@ class TestSurvey(unittest.TestCase):
         # 押す前に、何が送られて何が送られないかを書いている
         self.assertIn("このページで選んだ内容やメモは送られません", yachin)
         self.assertIn('href="../unei.html#kansou"', yachin)
+        # 事前入力でページの種類が開いた時点で伝わることを、リンクのそばに書く（2026-11-26 外部レビュー 8）
+        self.assertIn("このページの種類（「家賃が払えないとき（家賃編）」）がアドレスの一部として", yachin)
         # 案内はフッターの前、支える人への案内のあと（緊急の案内の途中に割り込まない）
         self.assertLess(yachin.index("隣で支える人へ"), yachin.index("survey-h"))
         self.assertLess(yachin.index("survey-h"), yachin.index("<footer>"))
@@ -1554,6 +1568,7 @@ class TestSurvey(unittest.TestCase):
         out = self.tmp / "site"
         self.site.build(out)
         self.assertIn(f'href="{self.FORM}" target="_blank"', self.read(out, "yachin/index.html"))
+        self.assertNotIn("このページの種類", self.read(out, "yachin/index.html"))
 
     def test_rejects_bad_settings(self):
         for bad in ("javascript:alert(1)", "http://docs.google.com/forms/x", 'https://x.example/"><script>', "<iframe src=x>"):
