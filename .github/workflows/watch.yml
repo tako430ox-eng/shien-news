@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "23 23 * * 0"
   workflow_dispatch:
+    inputs:
+      accept_baseline:
+        description: "公式ページを確かめたうえで、新しい基準として受け入れるURL（設定済みのもの。複数は空白で区切る）。ふだんは空のまま"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -19,7 +24,22 @@ jobs:
         with:
           python-version: "3.12"
       - name: 見張る
-        run: python scripts/watch.py --report watch_report.md
+        env:
+          ACCEPT: ${{ inputs.accept_baseline }}
+        run: |
+          set -f
+          args=()
+          for u in $ACCEPT; do args+=(--accept-baseline "$u"); done
+          python scripts/watch.py --report watch_report.md "${args[@]}"
+      # 知らせを先に出す。Issue を作れなかったときは状態を保存せず、次回も同じ変化を知らせる。
+      - name: 変化があれば Issue で知らせる
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f watch_report.md ]; then
+            gh label create "出典の変化" --color 0E6655 --force >/dev/null 2>&1 || true
+            gh issue create --title "出典ページに変化がありました（$(TZ=Asia/Tokyo date '+%Y-%m-%d')）" --label "出典の変化" --body-file watch_report.md
+          fi
       - name: 状態を保存
         run: |
           git config user.name "shien-news-bot"
@@ -28,12 +48,4 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "出典ページの確認 $(TZ=Asia/Tokyo date '+%Y-%m-%d')"
             git pull --rebase && git push
-          fi
-      - name: 変化があれば Issue で知らせる
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -f watch_report.md ]; then
-            gh label create "出典の変化" --color 0E6655 --force >/dev/null 2>&1 || true
-            gh issue create --title "出典ページに変化がありました（$(TZ=Asia/Tokyo date '+%Y-%m-%d')）" --label "出典の変化" --body-file watch_report.md
           fi
