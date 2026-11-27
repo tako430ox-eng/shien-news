@@ -142,6 +142,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: var(--s-2); line-height: 1
 /* ---- 今日やること（いちばん大事なカード） ---- */
 .first { background: var(--c-surface); border-radius: var(--r-md); box-shadow: var(--shadow-1); border: 2px solid var(--c-primary); padding: var(--s-5) var(--s-4) var(--s-4); display: grid; gap: var(--s-3); min-width: 0; position: relative; margin-top: 10px; }
 .first > h2 { position: absolute; top: -15px; left: 14px; font-size: 1rem; background: var(--c-primary); color: var(--c-primary-ink); padding: 3px 14px; border-radius: var(--r-pill); line-height: 1.5; }
+#firstSay:empty { display: none; }
 .first .lead2 { font-family: var(--f-display); font-size: var(--fs-lead); font-weight: 700; line-height: 1.55; }
 .notice { background: var(--c-warn-bg); border-radius: var(--r-sm); padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-2); }
 .notice strong { color: var(--c-warn); }
@@ -306,7 +307,7 @@ h2, h3, .cand-name, .first .lead2 { font-family: var(--f-body); font-weight: 700
 .hero h1 { font-size: var(--fs-h1); }
 p, li { text-wrap: pretty; }
 legend, summary, .opts:not(.tiles) .opt span, .cand-name, .say-h { word-break: auto-phrase; overflow-wrap: anywhere; }
-.tiles .opt span { word-break: normal; }
+.tiles .opt span { word-break: auto-phrase; overflow-wrap: anywhere; } /* 2026-11-28 外部レビュー 4：2列で「食べ／物」のように語の途中で折れていた。文節で折り返す */
 a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .card, .first, details.cand { box-shadow: none; }
 /* 看板は端から端まで */
@@ -317,6 +318,7 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .promise li::before { content: "✓"; width: auto; height: auto; border-radius: 0; background: none; color: var(--c-sign-accent); font-weight: 700; }
 .brandrow .tag, .badge, .eyebrow .tag { border-radius: 4px; font-size: 0.875rem; } /* 14px 未満は使わない（デジタル庁） */
 /* 選択肢：3つ以上は縦に並べ、左に丸を出す（GOV.UK：縦積み・丸は左。2つで短いときだけ横） */
+.opt .opt-sub { display: block; font-size: var(--fs-small); line-height: 1.6; color: var(--c-ink-soft); font-weight: 400; } /* 長い選択肢の補足（2026-11-28 外部レビュー 3） */
 .opts:not(.tiles) .opt span { position: relative; border-radius: var(--r-sm); border-width: 1px; padding: 10px 16px 10px 48px; line-height: 1.6; min-height: 48px; display: block; }
 .opts:not(.tiles) .opt span::before { content: "" !important; position: absolute; left: 13px; top: 12px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--c-ink); background: var(--c-surface); box-sizing: border-box; }
 .opts:not(.tiles) .opt input:checked + span { background: var(--c-primary-soft); color: var(--c-ink); border-color: var(--c-primary); box-shadow: inset 0 0 0 1px var(--c-primary); font-weight: 400; }
@@ -338,6 +340,10 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   #safety .section-head { gap: var(--s-1); }
   #safety .section-head > p { font-size: var(--fs-small); }
   .tiles .opt span { min-height: 0; padding: 8px 12px; line-height: 1.45; }
+  /* 2026-11-28 外部レビュー 4：スマホの2列では1行が8字ほどで「食べ／物」「死にたい／ほどつらい」と細切れになっていた。
+     狭い画面では1列にして、横幅いっぱいの1行で読めるようにする（押せる高さ 44px 以上） */
+  .tiles { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .tiles .opt span { min-height: 44px; padding-top: 7px; padding-bottom: 7px; display: flex; align-items: center; }
 }
 @media (max-width: 380px) {
   .page { --page-gap: var(--s-4); }
@@ -410,6 +416,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
       <span class="small muted">検索ボタンを押したときだけ、検索する言葉が Google に送られます。</span>
     </div>
     <div id="findOut"></div>
+    <div id="firstSay" class="stack"></div>
     <p><a class="more" href="#situation">もっとくわしく：状況に合わせて、手順・持ち物・窓口で聞くことを出す ↓</a></p>
   </section>
 
@@ -774,10 +781,15 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   // ---- render questions ----
   // 選択肢が横1行に収まる質問は、そのまま並べる。ほかは押すと選択肢が開く
   var INLINE_Q = ["when", "debt", "welfare", "nat"];
+  // 長い選択肢は、短い主文と補足に分ける（「年金だけでは足りない（仕事を失ったわけではない）」→ 下の行に小さく補足）
+  function optText(t) {
+    var m = /^(.+)（(.+)）$/.exec(t);
+    return m ? esc(m[1]) + '<small class="opt-sub">' + esc(m[2]) + '</small>' : esc(t);
+  }
   function optsHtml(q) {
     return q.opts.map(function (o) {
       var id = "q_" + q.id + "_" + o[0];
-      return '<label class="opt"><input type="radio" name="q_' + q.id + '" id="' + id + '" value="' + o[0] + '" data-q="' + q.id + '"><span>' + esc(o[1]) + '</span></label>';
+      return '<label class="opt"><input type="radio" name="q_' + q.id + '" id="' + id + '" value="' + o[0] + '" data-q="' + q.id + '"><span>' + optText(o[1]) + '</span></label>';
     }).join("");
   }
   function renderQuestions() {
@@ -1017,7 +1029,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
     var urgent = state.safety.night || state.safety.food;
     var open = officeOpen();
     var dvFirst = state.safety.dv || has("move", "flee");
-    var html = "";
+    var html = "", say = "";
     if (state.safety.life) {
       html += '<p class="lead2">まず命と体の安全を確保する</p><p>今すぐ命に危険があるときは119、暴力などの危険が迫っているときは110へ。つらい気持ちの相談先は、<a href="#safety">上の「今すぐの相談先」</a>にあります。家賃の手続きは、安全が確保できてからで大丈夫です。</p>';
     } else if (dvFirst) {
@@ -1032,16 +1044,24 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
         sayBox("first_law", EVICT_SCRIPT) + '<p class="small">鍵を替えられた・荷物を出されたときは、そのことも伝えてください。</p>' +
         LAW_CLOSED + '<p>市区町村の総合窓口にも、その窓口の受付時間内に早めに連絡してください（下の手順）。法テラスの受付を待つ必要はありません。</p>';
     } else if (has("welfare", "yes")) {
-      html += '<p class="lead2">担当のケースワーカー（福祉事務所）に家賃のことを伝える</p>' + sayBox("first_case", "生活保護を受けています。" + situationSentence() + "担当の方に、家賃と住まいのことを相談したいです。");
+      html += '<p class="lead2">担当のケースワーカー（福祉事務所）に家賃のことを伝える</p>';
+      say = sayBox("first_case", "生活保護を受けています。" + situationSentence() + "担当の方に、家賃と住まいのことを相談したいです。");
     } else {
-      html += '<p class="lead2">' + (callerIsSupporter() ? "支える人が" : "") + '市区町村の総合窓口（自立相談支援機関）に電話して、相談の予約をする</p>' +
-        sayBox("first_call", callScript());
+      html += '<p class="lead2">' + (callerIsSupporter() ? "支える人が" : "") + '市区町村の総合窓口（自立相談支援機関）に電話して、相談の予約をする</p>';
+      say = sayBox("first_call", callScript());
     }
+    // 2026-11-28 外部レビュー 2：ふだんの家賃の相談は「やること → 市区町村を入れて窓口を探す → 電話で言う文（コピー）→ 時間の補足」の順。
+    // 言う文は市区町村の欄と検索の下（#firstSay）に出す。閉まっている時間は、その時間にできることを先に（やることのすぐ下に）出す。
+    // 緊急・DV・退去のときは、選んだ状況の連絡先と文を、これまでどおり先頭（#firstOut）にまとめて出す。
     if (!open && !urgent && !state.safety.life) {
-      html += '<p class="small"><strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）の電話相談は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスと役所では受付時間が異なります。上の案内で受付時間を確認してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。') + (dvFirst ? '</p>' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。</p>') +
-        '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI, "よりそいホットライン") + '</p><p class="small">' + esc(YORISOI_HOURS) + ' ' + esc(YORISOI_OTHER) + ' ' + YORISOI_LINK + '</p>';
+      var hours = '<strong>いまは役所が閉まっている時間かもしれません。</strong>' + (dvFirst ? 'DV相談＋（0120-279-889）の電話相談は24時間です。役所の窓口は平日の昼間だけです。' : has("rent", "evict") ? '法テラスと役所では受付時間が異なります。上の案内で受付時間を確認してください。' : '多くの窓口は平日の昼間だけです。' + esc(nextWeekdayLabel()) + 'に電話してください。');
+      var keep = dvFirst ? '' : '今のうちに、この文のスクリーンショットを撮るか、紙に書き写しておくと安心です。';
+      var yori = '<p class="small">一人でいるのがつらいときは：' + telBtn(YORISOI, "よりそいホットライン") + '</p><p class="small">' + esc(YORISOI_HOURS) + ' ' + esc(YORISOI_OTHER) + ' ' + YORISOI_LINK + '</p>';
+      if (say) { html += '<p class="small">' + hours + '</p>'; say += (keep ? '<p class="small">' + keep + '</p>' : '') + yori; }
+      else html += '<p class="small">' + hours + keep + '</p>' + yori;
     }
     $("firstOut").innerHTML = html;
+    $("firstSay").innerHTML = say;
   }
 
   // ---- plan ----
