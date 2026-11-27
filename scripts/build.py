@@ -261,6 +261,17 @@ class Site:
         days = [d for d in days if d]
         return max(days) if days else None
 
+    def share_meta(self) -> str:
+        """共通の共有画像。利用者の入力や相談内容は含めない。"""
+        image = e(self.url("assets/kurashi-share.png"))
+        alt = "くらしの非常口。暮らしの相談先と今日やること。無料・登録不要。"
+        return f"""<meta property="og:image" content="{image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{e(alt)}">
+<meta name="twitter:card" content="summary_large_image">
+"""
+
     def head(self, title: str, desc: str, path: str, depth: int) -> str:
         up = "../" * depth
         canon = self.url(path)
@@ -280,6 +291,7 @@ class Site:
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{e(canon)}">
+{self.share_meta() if path == "index.html" else ""}
 {f'<meta name="google-site-verification" content="{e(verify)}">' + chr(10) if verify else ""}<meta name="theme-color" content="#fffaf2">
 <link rel="alternate" type="application/atom+xml" title="{e(self.cfg['name'])}" href="{up}feed.xml">
 <link rel="stylesheet" href="{up}assets/fonts.css">
@@ -535,6 +547,7 @@ class Site:
  <ul class="links">{rows}</ul>
  <p class="urgent-link small"><a href="{e(self.cfg.get("base_url", "") + "yachin/#safety")}">今夜寝る場所がない・今日の食べ物がない・命の危険・暴力から逃げたいときの相談先</a></p>
  <ul class="promise-plain small" aria-label="このサイトの約束"><li>無料です。登録はいらず、個人の情報も集めません。</li><li>制度の説明は、国などの公式資料で確かめ、出典を付けています。</li></ul>
+ <p class="small"><a href="about.html#share">このサイトを紹介する方へ</a></p>
 </section>"""
 
     # ------------------------------------------------------------ ページ
@@ -633,6 +646,11 @@ class Site:
 <li>職員の採用、入札、議事録、記者会見など、暮らしの支援と関わりが薄いお知らせは除いています。</li>
 <li>このページは利用する人の情報を集めていません。アクセス解析や広告のプログラムも入れていません。見出しに使っている書体（Zen Maru Gothic）もこのサイトの中に置いているので、ページを開いてもほかの会社のサーバーには接続しません（公開に使っている GitHub を除く）。</li>{survey_li}
 </ul>
+<h2 id="share">このサイトを紹介する方へ</h2>
+<p>家賃・失業・身近な人の生活の困りごとについて、今日やること、相談先、窓口でそのまま使える言葉をまとめた無料の案内サイトです。登録は不要です。行政機関のサイトや相談窓口ではありません。</p>
+<p>紹介するときは<a href="{e(self.url("index.html"))}">くらしの非常口のトップページ</a>をお使いください。必要なページが分かっている場合は、<a href="yachin/">家賃が払えないとき</a>、<a href="shitsugyo/">仕事を失った・辞めたとき</a>、<a href="sasaeru/">家族や友人を支えるとき</a>へ直接リンクできます。</p>
+<p>メッセージに添える文の例：</p>
+<blockquote><p>「くらしの非常口」は、家賃や仕事、生活のことで困ったときに、相談先と今日できることを探せる無料のサイトです。登録は不要です。 {e(self.url("index.html"))}</p></blockquote>
 <h2>種類の見方</h2>
 <ul>{kinds}</ul>
 <h2>情報源と、いまの状態</h2>
@@ -694,6 +712,8 @@ class Site:
                 text = SURVEY_MARK.sub(lambda m: self.survey_unei() if m.group(1) == "unei" else self.survey_block(m.group(1), depth), text)
                 if rel.as_posix() == "yachin/index.html":
                     text = prerender_yachin(text)
+                if rel.as_posix() in {"yachin/index.html", "shitsugyo/index.html", "sasaeru/index.html"}:
+                    text = text.replace("</head>", self.share_meta() + "</head>", 1)
                 text = add_csp(text)
                 dst.write_text(text, encoding="utf-8")
             else:
