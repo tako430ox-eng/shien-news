@@ -1640,7 +1640,7 @@ class TestSasaeru(unittest.TestCase):
         h = self.pages["seikatsuhogo/index.html"]
         self.assertNotIn('href="../../sasaeru/seikatsuhogo/"', h)
         self.assertIn('href="#kyou"', h)
-        self.assertIn("000801479.xlsx", t)
+        self.assertIn("fukusijimusyo/index.html", t)
 
 
 class TestShitsugyo(unittest.TestCase):
