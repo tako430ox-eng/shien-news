@@ -128,11 +128,20 @@ def say(sid: str, label: str, text: str) -> str:
             f'<p class="copy-row" hidden><button type="button" class="copy" data-copy="say_{sid}">この文をコピー</button></p></div>')
 
 
+def opt_text(t: str) -> str:
+    """長い選択肢は、短い主文と補足に分ける：「会社の都合（解雇・倒産…）」→ 主文「会社の都合」＋下の行に小さく補足。
+    （2026-11-28 外部レビュー 3：括弧の説明ごと折り返して、狭い画面で5行になっていた）"""
+    if t.endswith("）") and "（" in t:
+        main, sub = t[:-1].split("（", 1)
+        return f'{main}<small class="opt-sub">{sub}</small>'
+    return t
+
+
 def radio(name: str, opts: list[tuple[str, str]], legend: str) -> str:
     """押すと選択肢が開く質問（家賃編と同じ形）。スクリプトが動かないときは、全部開いたまま選べる（open）。
     スクリプトが動くときは、まだ答えていない最初の質問だけを開き、答えると閉じて、選んだ答えを見出しの下に出す。"""
     items = "".join(
-        f'<label class="opt"><input type="radio" name="{name}" value="{v}"><span>{t}</span></label>' for v, t in opts)
+        f'<label class="opt"><input type="radio" name="{name}" value="{v}"><span>{opt_text(t)}</span></label>' for v, t in opts)
     return (f'<details class="q" id="qd_{name}" open><summary><span class="q-label">{legend}</span>'
             f'<span class="q-ans" id="qa_{name}"></span></summary>'
             f'<fieldset><legend class="sr-only">{legend}</legend><div class="opts">{items}</div></fieldset></details>')
@@ -155,10 +164,14 @@ def more(summary: str, body: str, did: str = "") -> str:
 
 
 # ---------------------------------------------------------------- 本文
-SAFETY = """<div class="notice">
+SAFETY = """<div class="notice" id="kinkyu">
 <p class="notice-h">今夜寝る場所がない、今日食べるものやお金がないとき</p>
-<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）に、今日困っていることを伝えてください。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
-<p>探し方：<a href="#city">市区町村名を入力する</a>と、その下に「生活保護の相談窓口を探す」ボタンが出ます。ほかの質問は飛ばせます。<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html" rel="noopener">福祉事務所の一覧（厚生労働省。Excelの一覧があります）</a>もあります。電話番号は、市区町村の公式ページで確かめてください。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
+<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）へ。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。</p>
+<ul>
+<li>伝えること：「生活保護の相談をしたい」「今日困っている」。予約がなくてもかまいません。</li>
+<li>探し方：<a href="#city">市区町村名を入力する</a>と、検索ボタンが出ます（ほかの質問は飛ばせます）。<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html" rel="noopener">福祉事務所の一覧（厚生労働省。Excelの一覧があります）</a>もあります。</li>
+<li>電話番号は、市区町村の公式ページで確かめます。見つからないときは、役所の代表番号に電話します。</li>
+</ul>
 <p class="notice-h">命の危険があるとき</p>
 <ul>
 <li>暴力などの危険が迫っていて、警察にすぐ来てほしいとき：<a href="tel:110">110番</a></li>
@@ -403,7 +416,7 @@ BODY = f"""
 <details class="more"><summary>手持ちのお金がほとんどないとき：生活保護</summary><div class="more-body">
 <ul>
 <li>相談できます。窓口は、市区町村の福祉事務所です。</li>
-<li>失業給付などほかの収入があっても、国が決める最低限の生活費に足りなければ、足りない分が支給される仕組みです（厚生労働省）。</li>
+<li>失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです（厚生労働省）。</li>
 </ul>
 </div></details>
 
@@ -656,7 +669,7 @@ SCRIPT = r"""<script>
   var QS = ["why", "ins", "kenpo", "money"];
   function answerText(n) {
     var c = document.querySelector('input[name="' + n + '"]:checked');
-    return c ? c.parentNode.textContent : "";
+    return c ? c.parentNode.querySelector("span").firstChild.nodeValue : "";  // 主文だけ（補足は出さない）
   }
   function updateSummaries() {
     QS.forEach(function (n) {
@@ -775,9 +788,10 @@ def render() -> dict[str, str]:
 <div class="brandrow topbar">{LOGO}<span class="brandname"><a class="brand" href="{up}">くらしの非常口</a><span class="tag">仕事を失ったとき</span></span><!--site-menu--></div>
 <header class="hero hero-sub">
  <h1>仕事を失った・辞めたとき<br><em>まずやる手続き</em>と期限</h1>
- <p class="lead">健康保険と年金の手続きには、退職日の翌日から14日・20日という期限があります。失業給付は、離職票が届いたらハローワークへ。お金が足りないときの相談先も、このページにあります。</p>
+ <p class="lead">健康保険と年金の手続きには、退職日の翌日から14日・20日という期限があります。質問に答えると、あなたの場合の手順と期限の日付が出ます。</p>
  {SIGN}
 </header>
+<nav class="btn-row jumps" aria-label="このページの近道"><a class="btn" href="#tool-h">自分の手順を出す ↓</a><a class="btn" href="#toc-h">手続きの一覧 ↓</a></nav>
 {SAFETY}
 <main id="main" class="prose">
 {BODY.replace("{up}", up)}

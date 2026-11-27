@@ -12,7 +12,7 @@
 const vm = require('node:vm');
 
 // 書き込む場所（id）。何も選んでいない状態でプログラムが入れる中身と同じものを入れる。
-const TARGETS = ['questions', 'afterOpts', 'srcList', 'urgentOut', 'firstOut', 'findOut', 'candOut', 'exclOut', 'planOut'];
+const TARGETS = ['questions', 'afterOpts', 'srcList', 'urgentOut', 'firstOut', 'findOut', 'firstSay', 'candOut', 'exclOut', 'planOut'];
 // 窓口が開いている平日の昼（2026-11-18 水曜 10:00 日本時間）として作る。
 // 「いまは役所が閉まっている時間かもしれません」のような、開いた時刻で変わる文を本文に固定しないため。
 const WHEN = '2026-11-18T01:00:00Z';

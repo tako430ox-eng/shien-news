@@ -51,6 +51,15 @@ a:hover { text-decoration-thickness: 3px; }
 .chip[aria-current="page"] { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-primary-ink); }
 .chip[aria-current="page"]::before { content: "✓"; }
 .chip .n { font-family: var(--f-num); font-size: var(--fs-small); font-weight: 400; }
+/* 分野で絞る（2026-11-28 外部レビュー 5）：分野ボタンを押すと開く欄にまとめる。閉じていても「いま：○○」で今の分野が分かる */
+details.filter > summary { list-style: none; cursor: pointer; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--s-3); min-height: 48px; padding: 8px 48px 8px 16px; border: 1px solid var(--c-line-strong); border-radius: var(--r-sm); background: var(--c-surface); color: var(--c-ink); font-weight: 700; line-height: 1.5; }
+details.filter > summary::-webkit-details-marker { display: none; }
+details.filter > summary::after { content: ""; position: absolute; right: 20px; top: 50%; width: 10px; height: 10px; margin-top: -8px; border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(45deg); }
+details.filter[open] > summary::after { transform: rotate(225deg); margin-top: -3px; }
+details.filter > summary:hover { border-color: var(--c-ink); }
+details.filter .now { font-weight: 400; color: var(--c-ink-soft); }
+details.filter > .chips { margin-top: var(--s-3); }
+@media print { details.filter { display: none; } }
 
 /* ---- 新着の一覧 ---- */
 .day { font-size: var(--fs-h3); display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-4); }
@@ -180,6 +189,8 @@ th, td { border: 1px solid var(--c-line-strong); padding: var(--s-2); text-align
 .choose .opt input:checked + span { background: var(--c-primary-soft); border-color: var(--c-primary); box-shadow: inset 0 0 0 1px var(--c-primary); }
 .choose .opt input:checked + span::before { border: 7px solid var(--c-primary); }
 .choose .opt input:focus-visible + span { outline: 3px solid var(--c-link); outline-offset: 2px; }
+/* 長い選択肢は主文＋補足（2026-11-28 外部レビュー 3）。補足は下の行に、補足の大きさ（16px）で */
+.opt .opt-sub { display: block; font-size: var(--fs-small); line-height: 1.6; color: var(--c-ink-soft); font-weight: 400; }
 .choose .field { display: grid; gap: var(--s-1); }
 .choose .field label { font-weight: 700; }
 .choose .field input[type="date"], .choose .field input[type="text"] { font: inherit; width: 100%; max-width: 20em; min-height: 48px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--c-ink); background: var(--c-surface); color: var(--c-ink); }
@@ -213,6 +224,14 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; } /* �
 .q-ans.set { color: var(--c-ink); font-weight: 700; }
 .q-ans.set::before { content: "✓ "; color: var(--c-primary); }
 .q-ans:empty { display: none; }
+/* スマホでは「選ぶ道具」の外枠をやめ、枠の重なりを1段減らして選択肢の文の幅を確保する（外側の枠・質問の枠・選択肢の枠の3重だった） */
+@media (max-width: 40rem) {
+  .choose { background: transparent; border: 0; border-radius: 0; padding: 0; }
+  .choose details.q > summary { padding-left: 12px; }
+  .choose details.q > fieldset { padding: 0 12px 12px; }
+  .choose .opt span { padding: 11px 12px 11px 48px; }
+  .choose .opt span::before { left: 12px; }
+}
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* 一部の人だけが読む補足を畳む（GOV.UK Design System の Details）。押せる見出しは下線つきの文字と、左の向きの印。
@@ -239,3 +258,5 @@ details.more + details.more { margin-top: calc(-1 * var(--s-2)); }
 /* 上に出たままの行（.topbar、assets/menu.css）を低く保つ：幅の狭いスマホでは、看板の札（「支える人へ」など）を出さない。
    札と同じことは大見出し（h1）に書いてある。家賃編の「試作版」は家賃編の中で決める */
 @media (max-width: 26.5rem) { .topbar .brandname .tag { display: none; } }
+/* ページの上の近道（.btn-row.jumps）：2つを1行に収めるため、ボタンの左右の余白だけ詰める（高さ 48px は保つ） */
+.jumps .btn { padding: 8px 12px; }

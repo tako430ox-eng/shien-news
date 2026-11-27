@@ -73,7 +73,7 @@ test('Yorisoi distinguishes main and foreign-language hours wherever offered',()
     ['2026-11-23T01:00:00Z',{after:'notyet'},'renderAfter','afterOut'],
   ];
   for(const [time,state,method,id] of cases){
-    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML;
+    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML+(id==='firstOut'?el('firstSay').innerHTML:'');
     assert.match(out,/一般の電話相談は24時間.*外国語の電話相談は毎日10時〜22時.*対応する言語/);
     assert.match(out,/href="https:\/\/www\.since2011\.net\/yorisoi\/n2\//);
     assert.equal((out.match(/href="tel:0120279338"/g)||[]).length,1);
@@ -106,7 +106,7 @@ test('eviction keeps two independent opening windows and an official closed-hour
 });
 test('Yorisoi shows the Fukushima and IP-phone numbers wherever offered (recheck 2026-11-21)',()=>{
   for(const [time,state,method,id] of [['2026-11-23T01:00:00Z',{safety:{life:true}},'renderUrgent','urgentOut'],['2026-11-23T01:00:00Z',{},'renderFirst','firstOut'],['2026-11-23T01:00:00Z',{after:'notyet'},'renderAfter','afterOut']]){
-    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML;
+    const {a,el}=appAt(time);a.setState(state);a[method]();const out=el(id).innerHTML+(id==='firstOut'?el('firstSay').innerHTML:'');
     assert.match(out,/福島県からは 0120-279-226/);assert.match(out,/IP電話からは 050-3655-0279/);
   }
   assert.match(html,/第6\.[2-9]版、2026年11月2\d日更新/);
@@ -137,3 +137,15 @@ test('emergency contacts and quick exit work without JavaScript (review 1)',()=>
 test('rent arrears are not covered by the housing benefit, and that is said (review 5)',()=>{const {a,el}=appAt();
   a.setState({a:{rent:'late2'}}); const d=a.decide(); a.renderCandidates(d); assert.match(el('candOut').innerHTML,/滞納分）にはあてられません/);
   a.renderPlan(d); assert.match(el('planOut').innerHTML,/滞納分）にはあてられません/);});
+
+test('ordinary first step: action, then city search, then the script to say (external review 2026-11-28 #2)',()=>{
+  const {a,el}=appAt('2026-11-23T01:00:00Z');a.setState({});a.renderFirst();
+  assert.doesNotMatch(el('firstOut').innerHTML,/say_first_call/);
+  assert.match(el('firstOut').innerHTML,/閉まっている時間/);
+  assert.match(el('firstSay').innerHTML,/say_first_call/);
+  assert.match(el('firstSay').innerHTML,/スクリーンショット/);
+  const i=html.indexOf('id="city"'), j=html.indexOf('id="firstSay"');
+  assert.ok(i>0 && j>i,'言う文の欄は市区町村の欄より後');
+  // 退去・DV・緊急では、選んだ状況の文と連絡先を先頭にまとめる
+  a.setState({a:{rent:'evict'}});a.renderFirst();assert.equal(el('firstSay').innerHTML,'');assert.match(el('firstOut').innerHTML,/法テラス/);
+});

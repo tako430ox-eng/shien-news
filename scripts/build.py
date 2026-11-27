@@ -436,7 +436,11 @@ class Site:
         for it in self.useful:
             for t in it["topics"]:
                 counts[t] = counts.get(t, 0) + 1
-        out = ['<nav class="chips" aria-label="分野で絞る">']
+        # 2026-11-28 外部レビュー 5：スマホで分野ボタン（11個）が縦に長く並び、記事がなかなか見えなかった。
+        # 押すと開く「分野で絞る」にまとめ、今の分野は閉じたままでも見出しの文で分かるようにする（スクリプトなしで動く <details>）
+        now = "すべて" if current is None else self.topics.get(current, {}).get("label", "")
+        out = [f'<details class="filter"><summary>分野で絞る<span class="now">いま：{e(now)}</span></summary>',
+               '<nav class="chips" aria-label="分野で絞る">']
         cls = ' aria-current="page"' if current is None else ""
         out.append(f'<a class="chip" href="{up}index.html"{cls}>すべて</a>')
         for slug, t in self.topics.items():
@@ -444,7 +448,7 @@ class Site:
                 continue
             cls = ' aria-current="page"' if current == slug else ""
             out.append(f'<a class="chip" href="{up}t/{slug}.html"{cls}>{e(t["label"])}<span class="n">新着{counts.get(slug, 0)}件</span></a>')
-        out.append("</nav>")
+        out.append("</nav></details>")
         return "\n".join(out)
 
     def card(self, it: dict, depth: int) -> str:
@@ -460,7 +464,7 @@ class Site:
                          f'<p>{e(note["text"])}</p></div>')
         src = self.sources.get(it["source"], {})
         return f"""<li class="card kind-{e(it['kind'])}">
- <p class="meta"><span class="kind" title="{e(k['hint'])}">{e(k['label'])}</span><span class="src">{e(it['source_name'])}</span><time datetime="{e(it.get('published') or '')}">{e(jdate(it.get('published')))}</time></p>
+ <p class="meta"><span class="kind" title="{e(k['hint'])}">{e(k['label'])}</span><span class="src">{e(it['source_name'])}</span></p>
  <h3 class="title"><a href="{e(it['url'])}" rel="noopener">{e(it['title'])}</a></h3>
  {f'<p class="hint">{e(k["hint"])}</p>' if k.get('hint') else ''}
  {note_html}
@@ -558,13 +562,13 @@ class Site:
         body.append(self.source_warnings())
         body.append(self.guides_html())
         # 2026-11-21 コタローさんの判断：トップの主役は3つの入口。新着はその下に続ける
-        body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページに出た新着を、1日2回自動で集めています。暮らし・住まい・仕事・子ども・外国籍の人などに関わるものだけを選び、見出しは公式のまま載せています。分野で絞り込めます。お知らせの種類と分野は、見出しの言葉からプログラムが自動で付けたもので、間違うことがあります。</p>')
+        body.append('<h2 class="sec" id="news">国の支援の新着</h2><p class="small">国の機関の公式ページから1日2回、暮らしに関わる新着を自動で集めています。見出しは公式のままです。種類と分野はプログラムが見出しの言葉で付けたもので、間違うことがあります。</p>')
         body.append(self.chips(0, None))
         body.append(self.deadlines_html())
-        body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{("制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.rules.get("useful_kinds") else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。コンクール・表彰式・イベントなどの行事は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。") if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')
+        body.append(f'<h2 class="sec">暮らしに役立つお知らせ</h2><p class="small">{("制度の変更、申請や募集、相談窓口、注意の呼びかけの4種類だけを載せています。行事や広報は「そのほかのお知らせ」に、会議の開催は「国で話し合っていること」に分けています。" if self.rules.get("useful_kinds") else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。行事は「そのほかのお知らせ」、会議の開催は「国で話し合っていること」に分けています。") if self.other else "制度の変更、申請や募集、相談窓口、注意の呼びかけなど。会議の開催は下の「国で話し合っていること」に分けています。"}</p>')
         body.append(self.list_by_day(self.useful, 0, limit=60))
         if len(self.useful) > 60:
-            body.append('<p class="more">もっと前のお知らせは、上の分野ボタンから見られます。</p>')
+            body.append('<p class="more">もっと前のお知らせは、「分野で絞る」から分野を選ぶと見られます。</p>')
         body.append(self.other_box(0, self.other))
         body.append(self.talk_box(0, self.talk))
         body.append(self.help_html(0))

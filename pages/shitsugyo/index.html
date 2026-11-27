@@ -22,13 +22,18 @@
 <div class="brandrow topbar"><svg class="logo" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><rect x="7" y="3" width="17" height="25" rx="2" fill="var(--c-sign-accent)" stroke="var(--c-sign-ink)" stroke-width="2.5"/><path d="M7 3 L15 6 L15 30 L7 28 Z" fill="var(--c-sign-ink)"/><circle cx="13" cy="17" r="1.4" fill="var(--c-sign)"/></svg><span class="brandname"><a class="brand" href="../">くらしの非常口</a><span class="tag">仕事を失ったとき</span></span><!--site-menu--></div>
 <header class="hero hero-sub">
  <h1>仕事を失った・辞めたとき<br><em>まずやる手続き</em>と期限</h1>
- <p class="lead">健康保険と年金の手続きには、退職日の翌日から14日・20日という期限があります。失業給付は、離職票が届いたらハローワークへ。お金が足りないときの相談先も、このページにあります。</p>
+ <p class="lead">健康保険と年金の手続きには、退職日の翌日から14日・20日という期限があります。質問に答えると、あなたの場合の手順と期限の日付が出ます。</p>
  <svg class="sign-path" viewBox="0 0 360 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 34 C 90 34, 150 10, 330 14" stroke="var(--c-sign-accent)" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M0 34 C 90 34, 150 10, 330 14" stroke="rgba(0,0,0,0.22)" stroke-width="10" fill="none" stroke-dasharray="2 6"/></svg>
 </header>
-<div class="notice">
+<nav class="btn-row jumps" aria-label="このページの近道"><a class="btn" href="#tool-h">自分の手順を出す ↓</a><a class="btn" href="#toc-h">手続きの一覧 ↓</a></nav>
+<div class="notice" id="kinkyu">
 <p class="notice-h">今夜寝る場所がない、今日食べるものやお金がないとき</p>
-<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）に、今日困っていることを伝えてください。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです。</p>
-<p>探し方：<a href="#city">市区町村名を入力する</a>と、その下に「生活保護の相談窓口を探す」ボタンが出ます。ほかの質問は飛ばせます。<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html" rel="noopener">福祉事務所の一覧（厚生労働省。Excelの一覧があります）</a>もあります。電話番号は、市区町村の公式ページで確かめてください。見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。予約がなくても、今日困っていることを先に伝えてかまいません。</p>
+<p>この先の手続きより先に、お住まいの地域の<b>福祉事務所</b>（生活保護の相談窓口）へ。住むところがない場合は、今いる場所の近くの福祉事務所に相談・申請できます（厚生労働省）。</p>
+<ul>
+<li>伝えること：「生活保護の相談をしたい」「今日困っている」。予約がなくてもかまいません。</li>
+<li>探し方：<a href="#city">市区町村名を入力する</a>と、検索ボタンが出ます（ほかの質問は飛ばせます）。<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html" rel="noopener">福祉事務所の一覧（厚生労働省。Excelの一覧があります）</a>もあります。</li>
+<li>電話番号は、市区町村の公式ページで確かめます。見つからないときは、役所の代表番号に電話します。</li>
+</ul>
 <p class="notice-h">命の危険があるとき</p>
 <ul>
 <li>暴力などの危険が迫っていて、警察にすぐ来てほしいとき：<a href="tel:110">110番</a></li>
@@ -58,7 +63,7 @@
 <section id="tool" class="choose stack" aria-labelledby="tool-h">
 <h2 id="tool-h">あなたの場合を選ぶ（どれも任意）</h2>
 <p class="small">選ぶと、すぐ下に「今日やること」と期限の日付が出ます。質問の回答と退職日はこの画面の中だけで使い、保存しません。</p>
-<details class="q" id="qd_why" open><summary><span class="q-label">1. 辞めた理由</span><span class="q-ans" id="qa_why"></span></summary><fieldset><legend class="sr-only">1. 辞めた理由</legend><div class="opts"><label class="opt"><input type="radio" name="why" value="company"><span>会社の都合（解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた）</span></label><label class="opt"><input type="radio" name="why" value="self"><span>自分から辞めた</span></label><label class="opt"><input type="radio" name="why" value="notyet"><span>まだ辞めていない（辞めるように言われている）</span></label><label class="opt"><input type="radio" name="why" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_ins" open><summary><span class="q-label">2. 雇用保険</span><span class="q-ans" id="qa_ins"></span></summary><fieldset><legend class="sr-only">2. 雇用保険</legend><div class="opts"><label class="opt"><input type="radio" name="ins" value="yes"><span>入っていた（給与明細で「雇用保険」が引かれていた）</span></label><label class="opt"><input type="radio" name="ins" value="no"><span>雇われていたが、入っていなかった</span></label><label class="opt"><input type="radio" name="ins" value="self"><span>自営業やフリーランスだった</span></label><label class="opt"><input type="radio" name="ins" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_kenpo" open><summary><span class="q-label">3. 辞める前の健康保険</span><span class="q-ans" id="qa_kenpo"></span></summary><fieldset><legend class="sr-only">3. 辞める前の健康保険</legend><div class="opts"><label class="opt"><input type="radio" name="kenpo" value="company"><span>会社の健康保険（保険証に協会けんぽや健康保険組合の名前）</span></label><label class="opt"><input type="radio" name="kenpo" value="kokuho"><span>もともと市区町村の国民健康保険</span></label><label class="opt"><input type="radio" name="kenpo" value="family"><span>家族の健康保険の扶養に入っている</span></label><label class="opt"><input type="radio" name="kenpo" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_money" open><summary><span class="q-label">4. お金</span><span class="q-ans" id="qa_money"></span></summary><fieldset><legend class="sr-only">4. お金</legend><div class="opts"><label class="opt"><input type="radio" name="money" value="short"><span>家賃や今月の生活費が足りない・足りなくなりそう</span></label><label class="opt"><input type="radio" name="money" value="ok"><span>しばらくは暮らせる</span></label></div></fieldset></details><div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>
+<details class="q" id="qd_why" open><summary><span class="q-label">1. 辞めた理由</span><span class="q-ans" id="qa_why"></span></summary><fieldset><legend class="sr-only">1. 辞めた理由</legend><div class="opts"><label class="opt"><input type="radio" name="why" value="company"><span>会社の都合<small class="opt-sub">解雇・倒産・契約が更新されなかった・辞めるよう強く勧められた</small></span></label><label class="opt"><input type="radio" name="why" value="self"><span>自分から辞めた</span></label><label class="opt"><input type="radio" name="why" value="notyet"><span>まだ辞めていない<small class="opt-sub">辞めるように言われている</small></span></label><label class="opt"><input type="radio" name="why" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_ins" open><summary><span class="q-label">2. 雇用保険</span><span class="q-ans" id="qa_ins"></span></summary><fieldset><legend class="sr-only">2. 雇用保険</legend><div class="opts"><label class="opt"><input type="radio" name="ins" value="yes"><span>入っていた<small class="opt-sub">給与明細で「雇用保険」が引かれていた</small></span></label><label class="opt"><input type="radio" name="ins" value="no"><span>雇われていたが、入っていなかった</span></label><label class="opt"><input type="radio" name="ins" value="self"><span>自営業やフリーランスだった</span></label><label class="opt"><input type="radio" name="ins" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_kenpo" open><summary><span class="q-label">3. 辞める前の健康保険</span><span class="q-ans" id="qa_kenpo"></span></summary><fieldset><legend class="sr-only">3. 辞める前の健康保険</legend><div class="opts"><label class="opt"><input type="radio" name="kenpo" value="company"><span>会社の健康保険<small class="opt-sub">保険証に協会けんぽや健康保険組合の名前</small></span></label><label class="opt"><input type="radio" name="kenpo" value="kokuho"><span>もともと市区町村の国民健康保険</span></label><label class="opt"><input type="radio" name="kenpo" value="family"><span>家族の健康保険の扶養に入っている</span></label><label class="opt"><input type="radio" name="kenpo" value="unknown"><span>分からない</span></label></div></fieldset></details><details class="q" id="qd_money" open><summary><span class="q-label">4. お金</span><span class="q-ans" id="qa_money"></span></summary><fieldset><legend class="sr-only">4. お金</legend><div class="opts"><label class="opt"><input type="radio" name="money" value="short"><span>家賃や今月の生活費が足りない・足りなくなりそう</span></label><label class="opt"><input type="radio" name="money" value="ok"><span>しばらくは暮らせる</span></label></div></fieldset></details><div class="field"><label for="leave">5. 最後に在籍した日（退職日）</label><input type="date" id="leave"></div>
 <div class="field">
   <label for="city">6. 窓口を探す市区町村（任意）</label>
   <div id="cityHint">
@@ -248,7 +253,7 @@
 <details class="more"><summary>手持ちのお金がほとんどないとき：生活保護</summary><div class="more-body">
 <ul>
 <li>相談できます。窓口は、市区町村の福祉事務所です。</li>
-<li>失業給付などほかの収入があっても、国が決める最低限の生活費に足りなければ、足りない分が支給される仕組みです（厚生労働省）。</li>
+<li>失業給付など、ほかの制度で受け取れるお金があるときはまずそれを使い、それでも国が決める最低限の生活費に足りない分が支給される仕組みです（厚生労働省）。</li>
 </ul>
 </div></details>
 
@@ -503,7 +508,7 @@
   var QS = ["why", "ins", "kenpo", "money"];
   function answerText(n) {
     var c = document.querySelector('input[name="' + n + '"]:checked');
-    return c ? c.parentNode.textContent : "";
+    return c ? c.parentNode.querySelector("span").firstChild.nodeValue : "";  // 主文だけ（補足は出さない）
   }
   function updateSummaries() {
     QS.forEach(function (n) {

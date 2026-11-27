@@ -1449,9 +1449,11 @@ class TestSearch(unittest.TestCase):
         y = (out / "yachin" / "index.html").read_text(encoding="utf-8")
         src = (ROOT / "pages" / "yachin" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<div id="firstOut" class="stack" aria-live="polite"></div>', src)  # 正本は書き換えない
-        first = y[y.index('id="firstOut"'):y.index('id="city"')]
+        # 今日やること：やること（#firstOut）→ 市区町村の欄 → 電話で言う文（#firstSay）の順（2026-11-28 外部レビュー 2）
+        first = y[y.index('id="firstOut"'):y.index('id="situation"')]
         self.assertIn("自立相談支援機関", first)
         self.assertIn("家賃のことで相談したくて電話しました", first)
+        self.assertLess(y.index('id="city"'), y.index("家賃のことで相談したくて電話しました"))
         self.assertNotIn("閉まっている時間", first)  # 開いた時刻で変わる文は固定しない
         plan = y[y.index('id="planOut"'):y.index('id="candidates"')]
         self.assertIn("持ち物をそろえる", plan)
