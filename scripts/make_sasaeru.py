@@ -35,8 +35,8 @@ SRC = {
              "https://www.mhlw.go.jp/content/000746078.pdf", "2026-11-16"),
     "fuyoQA": ("厚生労働省 社会・援護局保護課長：事務連絡「『生活保護問答集について』の一部改正について」（令和3年2月26日、3月1日から適用）",
                "https://www.mhlw.go.jp/content/000746075.pdf", "2026-11-16"),
-    "fukushiList": ("厚生労働省：福祉事務所一覧（Excel）",
-                    "https://www.mhlw.go.jp/content/000801479.xlsx", "2026-11-16"),
+    "fukushiList": ("厚生労働省：福祉事務所一覧の掲載ページ",
+                    "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html", "2026-11-28"),
     "jukyo": ("厚生労働省：住居確保給付金（家賃補助）の制度概要",
               "https://corona-support.mhlw.go.jp/jukyokakuhokyufukin/index.html", "2026-11-16"),
     "jukyoKisoku": ("厚生労働省：生活困窮者自立支援法施行規則 第10条（離職・廃業から2年。病気・けが・育児などで30日以上求職活動ができなかった日数を足す。最長4年）",
@@ -99,7 +99,7 @@ SAFETY = ('<div class="notice">'
           '本人がいま居る場所の近くの<b>福祉事務所</b>（市区町村の生活保護の窓口）に、そのことを最初に伝えてください。'
           '住むところがなくても、生活保護は申請できます（厚生労働省）。'
           '夜間や休日に電話がつながる窓口は、地域によって違います。</p>'
-          '<p>探し方：「（市区町村名） 福祉事務所」で検索するか、<a href="https://www.mhlw.go.jp/content/000801479.xlsx" rel="noopener">福祉事務所の名前の一覧（厚生労働省、Excel）</a>を見ます。電話番号は市区町村の公式ページで確かめます。'
+          '<p>探し方：「（市区町村名） 福祉事務所」で検索するか、<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/seikatsuhogo/fukusijimusyo/index.html" rel="noopener">福祉事務所の一覧（厚生労働省。Excelの一覧があります）</a>を見ます。電話番号は市区町村の公式ページで確かめます。'
           '見つからないときは、役所の代表番号に電話して「生活保護の相談をしたい」と伝えます。'
           '<a href="{up}sasaeru/seikatsuhogo/">生活保護の相談のしかた</a></p></div>')
 
