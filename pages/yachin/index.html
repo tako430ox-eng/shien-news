@@ -207,7 +207,7 @@ details.cand[open] > summary::after { transform: rotate(225deg); top: 26px; }
 .tip { background: var(--c-sunken); border-radius: var(--r-md); padding: var(--s-4); }
 .survey { border: 1.5px solid var(--c-line-strong); border-radius: var(--r-md); padding: var(--s-4); }
 .survey-link { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
-.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--s-3); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); gap: var(--s-3); }
 
 /* ---- たためる箱・ページの終わり ---- */
 details { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-sm); padding: 0 14px; }
@@ -244,7 +244,7 @@ footer { display: grid; gap: var(--s-3); border-top: 1px solid var(--c-line); pa
 @media (min-width: 44rem) { .hero { border-radius: 0 0 var(--r-md) var(--r-md); } }
 .brandrow { display: flex; align-items: center; gap: 8px; }
 .brandrow .logo { width: 30px; height: 30px; flex: none; }
-.brandrow .brand { font-family: var(--f-display); font-weight: 900; font-size: 1.0625rem; letter-spacing: 0.06em; }
+.brandrow .brand { font-family: var(--f-display); font-weight: 900; font-size: 1.0625rem; letter-spacing: 0.06em; min-width: 0; overflow-wrap: anywhere; }
 .brandrow .tag { margin-left: auto; font-size: 0.8125rem; font-weight: 700; color: var(--c-sign-ink); border: 1px solid rgba(255,255,255,0.6); padding: 0 10px; border-radius: var(--r-pill); }
 .hero h1 { font-weight: 900; line-height: 1.3; letter-spacing: 0; font-size: clamp(1.5rem, 7.2vw, 2.5rem); }
 .hero h1 em { font-style: normal; color: var(--c-sign-accent); }
@@ -350,12 +350,29 @@ a { text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   .hero h1 { font-size: 1.625rem; }  /* 26px（決まった段の一つ下）。28px だと2行目が折り返して3行になる */
   .tiles { gap: 6px; }
   .tiles .opt span { padding: 6px 10px; font-size: var(--fs-small); }
+  .hero + #safety { margin-top: calc(-1 * var(--s-2)); } /* 看板との間 16→8px（ボタンの影 3px の分も帯にかからないように） */
+  #safety { gap: var(--s-2); } /* 2026-11-28 再確認 2：360×640 で4つ目のボタンの下端が帯に重なっていた。文字と押せる大きさは変えず、説明の文を1行に収め（読点を1つ省く）、見出しとボタンの間を 12→8px に */
 }
 
 /* 幅320px・文字拡大のとき（2026-11-19）：「すぐ閉じる」を1行に保って帯を低くし、フォーカスが帯に隠れないよう余白を文字の大きさに合わせる（WCAG 2.4.11） */
 html { scroll-padding-bottom: calc(5.5rem + 16px); }
 .exit-bar > span { min-width: 0; word-break: auto-phrase; }
 .quick-exit { flex: none; white-space: nowrap; }
+/* 2026-11-28 外部レビュー（再確認）1：文字を大きくすると「人に見られそうなときは」が細かく折り返し、帯が 235px（幅320pxで343px）まで高くなっていた。
+   帯の幅を文字の大きさ（em）で測り（コンテナクエリ。ブラウザの文字の拡大にも反応する）、入らないときは短い文に、それでも入らないときは文をボタンの上の1行に置く。
+   文字は縮めない。ボタンは常に右下に同じ形で出す */
+.exit-bar { container: exitbar / inline-size; display: block; }
+.exit-in { display: flex; justify-content: flex-end; align-items: center; gap: var(--s-1) var(--s-3); }
+.exit-note { min-width: 0; word-break: auto-phrase; }
+.exit-short { display: none; }
+@container exitbar (max-width: 19em) { .exit-long { display: none; } .exit-short { display: inline; } }
+@container exitbar (max-width: 15em) { .exit-in { flex-wrap: wrap; } .exit-note { flex: 1 0 100%; text-align: right; } }
+/* 本文の最後と、キーボードで移った先が帯に隠れないよう、帯の高さ（文字の大きさで変わる）に合わせて余白をとる */
+.page { padding-bottom: max(112px, calc(6.5rem + 24px)); }
+/* 文字2倍＋幅320pxで、日付の入力欄（#payday・#nextDate）の最小幅がページの幅を押し広げ、ページ全体が 9px 横にはみ出していた。
+   格子の中の部品が中身の最小幅より縮めるようにし、入力欄は欄の幅に合わせる */
+.page > *, .stack-lg > *, .first > *, .stack > *, .field > * { min-width: 0; }
+.field input, textarea { min-width: 0; max-width: 100%; }
 /* 文字拡大＋幅320pxで横にはみ出さないように（WCAG 1.4.10）：文節が欄より長いときだけ文節の中で折り返す */
 .plan > li { grid-template-columns: minmax(0, 1fr); }
 .plan > li > *, fieldset, legend { min-width: 0; max-width: 100%; }
@@ -363,7 +380,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
-<div class="exit-bar"><span class="small muted">人に見られそうなときは</span><a class="quick-exit" id="quickExit" href="https://tenki.jp/" rel="noreferrer">すぐ閉じる</a></div>
+<div class="exit-bar"><div class="exit-in"><span class="small muted exit-note"><span class="exit-long">人に見られそうなときは</span><span class="exit-short">見られそうなとき</span></span><a class="quick-exit" id="quickExit" href="https://tenki.jp/" rel="noreferrer">すぐ閉じる</a></div></div>
 <div class="cover" id="cover" hidden><p>天気予報</p><p class="small">読み込んでいます…</p></div>
 <div class="page" id="pageMain" lang="ja">
 
@@ -384,7 +401,7 @@ legend, summary, .step-body { overflow-wrap: anywhere; }
   <section id="safety" class="stack-lg" aria-labelledby="safety-h">
     <div class="section-head">
       <h2 id="safety-h">いま、こんなことはありますか</h2>
-      <p>当てはまるものを押すと、相談先が出ます。</p>
+      <p>当てはまるものを押すと相談先が出ます。</p>
     </div>
     <div class="opts tiles" role="group" aria-label="今すぐの危険">
       <label class="opt"><input type="checkbox" id="s_night" data-safety="night"><span>今夜、寝る場所がない</span></label>
